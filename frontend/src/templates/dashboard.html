@@ -21,7 +21,7 @@
             </div>
             <div class="flex items-center space-x-4">
               <button
-                hx-get="http://localhost:8000/htmx/wallets/add/"
+                hx-get="/htmx/wallets/add/"
                 hx-target="#modal-content"
                 hx-swap="innerHTML"
                 onclick="document.getElementById('modal').classList.remove('hidden')"
@@ -44,7 +44,7 @@
       <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Portfolio Summary -->
         <div
-          hx-get="http://localhost:8000/htmx/portfolio/summary/"
+          hx-get="/htmx/portfolio/summary/"
           hx-trigger="load"
           hx-target="this"
           hx-swap="innerHTML"
@@ -86,7 +86,7 @@
           <!-- Transaction History (2/3 width) -->
           <div class="lg:col-span-2">
             <div
-              hx-get="http://localhost:8000/htmx/transactions/"
+              hx-get="/htmx/transactions/"
               hx-trigger="load"
               hx-target="this"
               hx-swap="innerHTML"
@@ -111,7 +111,7 @@
               <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <h2 class="text-lg font-medium">My Wallets</h2>
                 <button
-                  hx-get="http://localhost:8000/htmx/wallets/add/"
+                  hx-get="/htmx/wallets/add/"
                   hx-target="#modal-content"
                   hx-swap="innerHTML"
                   onclick="document.getElementById('modal').classList.remove('hidden')"
@@ -121,7 +121,7 @@
                 </button>
               </div>
               <div
-                hx-get="http://localhost:8000/htmx/wallets/"
+                hx-get="/htmx/wallets/"
                 hx-trigger="load"
                 hx-target="this"
                 hx-swap="innerHTML"

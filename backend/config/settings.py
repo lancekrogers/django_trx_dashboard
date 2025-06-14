@@ -132,10 +132,25 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite dev server
     "http://127.0.0.1:5173",
+    "http://localhost:5174",  # Alternative Vite port
+    "http://127.0.0.1:5174",
 ]
 
 # Allow credentials to be included in CORS requests (needed for auth)
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF Configuration for HTMX
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+]
+
+# Session cookie settings for development
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read CSRF cookie
 
 # Additional CORS headers for SSE
 CORS_ALLOW_HEADERS = [

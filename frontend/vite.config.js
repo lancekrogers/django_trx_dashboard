@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'path'
 
 export default defineConfig({
   root: 'src',
@@ -7,7 +8,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: '/templates/dashboard.html'
+        main: resolve(__dirname, 'src/templates/dashboard.html'),
+        login: resolve(__dirname, 'src/templates/login.html')
       }
     }
   },
@@ -15,6 +17,10 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true
+      },
+      '/htmx': {
         target: 'http://localhost:8000',
         changeOrigin: true
       }

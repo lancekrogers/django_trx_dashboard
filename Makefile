@@ -68,20 +68,16 @@ run-backend: ## Run Django development server
 run-frontend: ## Run Vite development server
 	cd frontend && npm run dev
 
-run-all: ## Run both servers in parallel (requires GNU parallel or tmux)
-	@if command -v tmux >/dev/null 2>&1; then \
-		echo "Starting servers in tmux..."; \
-		tmux new-session -d -s portfolio || true; \
-		tmux send-keys -t portfolio:0 'cd backend && source .venv/bin/activate && python manage.py runserver' Enter; \
-		tmux split-window -t portfolio:0 -h; \
-		tmux send-keys -t portfolio:0.1 'cd frontend && npm run dev' Enter; \
-		tmux attach-session -t portfolio; \
-	else \
-		echo "tmux not found. Starting servers in background..."; \
-		$(MAKE) run-backend & \
-		$(MAKE) run-frontend & \
-		wait; \
-	fi
+run-all: ## Run both servers in parallel
+	@echo "Starting both servers..."
+	@echo "Backend: http://localhost:8000"
+	@echo "Frontend: http://localhost:5173"
+	@echo "Press Ctrl+C to stop both servers"
+	@echo ""
+	@trap 'kill %1 %2' INT; \
+	(cd backend && source .venv/bin/activate && python manage.py runserver) & \
+	(cd frontend && npm run dev) & \
+	wait
 
 # Test commands
 test: test-backend test-frontend ## Run all tests
@@ -151,7 +147,20 @@ clean-frontend: ## Clean frontend generated files
 	rm -rf node_modules dist .vite
 
 # Quick commands for common workflows
-dev: setup run-all ## Setup and run everything (first time setup)
+dev: ## Quick development setup and run
+	@echo "Setting up development environment..."
+	@$(MAKE) setup-backend
+	@$(MAKE) setup-frontend
+	@$(MAKE) mock-data
+	@echo ""
+	@echo "Setup complete! Starting servers..."
+	@$(MAKE) run-all
+
+dev-backend: ## Run backend only for development
+	cd backend && source .venv/bin/activate && python manage.py runserver
+
+dev-frontend: ## Run frontend only for development
+	cd frontend && npm run dev
 
 reset-db: ## Reset database (WARNING: destroys all data)
 	cd backend && \
