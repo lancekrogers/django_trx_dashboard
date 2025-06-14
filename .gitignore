@@ -1,6 +1,25 @@
+# Environment
 .envrc
 .direnv/
 .env
-*.swp
 .venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+
+# Django
+staticfiles/
+*.sqlite3
+*.db
+
+# IDE
+*.swp
+.vscode/
+.idea/
+
+# Docs (auto-generated)
 MAKEFILE_GUIDE.md

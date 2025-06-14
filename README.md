@@ -1,204 +1,118 @@
-# Multi-Chain Portfolio Dashboard
+# Portfolio Dashboard Backend
 
-A production-ready cryptocurrency portfolio tracker with real-time updates, supporting Ethereum, Solana, and Bitcoin.
+Django REST API for multi-chain cryptocurrency portfolio tracking.
 
 ## Features
 
-- 🔐 JWT authentication with email-based login
-- 💼 Multi-wallet support across different blockchains
-- 📊 Real-time portfolio value tracking with SSE
-- 📈 Interactive charts with Chart.js
-- 💸 Transaction history with filtering and pagination
-- 🎨 Responsive UI with HTMX and Tailwind CSS
-- ⚡ Fast development with uv and Vite
+- JWT Authentication
+- Multi-chain wallet support (Ethereum, Bitcoin, Solana)
+- Real-time portfolio updates via Server-Sent Events (SSE)
+- Transaction history with filtering and pagination
+- SQLite with performance optimizations
+- Mock data generation for testing
 
 ## Quick Start
 
 ### Prerequisites
 
 - Python 3.11+
-- Node.js 18+
-- uv (Python package manager)
-- direnv (optional, for automatic environment activation)
+- uv (for fast package management)
 
-### Using Make Commands
-
-The project includes a comprehensive Makefile for easy management:
+### Setup
 
 ```bash
-# Show all available commands
-make help
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# First time setup (creates venv, installs deps, runs migrations)
-make setup
+# Create and activate virtual environment
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Run both frontend and backend servers
-make run
+# Install dependencies
+uv sync
 
-# Or run servers individually
-make run-backend
-make run-frontend
-```
-
-### Manual Setup
-
-If you prefer manual setup:
-
-1. **Backend Setup:**
-```bash
-cd backend
-uv venv .venv
-source .venv/bin/activate
-uv pip install -r requirements/development.txt
+# Run migrations
 python manage.py migrate
-python manage.py createsuperuser  # Optional
-```
-
-2. **Frontend Setup:**
-```bash
-cd frontend
-npm install
-```
-
-## Common Commands
-
-### Development
-
-```bash
-# Run everything (setup + run servers)
-make dev
-
-# Check service status
-make status
 
 # Generate mock data
-make mock-data
+python manage.py generate_mock_data --users 3 --transactions 20
 
-# Open Django shell
-make shell
+# Create superuser (optional)
+python manage.py createsuperuser
 
-# Open API docs in browser
-make api-docs
+# Run development server
+python manage.py runserver
 ```
 
-### Database
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login/` - User login
+- `POST /api/auth/refresh/` - Refresh JWT token
+- `POST /api/auth/register/` - Register new user
+
+### Wallets
+- `GET /api/v1/wallets/` - List user wallets
+- `POST /api/v1/wallets/` - Add new wallet
+- `GET /api/v1/wallets/{id}/` - Get wallet details
+- `PATCH /api/v1/wallets/{id}/` - Update wallet
+- `DELETE /api/v1/wallets/{id}/` - Remove wallet
+
+### Portfolio
+- `GET /api/v1/portfolio/summary` - Get portfolio summary
+- `GET /api/v1/portfolio/history` - Historical portfolio values
+- `GET /api/v1/portfolio/wallets` - Individual wallet balances
+- `GET /api/v1/portfolio/stream` - SSE portfolio updates
+
+### Transactions
+- `GET /api/v1/transactions/` - List transactions (paginated)
+- `GET /api/v1/transactions/{id}/` - Transaction details
+- `GET /api/v1/transactions/stats` - Transaction statistics
+
+## Testing
+
+Run the API test script:
 
 ```bash
-# Run migrations
-make migrate
+# Start the server in one terminal
+python manage.py runserver
 
-# Create superuser
-make createsuperuser
-
-# Reset database (WARNING: destroys all data)
-make reset-db
+# In another terminal
+python test_api.py
 ```
 
-### Testing
+## Development
+
+### Project Structure
+
+```
+backend/
+├── config/          # Django settings and URLs
+├── apps/
+│   ├── authentication/  # JWT auth
+│   ├── wallets/        # Wallet management
+│   ├── portfolio/      # Portfolio calculations
+│   ├── transactions/   # Transaction history
+│   └── core/          # Shared utilities
+├── portfolio.db     # SQLite database
+└── manage.py
+```
+
+### Mock Data
+
+Generate test data:
 
 ```bash
-# Run all tests
-make test
-
-# Run backend tests only
-make test-backend
-
-# Run frontend tests only
-make test-frontend
-
-# Test authentication endpoints
-make api-test-auth
+python manage.py generate_mock_data --users 5 --transactions 100
 ```
 
-### Linting
+### API Documentation
 
-```bash
-# Run all linters
-make lint
+Visit http://localhost:8000/api/docs for interactive API documentation.
 
-# Backend linting (ruff + mypy)
-make lint-backend
+## Performance Notes
 
-# Frontend linting
-make lint-frontend
-```
-
-### Cleanup
-
-```bash
-# Clean all generated files
-make clean
-
-# Clean backend only
-make clean-backend
-
-# Clean frontend only
-make clean-frontend
-```
-
-## API Documentation
-
-Once the backend is running, visit http://localhost:8000/api/docs for interactive API documentation.
-
-### Key Endpoints
-
-- **Authentication**: `/api/auth/login/`, `/api/auth/register/`
-- **Wallets**: `/api/v1/wallets/`
-- **Portfolio**: `/api/v1/portfolio/summary`, `/api/v1/portfolio/stream`
-- **Transactions**: `/api/v1/transactions/`
-
-## Architecture
-
-### Backend (Django + Django-Ninja)
-- JWT authentication with djangorestframework-simplejwt
-- SQLite with performance optimizations (WAL mode)
-- Server-Sent Events for real-time updates
-- Caching layer for expensive calculations
-
-### Frontend (HTMX + Tailwind)
-- Server-driven UI with HTMX
-- Real-time updates via SSE
-- Chart.js for portfolio visualization
-- Responsive design with Tailwind CSS
-
-## Development Tips
-
-1. **Using direnv**: The project supports direnv for automatic environment activation. Run `direnv allow` in the project root.
-
-2. **Mock Data**: Use `make mock-data` to generate sample data for testing.
-
-3. **API Testing**: Use `make api-test-auth` to quickly test authentication endpoints.
-
-4. **Real-time Updates**: The portfolio stream endpoint (`/api/v1/portfolio/stream`) sends updates every 100ms (10Hz).
-
-5. **CORS**: Configured for `http://localhost:5173` (Vite dev server) in development.
-
-## Project Structure
-
-```
-multichain_trx_dashboard/
-├── Makefile              # Build automation
-├── backend/              # Django backend
-│   ├── authentication/   # JWT auth
-│   ├── wallets/         # Wallet models & API
-│   ├── portfolio/       # Portfolio calculations
-│   ├── transactions/    # Transaction history
-│   └── core/           # Shared utilities
-└── frontend/            # HTMX frontend
-    ├── src/
-    │   ├── css/        # Tailwind styles
-    │   ├── js/         # JavaScript modules
-    │   └── templates/  # HTMX templates
-    └── vite.config.js  # Vite configuration
-```
-
-## Troubleshooting
-
-- **Port already in use**: Kill existing processes or change ports in settings
-- **Migration errors**: Run `make reset-db` to start fresh
-- **CORS errors**: Ensure frontend is running on `http://localhost:5173`
-- **SSE not working**: Check browser console for connection errors
-
-## License
-
-MIT
+- SSE updates throttled to 10Hz maximum
+- Portfolio calculations cached for 1 minute
+- SQLite with WAL mode for better concurrency
+- Proper indexes on all foreign keys and query fields

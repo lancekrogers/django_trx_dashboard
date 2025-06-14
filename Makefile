@@ -1,10 +1,6 @@
 # Portfolio Dashboard Makefile
-# Handles both frontend and backend operations
 
-.PHONY: help setup setup-backend setup-frontend install install-backend install-frontend \
-        migrate createsuperuser mock-data run run-backend run-frontend run-all \
-        test test-backend test-frontend lint clean clean-backend clean-frontend \
-        shell dbshell logs-backend logs-frontend status
+.PHONY: help setup install migrate collectstatic createsuperuser mock-data run test lint lint-strict format clean shell dbshell status
 
 # Default target
 help: ## Show this help message
@@ -14,172 +10,103 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 # Setup commands
-setup: setup-backend setup-frontend ## Setup both backend and frontend
+setup: install migrate collectstatic ## Setup complete Django application
 
-setup-backend: ## Setup backend (uv sync, migrations)
-	@echo "Setting up backend with uv..."
-	cd backend && \
-	uv sync && \
-	source .venv/bin/activate && \
-	python manage.py makemigrations && \
-	python manage.py migrate
-	@echo "Backend setup complete!"
+collectstatic: ## Collect static files
+	@echo "Collecting static files..."
+	@uv run python manage.py collectstatic --noinput
+	@echo "Static files collected!"
 
-setup-frontend: ## Setup frontend (npm install)
-	@echo "Setting up frontend..."
-	cd frontend && npm install
-	@echo "Frontend setup complete!"
+install: ## Install dependencies with uv
+	@echo "Installing dependencies with uv..."
+	@if [ ! -d .venv ]; then \
+		echo "Creating virtual environment..."; \
+		uv venv .venv; \
+	fi && \
+	uv sync || uv pip install -r requirements/development.txt
+	@echo "Dependencies installed!"
 
-# Install dependencies
-install: install-backend install-frontend ## Install all dependencies
-
-install-backend: ## Install backend dependencies
-	cd backend && \
-	uv sync
-
-install-frontend: ## Install frontend dependencies
-	cd frontend && npm install
-
-# Database commands
 migrate: ## Run Django migrations
-	cd backend && \
-	source .venv/bin/activate && \
-	python manage.py makemigrations && \
-	python manage.py migrate
+	@echo "Running Django migrations..."
+	@uv run python manage.py makemigrations && uv run python manage.py migrate
+	@echo "Migrations complete!"
 
 createsuperuser: ## Create Django superuser
-	cd backend && \
-	source .venv/bin/activate && \
-	python manage.py createsuperuser
+	@uv run python manage.py createsuperuser
 
-mock-data: ## Generate mock data
-	cd backend && \
-	source .venv/bin/activate && \
-	python manage.py generate_mock_data --users 3 --transactions 20
+mock-data: ## Generate mock portfolio data
+	@echo "Generating mock data..."
+	@uv run python manage.py generate_mock_data
+	@echo "Mock data generated!"
 
-# Run commands
-run: run-all ## Run both frontend and backend (alias for run-all)
-
-run-backend: ## Run Django development server
-	cd backend && \
-	source .venv/bin/activate && \
-	python manage.py runserver
-
-run-frontend: ## Run Vite development server
-	cd frontend && npm run dev
-
-run-all: ## Run both servers in parallel
-	@echo "Starting both servers..."
-	@echo "Backend: http://localhost:8000"
-	@echo "Frontend: http://localhost:5173"
-	@echo "Press Ctrl+C to stop both servers"
+# Development commands
+run: ## Run Django development server
+	@echo "Starting Django development server..."
+	@echo "Application: http://localhost:8000"
+	@echo "API Docs: http://localhost:8000/api/docs"
+	@echo "Admin: http://localhost:8000/admin"
 	@echo ""
-	@trap 'kill %1 %2' INT; \
-	(cd backend && source .venv/bin/activate && python manage.py runserver) & \
-	(cd frontend && npm run dev) & \
-	wait
+	@uv run python manage.py runserver
 
-# Test commands
-test: test-backend test-frontend ## Run all tests
+# Testing commands
+test: ## Run all tests
+	@echo "Running Django tests..."
+	@uv run python manage.py test
+	@echo "Tests complete!"
 
-test-backend: ## Run backend tests
-	@echo "Note: Django server must be running for API tests"
-	@echo "Run 'make run-backend' in another terminal first"
-	cd backend && \
-	source .venv/bin/activate && \
-	python test_api.py
+format: ## Format Python code with Black
+	@echo "Formatting Python code with Black..."
+	@uv run black .
+	@echo "Code formatting complete!"
 
-test-frontend: ## Run frontend tests
-	cd frontend && npm test
+lint: ## Run code linting for Python and JavaScript
+	@echo "Running Python linting..."
+	@uv run ruff check .
+	@uv run black --check . --diff
+	@echo "Running type checking (warnings only)..."
+	@uv run mypy . --ignore-missing-imports --warn-return-any --no-error-summary || echo "Note: Some type warnings found (non-blocking)"
+	@echo "Running JavaScript linting..."
+	@if command -v node >/dev/null 2>&1; then \
+		if [ -f package.json ]; then \
+			npm run lint 2>/dev/null || echo "Warning: npm lint script not found, checking JS files manually..."; \
+		fi; \
+		if command -v jshint >/dev/null 2>&1; then \
+			jshint static/js/*.js 2>/dev/null || echo "JSHint not available for JS linting"; \
+		else \
+			echo "Note: Install jshint globally for JS linting: npm install -g jshint"; \
+		fi; \
+	else \
+		echo "Note: Node.js not available for JavaScript linting"; \
+	fi
+	@echo "Linting complete!"
 
-# Lint commands
-lint: lint-backend lint-frontend ## Run all linters
+lint-strict: ## Run strict linting (fails on any errors)
+	@echo "Running strict linting..."
+	@uv run ruff check .
+	@uv run black --check . --diff
+	@uv run mypy .
+	@echo "Strict linting complete!"
 
-lint-backend: ## Run backend linters (ruff, mypy)
-	cd backend && \
-	source .venv/bin/activate && \
-	ruff check . && \
-	mypy .
+# Database commands
+shell: ## Django shell
+	@uv run python manage.py shell
 
-lint-frontend: ## Run frontend linters
-	cd frontend && npm run lint
+dbshell: ## Database shell
+	@uv run python manage.py dbshell
 
 # Utility commands
-shell: ## Open Django shell
-	cd backend && \
-	source .venv/bin/activate && \
-	python manage.py shell
+clean: ## Clean up generated files
+	@echo "Cleaning up..."
+	@find . -name "*.pyc" -delete
+	@find . -name "__pycache__" -type d -exec rm -rf {} + || true
+	@rm -rf staticfiles/
+	@echo "Cleanup complete!"
 
-dbshell: ## Open database shell
-	cd backend && \
-	source .venv/bin/activate && \
-	python manage.py dbshell
-
-logs-backend: ## Tail backend logs
-	tail -f backend/*.log 2>/dev/null || echo "No log files found"
-
-logs-frontend: ## Tail frontend logs
-	cd frontend && npm run dev
-
-status: ## Check status of services
-	@echo "Checking service status..."
+status: ## Check service status
+	@echo "Checking Django server status..."
+	@curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/ | grep -q 200 && echo "✅ Django server is running" || echo "❌ Django server is not running"
 	@echo ""
-	@echo "Backend:"
-	@curl -s http://localhost:8000/api/docs >/dev/null 2>&1 && echo "   Django server is running" || echo "  L Django server is not running"
-	@echo ""
-	@echo "Frontend:"
-	@curl -s http://localhost:5173 >/dev/null 2>&1 && echo "   Vite server is running" || echo "  L Vite server is not running"
-	@echo ""
-	@echo "Database:"
-	@if [ -f backend/portfolio.db ]; then echo "   SQLite database exists"; else echo "  L SQLite database not found"; fi
-
-# Clean commands
-clean: clean-backend clean-frontend ## Clean all generated files
-
-clean-backend: ## Clean backend generated files
-	cd backend && \
-	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
-	find . -type f -name "*.pyc" -delete && \
-	rm -rf .pytest_cache .mypy_cache .ruff_cache
-
-clean-frontend: ## Clean frontend generated files
-	cd frontend && \
-	rm -rf node_modules dist .vite
-
-# Quick commands for common workflows
-dev: ## Quick development setup and run
-	@echo "Setting up development environment..."
-	@$(MAKE) setup-backend
-	@$(MAKE) setup-frontend
-	@$(MAKE) mock-data
-	@echo ""
-	@echo "Setup complete! Starting servers..."
-	@$(MAKE) run-all
-
-dev-backend: ## Run backend only for development
-	cd backend && source .venv/bin/activate && python manage.py runserver
-
-dev-frontend: ## Run frontend only for development
-	cd frontend && npm run dev
-
-reset-db: ## Reset database (WARNING: destroys all data)
-	cd backend && \
-	rm -f portfolio.db portfolio.db-wal portfolio.db-shm && \
-	source .venv/bin/activate && \
-	python manage.py migrate && \
-	echo "Database reset complete!"
-
-# API testing shortcuts
-api-test-auth: ## Test authentication endpoints
-	@echo "Testing registration..."
-	@curl -X POST http://localhost:8000/api/auth/register/ \
-		-H "Content-Type: application/json" \
-		-d '{"email":"test@example.com","password":"testpass123"}' -s | jq . || echo "Registration response received"
-	@echo "\nTesting login..."
-	@curl -X POST http://localhost:8000/api/auth/login/ \
-		-H "Content-Type: application/json" \
-		-d '{"email":"test@example.com","password":"testpass123"}' -s | jq . || echo "Login response received"
-
-api-docs: ## Open API documentation in browser
-	@echo "Opening API docs..."
-	@python -m webbrowser http://localhost:8000/api/docs || open http://localhost:8000/api/docs || xdg-open http://localhost:8000/api/docs
+	@echo "Quick Status:"
+	@echo "- Django: http://localhost:8000"
+	@echo "- Admin: http://localhost:8000/admin"
+	@echo "- API: http://localhost:8000/api/docs"

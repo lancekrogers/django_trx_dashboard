@@ -1,0 +1,61 @@
+[project]
+name = "portfolio-dashboard-backend"
+version = "0.1.0"
+description = "Multi-chain cryptocurrency portfolio tracker backend"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "Django==4.2.7",
+    "django-ninja==1.0.1",
+    "djangorestframework-simplejwt==5.3.0",
+    "web3==6.11.3",
+    "httpx==0.25.2",
+    "python-decouple==3.8",
+    "django-extensions==3.2.3",
+    "Faker==19.12.0",
+    "django-cors-headers==4.3.1",
+    "django-htmx==1.23.0",
+    "setuptools<81",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==7.4.3",
+    "pytest-django==4.7.0",
+    "mypy==1.7.1",
+    "ruff==0.1.6",
+    "ipython==8.17.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["config", "apps"]
+
+
+[tool.ruff]
+select = ["E", "F", "I"]
+line-length = 100
+target-version = "py311"
+exclude = ["migrations"]
+
+[tool.ruff.per-file-ignores]
+"**/migrations/*.py" = ["E501"]  # Ignore line length in migrations
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "types-requests>=2.32.4.20250611",
+]
