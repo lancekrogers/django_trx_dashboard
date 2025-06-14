@@ -24,7 +24,7 @@ class PortfolioService:
         cached_data = self.cache_service.get_portfolio_data(self.user.id, cache_key)
 
         if cached_data:
-            return cached_data
+            return cached_data  # type: ignore[return-value]
 
         # Calculate portfolio value
         wallets = Wallet.objects.filter(user=self.user, is_active=True)

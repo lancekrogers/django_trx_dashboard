@@ -35,7 +35,7 @@ class CacheService:
                 cache.delete()
                 return None
 
-            return cache.data
+            return cache.data  # type: ignore[return-value]
         except PortfolioCache.DoesNotExist:
             return None
 
@@ -56,7 +56,7 @@ class CacheService:
             if cache.last_updated < timezone.now() - timedelta(seconds=30):
                 return None
 
-            return cache.price_data
+            return cache.price_data  # type: ignore[return-value]
         except PriceCache.DoesNotExist:
             return None
 

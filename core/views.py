@@ -205,8 +205,30 @@ def htmx_dashboard(request):
 
 
 def home_view(request):
-    """Root view - redirect to dashboard or login."""
-    if request.user.is_authenticated:
-        return render(request, "dashboard.html")
-    else:
-        return render(request, "login.html")
+    """Root view - single page app container."""
+    return render(request, "app.html")
+
+
+def htmx_welcome(request):
+    """Welcome page content for unauthenticated users."""
+    return render(request, "partials/welcome.html")
+
+
+def htmx_nav_authenticated(request):
+    """Navigation for authenticated users."""
+    return render(request, "partials/nav_authenticated.html")
+
+
+def htmx_nav_unauthenticated(request):
+    """Navigation for unauthenticated users."""
+    return render(request, "partials/nav_unauthenticated.html")
+
+
+@require_http_methods(["POST"])
+def htmx_logout(request):
+    """Handle logout and return welcome content."""
+    from django.contrib.auth import logout
+    logout(request)
+    response = render(request, "partials/welcome.html")
+    response["X-Auth-Status"] = "unauthenticated"
+    return response

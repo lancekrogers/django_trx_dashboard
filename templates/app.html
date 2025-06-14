@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Multi-Chain Portfolio Dashboard{% endblock %}
+
+{% block content %}
+<!-- Single Page App Container -->
+<div id="app" class="min-h-screen bg-gray-50">
+    <!-- Navigation Bar (always visible) -->
+    <nav class="bg-white shadow-sm border-b border-gray-200" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold">Portfolio Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4" id="nav-actions">
+                    <!-- Dynamic navigation actions will be loaded here -->
+                    {% if user.is_authenticated %}
+                        <button
+                            hx-get="{% url 'htmx:add_wallet' %}"
+                            hx-target="#main-content"
+                            hx-swap="innerHTML"
+                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                            Add Wallet
+                        </button>
+                        <button
+                            hx-post="{% url 'htmx:logout' %}"
+                            hx-target="#main-content"
+                            hx-swap="innerHTML"
+                            class="px-4 py-2 text-gray-700 hover:text-gray-900"
+                        >
+                            Logout
+                        </button>
+                    {% else %}
+                        <button
+                            hx-get="{% url 'htmx:login' %}"
+                            hx-target="#main-content"
+                            hx-swap="innerHTML"
+                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                            Login
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1">
+        <!-- Initial content loaded based on auth status -->
+        <div 
+            hx-get="{% if user.is_authenticated %}{% url 'htmx:dashboard' %}{% else %}{% url 'htmx:welcome' %}{% endif %}"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="outerHTML"
+        >
+            <!-- Loading state -->
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="text-center">
+                    <div class="inline-flex items-center">
+                        <svg class="animate-spin h-8 w-8 text-blue-500" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <span class="ml-2 text-gray-600">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Container (for forms and dialogs) -->
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="modal-title" class="text-lg font-semibold">Modal Title</h3>
+                    <button
+                        onclick="document.getElementById('modal').classList.add('hidden')"
+                        class="text-gray-400 hover:text-gray-600"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="modal-content">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Dynamic toasts will appear here -->
+    </div>
+</div>
+
+<script>
+    // Handle navigation updates without page refresh
+    document.body.addEventListener('htmx:afterSwap', function(event) {
+        // Update navigation based on authentication state
+        if (event.detail.xhr.getResponseHeader('X-Auth-Status')) {
+            const authStatus = event.detail.xhr.getResponseHeader('X-Auth-Status');
+            if (authStatus === 'authenticated') {
+                // Update nav to show authenticated state
+                htmx.ajax('GET', '{% url "htmx:nav_authenticated" %}', '#nav-actions');
+            } else {
+                // Update nav to show unauthenticated state
+                htmx.ajax('GET', '{% url "htmx:nav_unauthenticated" %}', '#nav-actions');
+            }
+        }
+    });
+
+    // Handle modal interactions
+    document.body.addEventListener('htmx:afterSwap', function(event) {
+        if (event.detail.target.id === 'modal-content') {
+            document.getElementById('modal').classList.remove('hidden');
+        }
+    });
+
+    // Toast notifications
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `p-4 rounded-lg shadow-lg text-white ${
+            type === 'success' ? 'bg-green-500' : 
+            type === 'error' ? 'bg-red-500' : 
+            'bg-blue-500'
+        } transform transition-all duration-300 translate-x-full`;
+        toast.innerHTML = message;
+        
+        document.getElementById('toast-container').appendChild(toast);
+        
+        // Animate in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+            toast.classList.add('translate-x-0');
+        }, 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Listen for custom events from HTMX responses
+    document.body.addEventListener('showToast', function(event) {
+        showToast(event.detail.message, event.detail.type);
+    });
+</script>
+{% endblock %}

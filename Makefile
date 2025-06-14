@@ -14,7 +14,7 @@ setup: install migrate collectstatic ## Setup complete Django application
 
 collectstatic: ## Collect static files
 	@echo "Collecting static files..."
-	@uv run python manage.py collectstatic --noinput
+	@uv run --project . python manage.py collectstatic --noinput
 	@echo "Static files collected!"
 
 install: ## Install dependencies with uv
@@ -28,15 +28,15 @@ install: ## Install dependencies with uv
 
 migrate: ## Run Django migrations
 	@echo "Running Django migrations..."
-	@uv run python manage.py makemigrations && uv run python manage.py migrate
+	@uv run --project . python manage.py makemigrations && uv run --project . python manage.py migrate
 	@echo "Migrations complete!"
 
 createsuperuser: ## Create Django superuser
-	@uv run python manage.py createsuperuser
+	@uv run --project . python manage.py createsuperuser
 
 mock-data: ## Generate mock portfolio data
 	@echo "Generating mock data..."
-	@uv run python manage.py generate_mock_data
+	@uv run --project . python manage.py generate_mock_data
 	@echo "Mock data generated!"
 
 # Development commands
@@ -46,25 +46,25 @@ run: ## Run Django development server
 	@echo "API Docs: http://localhost:8000/api/docs"
 	@echo "Admin: http://localhost:8000/admin"
 	@echo ""
-	@uv run python manage.py runserver
+	@uv run --project . python manage.py runserver
 
 # Testing commands
 test: ## Run all tests
 	@echo "Running Django tests..."
-	@uv run python manage.py test
+	@uv run --project . python manage.py test
 	@echo "Tests complete!"
 
 format: ## Format Python code with Black
 	@echo "Formatting Python code with Black..."
-	@uv run black .
+	@uv run --project . black .
 	@echo "Code formatting complete!"
 
 lint: ## Run code linting for Python and JavaScript
 	@echo "Running Python linting..."
-	@uv run ruff check .
-	@uv run black --check . --diff
+	@uv run --project . ruff check .
+	@uv run --project . black --check . --diff
 	@echo "Running type checking (warnings only)..."
-	@uv run mypy . --ignore-missing-imports --warn-return-any --no-error-summary || echo "Note: Some type warnings found (non-blocking)"
+	@uv run --project . mypy . --ignore-missing-imports --warn-return-any --no-error-summary || echo "Note: Some type warnings found (non-blocking)"
 	@echo "Running JavaScript linting..."
 	@if command -v node >/dev/null 2>&1; then \
 		if [ -f package.json ]; then \
@@ -82,17 +82,17 @@ lint: ## Run code linting for Python and JavaScript
 
 lint-strict: ## Run strict linting (fails on any errors)
 	@echo "Running strict linting..."
-	@uv run ruff check .
-	@uv run black --check . --diff
-	@uv run mypy .
+	@uv run --project . ruff check .
+	@uv run --project . black --check . --diff
+	@uv run --project . mypy .
 	@echo "Strict linting complete!"
 
 # Database commands
 shell: ## Django shell
-	@uv run python manage.py shell
+	@uv run --project . python manage.py shell
 
 dbshell: ## Database shell
-	@uv run python manage.py dbshell
+	@uv run --project . python manage.py dbshell
 
 # Utility commands
 clean: ## Clean up generated files

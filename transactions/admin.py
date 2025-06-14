@@ -21,11 +21,10 @@ class TransactionAdmin(admin.ModelAdmin):
     ordering = ("-timestamp",)
     readonly_fields = ("created_at",)
 
-    def tx_hash_short(self, obj):
+    @admin.display(description="TX Hash")
+    def tx_hash_short(self, obj) -> str:
         """Display shortened transaction hash"""
         return f"{obj.tx_hash[:8]}..."
-
-    tx_hash_short.short_description = "TX Hash"
 
 
 @admin.register(Asset)

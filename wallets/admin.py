@@ -35,8 +35,7 @@ class WalletAdmin(admin.ModelAdmin):
     search_fields = ("address", "label", "user__email")
     ordering = ("-created_at",)
 
-    def address_short(self, obj):
+    @admin.display(description="Address")
+    def address_short(self, obj) -> str:
         """Display shortened address in admin list"""
         return f"{obj.address[:6]}...{obj.address[-4:]}"
-
-    address_short.short_description = "Address"

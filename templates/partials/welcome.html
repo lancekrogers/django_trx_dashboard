@@ -1,0 +1,51 @@
+<!-- Welcome/Landing Page Content -->
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Welcome to Portfolio Dashboard
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Track your cryptocurrency portfolio across multiple blockchains
+            </p>
+        </div>
+        
+        <div class="mt-8 space-y-6">
+            <div class="rounded-md shadow">
+                <button
+                    hx-get="{% url 'htmx:login' %}"
+                    hx-target="#main-content"
+                    hx-swap="innerHTML"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Sign In
+                </button>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-sm text-gray-600">
+                    Demo credentials: <strong>demo@example.com</strong> / <strong>demo123</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="mt-12 space-y-4">
+            <h3 class="text-lg font-medium text-center text-gray-900">Features</h3>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="bg-white p-4 rounded-lg shadow border border-gray-200">
+                    <h4 class="font-medium text-gray-900">🔗 Multi-Chain Support</h4>
+                    <p class="mt-1 text-sm text-gray-600">Track wallets across Ethereum, Solana, and Bitcoin</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow border border-gray-200">
+                    <h4 class="font-medium text-gray-900">📊 Real-Time Updates</h4>
+                    <p class="mt-1 text-sm text-gray-600">Live portfolio values with SSE technology</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow border border-gray-200">
+                    <h4 class="font-medium text-gray-900">📈 Transaction History</h4>
+                    <p class="mt-1 text-sm text-gray-600">Complete history with filtering and search</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
