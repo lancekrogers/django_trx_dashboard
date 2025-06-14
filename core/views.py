@@ -36,9 +36,9 @@ def htmx_login(request):
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
-        # Return a redirect header for HTMX
-        response = HttpResponse()
-        response["HX-Redirect"] = "/dashboard"
+        # Return dashboard content and signal auth status
+        response = render(request, "dashboard.html")
+        response["X-Auth-Status"] = "authenticated"
         return response
     else:
         return render(
