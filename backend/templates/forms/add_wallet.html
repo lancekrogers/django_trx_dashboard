@@ -1,0 +1,182 @@
+<!-- Add Wallet Form Partial - HTMX-friendly -->
+<form id="add-wallet-form" 
+      hx-post="/api/v1/wallets/" 
+      hx-target="#wallets-list" 
+      hx-swap="beforeend"
+      hx-on="htmx:afterRequest: if(event.detail.successful) this.reset()"
+      hx-indicator="#add-wallet-spinner"
+      class="space-y-6 bg-white p-6 rounded-lg shadow">
+    {% csrf_token %}
+    
+    <div>
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Add New Wallet</h3>
+        <p class="mt-1 text-sm text-gray-500">
+            Connect your cryptocurrency wallet to track your portfolio.
+        </p>
+    </div>
+
+    <div>
+        <label for="chain" class="block text-sm font-medium leading-6 text-gray-900">
+            Blockchain
+        </label>
+        <div class="mt-2">
+            <select id="chain" 
+                    name="chain" 
+                    required
+                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                <option value="">Select a blockchain</option>
+                <option value="ethereum">Ethereum</option>
+                <option value="solana">Solana</option>
+                <option value="bitcoin">Bitcoin</option>
+            </select>
+        </div>
+    </div>
+
+    <div>
+        <label for="address" class="block text-sm font-medium leading-6 text-gray-900">
+            Wallet Address
+        </label>
+        <div class="mt-2">
+            <input id="address" 
+                   name="address" 
+                   type="text" 
+                   required
+                   placeholder="0x..." 
+                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+        <p class="mt-2 text-sm text-gray-500" id="address-helper">
+            Enter your public wallet address
+        </p>
+    </div>
+
+    <div>
+        <label for="name" class="block text-sm font-medium leading-6 text-gray-900">
+            Wallet Name (Optional)
+        </label>
+        <div class="mt-2">
+            <input id="name" 
+                   name="name" 
+                   type="text" 
+                   placeholder="My Main Wallet"
+                   class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        </div>
+        <p class="mt-2 text-sm text-gray-500">
+            Give your wallet a friendly name for easy identification
+        </p>
+    </div>
+
+    <!-- Error Messages -->
+    <div id="wallet-errors" class="hidden">
+        <div class="rounded-md bg-red-50 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Error adding wallet</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <p id="wallet-error-message"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div id="wallet-success" class="hidden">
+        <div class="rounded-md bg-green-50 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800">
+                        Wallet added successfully!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex gap-3">
+        <button type="submit" 
+                class="flex-1 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
+            <span class="htmx-indicator" id="add-wallet-spinner">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </span>
+            Add Wallet
+        </button>
+        <button type="reset" 
+                class="inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+            Cancel
+        </button>
+    </div>
+</form>
+
+<script>
+    // Update address placeholder based on selected chain
+    document.getElementById('chain').addEventListener('change', function() {
+        const addressInput = document.getElementById('address');
+        const addressHelper = document.getElementById('address-helper');
+        
+        switch(this.value) {
+            case 'ethereum':
+                addressInput.placeholder = '0x742d35Cc6634C0532925a3b844Bc9e7595f89594';
+                addressHelper.textContent = 'Enter your Ethereum address (starts with 0x)';
+                break;
+            case 'solana':
+                addressInput.placeholder = '7VX6Y3srvn2WgFb3Tn4beKY9n2fTVhE7DxTS9ygDZPVH';
+                addressHelper.textContent = 'Enter your Solana address';
+                break;
+            case 'bitcoin':
+                addressInput.placeholder = 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh';
+                addressHelper.textContent = 'Enter your Bitcoin address';
+                break;
+            default:
+                addressInput.placeholder = '0x...';
+                addressHelper.textContent = 'Enter your public wallet address';
+        }
+    });
+
+    // Handle form responses
+    document.getElementById('add-wallet-form').addEventListener('htmx:afterRequest', function(evt) {
+        const errorDiv = document.getElementById('wallet-errors');
+        const successDiv = document.getElementById('wallet-success');
+        
+        if (evt.detail.successful) {
+            // Show success message
+            errorDiv.classList.add('hidden');
+            successDiv.classList.remove('hidden');
+            
+            // Hide success message after 3 seconds
+            setTimeout(() => {
+                successDiv.classList.add('hidden');
+            }, 3000);
+        } else {
+            // Show error message
+            successDiv.classList.add('hidden');
+            errorDiv.classList.remove('hidden');
+            
+            const errorMessage = document.getElementById('wallet-error-message');
+            if (evt.detail.xhr.status === 400) {
+                const response = JSON.parse(evt.detail.xhr.responseText);
+                errorMessage.textContent = response.detail || 'Invalid wallet address or data.';
+            } else {
+                errorMessage.textContent = 'An error occurred. Please try again.';
+            }
+        }
+    });
+
+    // Clear messages on form input
+    document.getElementById('add-wallet-form').addEventListener('input', function() {
+        document.getElementById('wallet-errors').classList.add('hidden');
+        document.getElementById('wallet-success').classList.add('hidden');
+    });
+</script>

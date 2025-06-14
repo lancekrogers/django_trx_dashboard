@@ -1,0 +1,25 @@
+{% for transaction in transactions %}
+{% include 'partials/transaction_row.html' with transaction=transaction %}
+{% endfor %}
+
+{% if transactions.has_next %}
+<tr>
+    <td colspan="7" class="text-center py-4">
+        <button 
+            hx-get="{% url 'htmx:transactions' %}?page={{ transactions.next_page_number }}"
+            hx-target="#transaction-rows"
+            hx-swap="beforeend"
+            hx-indicator="#loading-more"
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+            Load More
+            <span id="loading-more" class="htmx-indicator ml-2">
+                <svg class="inline w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+            </span>
+        </button>
+    </td>
+</tr>
+{% endif %}

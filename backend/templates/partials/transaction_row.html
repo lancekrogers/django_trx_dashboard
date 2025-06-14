@@ -1,0 +1,96 @@
+<!-- Transaction Row Partial - For transaction table -->
+<tr class="hover:bg-gray-50" id="transaction-{{ transaction.id }}">
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        <div class="flex items-center">
+            <div class="flex-shrink-0 h-10 w-10">
+                <div class="h-10 w-10 rounded-full bg-{{ transaction.type_color|default:'gray' }}-100 flex items-center justify-center">
+                    {% if transaction.type == 'send' %}
+                    <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    {% elif transaction.type == 'receive' %}
+                    <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8l-8 8-8-8" />
+                    </svg>
+                    {% elif transaction.type == 'swap' %}
+                    <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                    {% else %}
+                    <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="ml-4">
+                <div class="text-sm font-medium text-gray-900">
+                    {{ transaction.type|title }}
+                </div>
+                <div class="text-sm text-gray-500">
+                    {{ transaction.chain|title }}
+                </div>
+            </div>
+        </div>
+    </td>
+    
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <div class="font-mono text-xs">
+            <a href="{{ transaction.explorer_url }}" 
+               target="_blank" 
+               class="text-indigo-600 hover:text-indigo-900">
+                {{ transaction.hash|truncatechars:10 }}...{{ transaction.hash|slice:"-6:" }}
+            </a>
+        </div>
+    </td>
+    
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        <div>
+            {% if transaction.type == 'send' %}
+                <span class="text-red-600">-{{ transaction.amount|floatformat:6 }}</span>
+            {% elif transaction.type == 'receive' %}
+                <span class="text-green-600">+{{ transaction.amount|floatformat:6 }}</span>
+            {% else %}
+                {{ transaction.amount|floatformat:6 }}
+            {% endif %}
+            <span class="text-gray-500">{{ transaction.asset.symbol }}</span>
+        </div>
+        <div class="text-xs text-gray-500">
+            ${{ transaction.usd_value|floatformat:2 }}
+        </div>
+    </td>
+    
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <div class="flex items-center">
+            {% if transaction.status == 'confirmed' %}
+                <span class="flex-shrink-0 inline-block px-2 py-0.5 text-green-800 text-xs font-medium bg-green-100 rounded-full">
+                    Confirmed
+                </span>
+            {% elif transaction.status == 'pending' %}
+                <span class="flex-shrink-0 inline-block px-2 py-0.5 text-yellow-800 text-xs font-medium bg-yellow-100 rounded-full">
+                    Pending
+                </span>
+            {% else %}
+                <span class="flex-shrink-0 inline-block px-2 py-0.5 text-red-800 text-xs font-medium bg-red-100 rounded-full">
+                    Failed
+                </span>
+            {% endif %}
+        </div>
+    </td>
+    
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <time datetime="{{ transaction.timestamp|date:'c' }}" 
+              title="{{ transaction.timestamp|date:'Y-m-d H:i:s' }}">
+            {{ transaction.timestamp|timesince }} ago
+        </time>
+    </td>
+    
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button hx-get="/api/v1/transactions/{{ transaction.id }}/"
+                hx-target="#transaction-details"
+                hx-swap="innerHTML"
+                class="text-indigo-600 hover:text-indigo-900">
+            Details
+        </button>
+    </td>
+</tr>

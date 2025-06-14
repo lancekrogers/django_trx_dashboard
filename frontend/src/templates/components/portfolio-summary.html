@@ -1,0 +1,39 @@
+<!-- Portfolio Summary Cards -->
+<div class="bg-white p-6 rounded-lg shadow">
+    <h3 class="text-sm font-medium text-gray-500 mb-2">Total Value</h3>
+    <p class="text-2xl font-bold text-gray-900">
+        $<span id="total-value">{{ total_value_usd|floatformat:2|intcomma }}</span>
+    </p>
+    <p class="text-sm mt-2">
+        <span class="{% if change_24h >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+            {% if change_24h >= 0 %}+{% endif %}{{ change_24h|floatformat:2 }}%
+        </span>
+        <span class="text-gray-500">24h</span>
+    </p>
+</div>
+
+<div class="bg-white p-6 rounded-lg shadow">
+    <h3 class="text-sm font-medium text-gray-500 mb-2">Active Wallets</h3>
+    <p class="text-2xl font-bold text-gray-900">{{ wallet_count }}</p>
+    <button 
+        hx-get="/api/v1/wallets/modal"
+        hx-target="#modal-container"
+        hx-swap="innerHTML"
+        class="text-sm text-blue-600 hover:text-blue-700 mt-2"
+    >
+        Manage Wallets
+    </button>
+</div>
+
+<div class="bg-white p-6 rounded-lg shadow">
+    <h3 class="text-sm font-medium text-gray-500 mb-2">Last Updated</h3>
+    <p class="text-lg font-medium text-gray-900">
+        <span id="last-updated" data-timestamp="{{ last_updated|date:'c' }}">
+            Just now
+        </span>
+    </p>
+    <div class="flex items-center mt-2 space-x-2">
+        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+        <span class="text-sm text-gray-500">Auto-updating</span>
+    </div>
+</div>

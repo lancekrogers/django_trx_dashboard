@@ -2,3 +2,5 @@
 .direnv/
 .env
 *.swp
+.venv/
+MAKEFILE_GUIDE.md

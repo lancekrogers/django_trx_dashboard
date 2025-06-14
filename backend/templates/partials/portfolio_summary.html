@@ -1,0 +1,163 @@
+<!-- Portfolio Summary Partial - Real-time updates via SSE -->
+<div id="portfolio-summary" 
+     class="bg-white overflow-hidden shadow rounded-lg"
+     hx-ext="sse" 
+     sse-connect="/api/v1/portfolio/stream/"
+     sse-swap="message">
+    
+    <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+            Portfolio Overview
+        </h3>
+        
+        <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+            <!-- Total Value -->
+            <div class="overflow-hidden rounded-lg bg-gray-50 px-4 py-5 shadow sm:p-6">
+                <dt class="truncate text-sm font-medium text-gray-500">
+                    Total Portfolio Value
+                </dt>
+                <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+                    <span id="total-value">${{ portfolio.total_usd_value|floatformat:2|default:"0.00" }}</span>
+                </dd>
+                <p class="mt-2 flex items-center text-sm">
+                    <span id="value-change" class="{% if portfolio.change_24h >= 0 %}text-green-600{% else %}text-red-600{% endif %} flex items-center">
+                        {% if portfolio.change_24h >= 0 %}
+                        <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        {% else %}
+                        <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        {% endif %}
+                        <span id="change-percent">{{ portfolio.change_24h|floatformat:2|default:"0.00" }}%</span>
+                    </span>
+                    <span class="text-gray-500 ml-2">24h change</span>
+                </p>
+            </div>
+
+            <!-- Number of Assets -->
+            <div class="overflow-hidden rounded-lg bg-gray-50 px-4 py-5 shadow sm:p-6">
+                <dt class="truncate text-sm font-medium text-gray-500">
+                    Total Assets
+                </dt>
+                <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+                    <span id="total-assets">{{ portfolio.asset_count|default:0 }}</span>
+                </dd>
+                <p class="mt-2 text-sm text-gray-500">
+                    Across <span id="chain-count">{{ portfolio.chain_count|default:0 }}</span> blockchains
+                </p>
+            </div>
+
+            <!-- Top Performing Asset -->
+            <div class="overflow-hidden rounded-lg bg-gray-50 px-4 py-5 shadow sm:p-6">
+                <dt class="truncate text-sm font-medium text-gray-500">
+                    Best Performer (24h)
+                </dt>
+                <dd class="mt-1 text-2xl font-semibold tracking-tight text-gray-900">
+                    <span id="top-asset">{{ portfolio.top_performer.symbol|default:"N/A" }}</span>
+                </dd>
+                <p class="mt-2 text-sm text-green-600">
+                    <span id="top-asset-change">+{{ portfolio.top_performer.change_24h|floatformat:2|default:"0.00" }}%</span>
+                </p>
+            </div>
+        </dl>
+
+        <!-- Asset Distribution Chart -->
+        <div class="mt-6">
+            <h4 class="text-sm font-medium text-gray-500 mb-2">Asset Distribution</h4>
+            <div class="relative pt-1">
+                <canvas id="distribution-chart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="portfolio-loading" class="hidden absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
+        <div class="text-center">
+            <svg class="animate-spin h-8 w-8 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-2 text-sm text-gray-500">Updating portfolio...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize distribution chart
+    const ctx = document.getElementById('distribution-chart').getContext('2d');
+    const distributionChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ portfolio.asset_labels|safe|default:"[]" }},
+            datasets: [{
+                data: {{ portfolio.asset_values|safe|default:"[]" }},
+                backgroundColor: [
+                    '#4F46E5', // indigo-600
+                    '#7C3AED', // violet-600
+                    '#2563EB', // blue-600
+                    '#0891B2', // cyan-600
+                    '#059669', // emerald-600
+                    '#EAB308', // yellow-600
+                    '#EA580C', // orange-600
+                    '#DC2626', // red-600
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 10,
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Handle SSE updates
+    document.addEventListener('sse:message', function(e) {
+        const data = JSON.parse(e.detail.data);
+        
+        // Update values
+        document.getElementById('total-value').textContent = '$' + data.total_usd_value.toFixed(2);
+        document.getElementById('total-assets').textContent = data.asset_count;
+        document.getElementById('chain-count').textContent = data.chain_count;
+        
+        // Update change indicator
+        const changeElement = document.getElementById('value-change');
+        const changePercent = document.getElementById('change-percent');
+        changePercent.textContent = data.change_24h.toFixed(2) + '%';
+        
+        if (data.change_24h >= 0) {
+            changeElement.classList.remove('text-red-600');
+            changeElement.classList.add('text-green-600');
+            changeElement.querySelector('svg').innerHTML = '<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />';
+        } else {
+            changeElement.classList.remove('text-green-600');
+            changeElement.classList.add('text-red-600');
+            changeElement.querySelector('svg').innerHTML = '<path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />';
+        }
+        
+        // Update top performer
+        if (data.top_performer) {
+            document.getElementById('top-asset').textContent = data.top_performer.symbol;
+            document.getElementById('top-asset-change').textContent = '+' + data.top_performer.change_24h.toFixed(2) + '%';
+        }
+        
+        // Update chart
+        if (data.asset_distribution) {
+            distributionChart.data.labels = data.asset_distribution.labels;
+            distributionChart.data.datasets[0].data = data.asset_distribution.values;
+            distributionChart.update();
+        }
+    });
+</script>
