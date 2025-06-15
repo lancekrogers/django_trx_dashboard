@@ -1,0 +1,73 @@
+<!-- Transactions Page -->
+<div class="px-4 sm:px-0">
+    <!-- Page Header -->
+    <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                Transaction History
+            </h2>
+            <p class="mt-1 text-sm text-gray-500">
+                View all your cryptocurrency transactions across wallets.
+            </p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+            <form hx-get="{% url 'htmx:transactions' %}" 
+                  hx-target="#transactions-table"
+                  hx-swap="innerHTML"
+                  class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                
+                <!-- Wallet Filter -->
+                <div>
+                    <label for="wallet" class="block text-sm font-medium text-gray-700">Wallet</label>
+                    <select name="wallet" id="wallet" 
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">All Wallets</option>
+                        {% for wallet in wallets %}
+                            <option value="{{ wallet.id }}">{{ wallet.name }} ({{ wallet.chain|title }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Type Filter -->
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700">Transaction Type</label>
+                    <select name="type" id="type"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">All Types</option>
+                        <option value="send">Send</option>
+                        <option value="receive">Receive</option>
+                        <option value="swap">Swap</option>
+                        <option value="contract">Contract</option>
+                    </select>
+                </div>
+
+                <!-- Search -->
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+                    <input type="text" name="search" id="search" 
+                           placeholder="Hash or address..."
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex items-end">
+                    <button type="submit"
+                            class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div id="transactions-table">
+            {% include "partials/transaction_table.html" %}
+        </div>
+    </div>
+</div>

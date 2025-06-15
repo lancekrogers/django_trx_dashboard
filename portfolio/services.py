@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 from django.utils import timezone
 
-from wallets.models import Wallet
+from wallets.models import UserSettings, Wallet
 
 from .cache import CacheService
 
@@ -16,6 +16,13 @@ class PortfolioService:
     def __init__(self, user):
         self.user = user
         self.cache_service = CacheService()
+        
+        # Check if user has mock data enabled
+        try:
+            settings = UserSettings.objects.get(user=user)
+            self.mock_data_enabled = settings.mock_data_enabled
+        except UserSettings.DoesNotExist:
+            self.mock_data_enabled = False
 
     def get_portfolio_summary(self) -> Dict[str, Any]:
         """Calculate current portfolio value across all wallets"""
@@ -30,15 +37,18 @@ class PortfolioService:
         wallets = Wallet.objects.filter(user=self.user, is_active=True)
         total_value = Decimal("0")
 
-        # For MVP, we'll use mock values
-        # In production, this would call chain adapters
-        for wallet in wallets:
-            # Mock balance calculation
-            wallet_value = self._get_mock_wallet_value(wallet)
-            total_value += wallet_value
+        if self.mock_data_enabled:
+            # Use mock values for demonstration
+            for wallet in wallets:
+                wallet_value = self._get_mock_wallet_value(wallet)
+                total_value += wallet_value
+        else:
+            # Real data mode - would call chain adapters
+            # For now, return zero since we don't have real adapters implemented
+            total_value = Decimal("0")
 
         # Calculate 24h change
-        change_24h = self._calculate_24h_change()
+        change_24h = self._calculate_24h_change() if self.mock_data_enabled else Decimal("0")
 
         result = {
             "total_value_usd": float(total_value),
@@ -80,6 +90,10 @@ class PortfolioService:
 
     def get_historical_data(self, period: str = "24h") -> list:
         """Get historical portfolio values"""
+        if not self.mock_data_enabled:
+            # Return empty data in real mode
+            return []
+            
         # Map period to timedelta
         period_map = {
             "24h": timedelta(days=1),
@@ -90,7 +104,7 @@ class PortfolioService:
         time_delta = period_map.get(period, timedelta(days=1))
         start_time = timezone.now() - time_delta
 
-        # For MVP, generate mock historical data
+        # Generate mock historical data
         data_points = []
         current_value = self.get_portfolio_summary()["total_value_usd"]
 
@@ -114,8 +128,13 @@ class PortfolioService:
         balances = []
 
         for wallet in wallets:
-            # Mock balance for MVP
-            value = self._get_mock_wallet_value(wallet)
+            if self.mock_data_enabled:
+                # Mock balance for demonstration
+                value = self._get_mock_wallet_value(wallet)
+            else:
+                # Real data mode - would call chain adapters
+                value = Decimal("0")
+                
             balances.append(
                 {
                     "wallet_id": wallet.id,

@@ -12,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 
 from portfolio.services import PortfolioService
 from transactions.models import Transaction
-from wallets.models import Wallet
+from wallets.models import User, UserSettings, Wallet
 
 
 @require_http_methods(["GET", "POST"])
@@ -39,6 +39,7 @@ def htmx_login(request):
         # Return dashboard content and signal auth status
         response = render(request, "dashboard.html")
         response["X-Auth-Status"] = "authenticated"
+        response["HX-Trigger"] = "auth-change"
         return response
     else:
         return render(
@@ -145,15 +146,26 @@ def htmx_portfolio_summary(request):
 @login_required
 @require_http_methods(["GET"])
 def htmx_transactions(request):
-    """Render paginated transaction table."""
+    """Render transactions page or table partial."""
     # Get filter parameters
     wallet_id = request.GET.get("wallet")
     tx_type = request.GET.get("type")
     search = request.GET.get("search")
     page = request.GET.get("page", 1)
 
-    # Build query
-    transactions = Transaction.objects.filter(wallet__user=request.user)
+    # Check user's mock data setting
+    try:
+        settings = UserSettings.objects.get(user=request.user)
+        mock_data_enabled = settings.mock_data_enabled
+    except UserSettings.DoesNotExist:
+        mock_data_enabled = False
+
+    # Build query - only show transactions if mock data is enabled
+    if mock_data_enabled:
+        transactions = Transaction.objects.filter(wallet__user=request.user)
+    else:
+        # In real mode, show empty transaction list since we don't have real blockchain adapters
+        transactions = Transaction.objects.none()
 
     if wallet_id:
         transactions = transactions.filter(wallet_id=wallet_id)
@@ -175,28 +187,40 @@ def htmx_transactions(request):
     paginator = Paginator(transactions, 20)  # 20 transactions per page
     page_obj = paginator.get_page(page)
 
-    # Return table rows only if this is an HTMX request
-    if request.htmx and request.GET.get("page"):
+    # Get all user wallets for filter dropdown
+    wallets = Wallet.objects.filter(user=request.user)
+
+    # Return table rows only if this is a pagination request
+    if request.htmx and request.GET.get("page") and not request.headers.get("HX-Target") == "main-content":
         # Just return the rows for pagination
         return render(
             request, "partials/transaction_rows.html", {"transactions": page_obj}
         )
 
-    # Return full table
+    # Check if this is a filter request (has filter params but not initial page load)
+    if request.htmx and any([wallet_id, tx_type, search]) and request.headers.get("HX-Target") == "transactions-table":
+        # Return just the table for filter updates
+        return render(
+            request,
+            "partials/transaction_table.html",
+            {"transactions": page_obj, "wallets": wallets},
+        )
+
+    # Return full page
     return render(
         request,
-        "partials/transaction_table.html",
-        {"transactions": page_obj, "wallets": Wallet.objects.filter(user=request.user)},
+        "partials/transactions_page.html",
+        {"transactions": page_obj, "wallets": wallets},
     )
 
 
 @login_required
 @require_http_methods(["GET"])
 def htmx_wallets(request):
-    """Render wallet list."""
+    """Render wallets page."""
     wallets = Wallet.objects.filter(user=request.user)
 
-    return render(request, "partials/wallet_list.html", {"wallets": wallets})
+    return render(request, "partials/wallets_page.html", {"wallets": wallets})
 
 
 def htmx_dashboard(request):
@@ -222,6 +246,31 @@ def htmx_nav_authenticated(request):
 def htmx_nav_unauthenticated(request):
     """Navigation for unauthenticated users."""
     return render(request, "partials/nav_unauthenticated.html")
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def htmx_settings(request):
+    """Handle settings display and updates."""
+    # Get or create user settings
+    settings, created = UserSettings.objects.get_or_create(
+        user=request.user, defaults={"mock_data_enabled": False}
+    )
+
+    if request.method == "GET":
+        return render(request, "partials/settings_page.html", {"settings": settings})
+
+    # POST - Handle settings update
+    mock_data_enabled = request.POST.get("mock_data_enabled") == "on"
+    settings.mock_data_enabled = mock_data_enabled
+    settings.save()
+
+    # Return updated settings page with success message
+    return render(
+        request,
+        "partials/settings_page.html",
+        {"settings": settings, "success": "Settings updated successfully!"},
+    )
 
 
 @require_http_methods(["POST"])

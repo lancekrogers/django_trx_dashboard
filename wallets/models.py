@@ -73,3 +73,19 @@ class Wallet(models.Model):
 
     def __str__(self):
         return f"{self.label or self.address[:10]}... ({self.get_chain_display()})"
+
+
+class UserSettings(models.Model):
+    """User preference settings"""
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="settings")
+    mock_data_enabled = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "User Settings"
+        verbose_name_plural = "User Settings"
+
+    def __str__(self):
+        return f"Settings for {self.user.email}"

@@ -20,6 +20,7 @@ urlpatterns = [
     # Pages
     path("welcome/", views.htmx_welcome, name="welcome"),
     path("dashboard/", views.htmx_dashboard, name="dashboard"),
+    path("settings/", views.htmx_settings, name="settings"),
     
     # Wallet management
     path("wallets/add/", views.htmx_add_wallet, name="add_wallet"),

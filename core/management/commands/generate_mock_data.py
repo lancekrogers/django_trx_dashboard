@@ -7,7 +7,7 @@ from django.utils import timezone
 from faker import Faker
 
 from transactions.models import Asset, Transaction, TransactionType
-from wallets.models import User, Wallet
+from wallets.models import User, UserSettings, Wallet
 
 fake = Faker()
 
@@ -25,6 +25,18 @@ class Command(BaseCommand):
             default=50,
             help="Number of transactions per wallet",
         )
+        parser.add_argument(
+            "--superusers",
+            type=int,
+            default=1,
+            help="Number of superusers to create",
+        )
+        parser.add_argument(
+            "--email-domain",
+            type=str,
+            default="example.com",
+            help="Email domain for generated users",
+        )
 
     def handle(self, *args, **options):
         self.stdout.write("Generating mock data...")
@@ -32,9 +44,20 @@ class Command(BaseCommand):
         # Create assets
         assets = self._create_assets()
 
-        # Create users with wallets
+        # Create superusers
+        for i in range(options["superusers"]):
+            user = self._create_superuser(i, options["email_domain"])
+            wallets = self._create_wallets(user)
+
+            # Create transactions for each wallet
+            for wallet in wallets:
+                self._create_transactions(
+                    wallet, assets[wallet.chain], options["transactions"]
+                )
+
+        # Create regular users with wallets
         for i in range(options["users"]):
-            user = self._create_user(i)
+            user = self._create_user(i, options["email_domain"])
             wallets = self._create_wallets(user)
 
             # Create transactions for each wallet
@@ -108,9 +131,39 @@ class Command(BaseCommand):
 
         return assets
 
-    def _create_user(self, index):
+    def _create_superuser(self, index, domain):
+        """Create a mock superuser"""
+        email = f"admin{index}@{domain}"
+        username = f"admin{index}"
+
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "username": username,
+                "first_name": fake.first_name(),
+                "last_name": fake.last_name(),
+                "is_staff": True,
+                "is_superuser": True,
+            },
+        )
+
+        if created:
+            user.set_password("admin123")
+            user.save()
+            self.stdout.write(f"Created superuser: {email}")
+
+        # Create settings with mock data enabled by default
+        settings, settings_created = UserSettings.objects.get_or_create(
+            user=user, defaults={"mock_data_enabled": True}
+        )
+        if settings_created:
+            self.stdout.write(f"Created settings for superuser: {email}")
+
+        return user
+
+    def _create_user(self, index, domain):
         """Create a mock user"""
-        email = f"user{index}@example.com"
+        email = f"user{index}@{domain}"
         username = f"user{index}"
 
         user, created = User.objects.get_or_create(
@@ -126,6 +179,13 @@ class Command(BaseCommand):
             user.set_password("testpass123")
             user.save()
             self.stdout.write(f"Created user: {email}")
+
+        # Create settings with mock data enabled by default
+        settings, settings_created = UserSettings.objects.get_or_create(
+            user=user, defaults={"mock_data_enabled": True}
+        )
+        if settings_created:
+            self.stdout.write(f"Created settings for user: {email}")
 
         return user
 

@@ -11,37 +11,14 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <h1 class="text-xl font-semibold">Portfolio Dashboard</h1>
+                    <h1 class="text-xl font-semibold">Multi-Chain Portfolio</h1>
                 </div>
-                <div class="flex items-center space-x-4" id="nav-actions">
-                    <!-- Dynamic navigation actions will be loaded here -->
-                    {% if user.is_authenticated %}
-                        <button
-                            hx-get="{% url 'htmx:add_wallet' %}"
-                            hx-target="#main-content"
-                            hx-swap="innerHTML"
-                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        >
-                            Add Wallet
-                        </button>
-                        <button
-                            hx-post="{% url 'htmx:logout' %}"
-                            hx-target="#main-content"
-                            hx-swap="innerHTML"
-                            class="px-4 py-2 text-gray-700 hover:text-gray-900"
-                        >
-                            Logout
-                        </button>
-                    {% else %}
-                        <button
-                            hx-get="{% url 'htmx:login' %}"
-                            hx-target="#main-content"
-                            hx-swap="innerHTML"
-                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        >
-                            Login
-                        </button>
-                    {% endif %}
+                <div class="flex items-center"
+                     id="nav-content"
+                     hx-get="{% if user.is_authenticated %}{% url 'htmx:nav_authenticated' %}{% else %}{% url 'htmx:nav_unauthenticated' %}{% endif %}"
+                     hx-trigger="load, auth-change from:body"
+                     hx-swap="innerHTML">
+                    <!-- Navigation will be loaded here -->
                 </div>
             </div>
         </div>
@@ -72,26 +49,7 @@
     </main>
 
     <!-- Modal Container (for forms and dialogs) -->
-    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="modal-title" class="text-lg font-semibold">Modal Title</h3>
-                    <button
-                        onclick="document.getElementById('modal').classList.add('hidden')"
-                        class="text-gray-400 hover:text-gray-600"
-                    >
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div id="modal-content">
-                    <!-- Dynamic content will be loaded here -->
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="modal-container"></div>
 
     <!-- Toast Notifications -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2">
@@ -100,25 +58,11 @@
 </div>
 
 <script>
-    // Handle navigation updates without page refresh
-    document.body.addEventListener('htmx:afterSwap', function(event) {
-        // Update navigation based on authentication state
-        if (event.detail.xhr.getResponseHeader('X-Auth-Status')) {
-            const authStatus = event.detail.xhr.getResponseHeader('X-Auth-Status');
-            if (authStatus === 'authenticated') {
-                // Update nav to show authenticated state
-                htmx.ajax('GET', '{% url "htmx:nav_authenticated" %}', '#nav-actions');
-            } else {
-                // Update nav to show unauthenticated state
-                htmx.ajax('GET', '{% url "htmx:nav_unauthenticated" %}', '#nav-actions');
-            }
-        }
-    });
-
-    // Handle modal interactions
-    document.body.addEventListener('htmx:afterSwap', function(event) {
-        if (event.detail.target.id === 'modal-content') {
-            document.getElementById('modal').classList.remove('hidden');
+    // Handle authentication changes
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.xhr.getResponseHeader('HX-Trigger') === 'auth-change') {
+            // Trigger navigation reload
+            htmx.trigger('#nav-content', 'auth-change');
         }
     });
 

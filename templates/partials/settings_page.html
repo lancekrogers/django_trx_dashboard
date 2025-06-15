@@ -1,0 +1,149 @@
+<!-- Settings Page -->
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Settings</h1>
+        <p class="mt-2 text-gray-600">Manage your account preferences and configuration.</p>
+    </div>
+
+    <!-- Success Message -->
+    {% if success %}
+    <div class="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium text-green-800">{{ success }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Settings Form -->
+    <div class="bg-white shadow rounded-lg divide-y divide-gray-200">
+        <!-- Mock Data Section -->
+        <div class="p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Data Preferences</h3>
+            
+            <form hx-post="/settings/" hx-target="#main-content" hx-swap="innerHTML">
+                {% csrf_token %}
+                <div class="space-y-6">
+                    <!-- Mock Data Toggle -->
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input 
+                                id="mock_data_enabled" 
+                                name="mock_data_enabled" 
+                                type="checkbox" 
+                                {% if settings.mock_data_enabled %}checked{% endif %}
+                                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                            >
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="mock_data_enabled" class="font-medium text-gray-700">
+                                Enable Mock Data
+                            </label>
+                            <p class="text-gray-500">
+                                When enabled, your portfolio will display mock transactions and balances for demonstration purposes. 
+                                This is useful for testing and demos when you don't have real blockchain data.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Mock Data Info -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-medium text-blue-800">About Mock Data</h4>
+                                <div class="mt-2 text-sm text-blue-700">
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>Mock data includes sample transactions across Ethereum, Bitcoin, and Solana</li>
+                                        <li>Portfolio values and historical data are generated for demonstration</li>
+                                        <li>Real blockchain connections are disabled when mock data is active</li>
+                                        <li>You can toggle this setting anytime without losing your wallet configuration</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Status -->
+                    <div class="bg-gray-50 rounded-md p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                {% if settings.mock_data_enabled %}
+                                <div class="h-2 w-2 bg-green-400 rounded-full"></div>
+                                {% else %}
+                                <div class="h-2 w-2 bg-gray-400 rounded-full"></div>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-900">
+                                    Current Status: 
+                                    {% if settings.mock_data_enabled %}
+                                        <span class="text-green-600">Mock Data Enabled</span>
+                                    {% else %}
+                                        <span class="text-gray-600">Real Data Mode</span>
+                                    {% endif %}
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    {% if settings.mock_data_enabled %}
+                                        Your dashboard is currently showing mock/demo data for testing purposes.
+                                    {% else %}
+                                        Your dashboard will attempt to connect to real blockchain data sources.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-end">
+                        <button 
+                            type="submit"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Save Settings
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Account Information Section -->
+        <div class="p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Account Information</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <div class="mt-1 text-sm text-gray-900">{{ user.email }}</div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Account Type</label>
+                    <div class="mt-1 text-sm text-gray-900">
+                        {% if user.is_superuser %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                Administrator
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                Standard User
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Member Since</label>
+                    <div class="mt-1 text-sm text-gray-900">{{ user.date_joined|date:"F j, Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
