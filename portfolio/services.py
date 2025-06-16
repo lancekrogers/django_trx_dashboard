@@ -16,7 +16,7 @@ class PortfolioService:
     def __init__(self, user):
         self.user = user
         self.cache_service = CacheService()
-        
+
         # Check if user has mock data enabled
         try:
             settings = UserSettings.objects.get(user=user)
@@ -48,12 +48,22 @@ class PortfolioService:
             total_value = Decimal("0")
 
         # Calculate 24h change
-        change_24h = self._calculate_24h_change() if self.mock_data_enabled else Decimal("0")
+        change_24h = (
+            self._calculate_24h_change() if self.mock_data_enabled else Decimal("0")
+        )
 
+        # Get asset distribution data
+        asset_distribution = self._get_asset_distribution() if self.mock_data_enabled else {"labels": [], "values": []}
+        
         result = {
             "total_value_usd": float(total_value),
             "change_24h": float(change_24h),
             "wallet_count": wallets.count(),
+            "asset_count": len(asset_distribution["labels"]),
+            "chain_count": wallets.values("chain").distinct().count(),
+            "top_performer": self._get_top_performer() if self.mock_data_enabled else {"symbol": "N/A", "change_24h": 0},
+            "asset_labels": asset_distribution["labels"],
+            "asset_values": asset_distribution["values"],
             "last_updated": timezone.now().isoformat(),
         }
 
@@ -93,7 +103,7 @@ class PortfolioService:
         if not self.mock_data_enabled:
             # Return empty data in real mode
             return []
-            
+
         # Map period to timedelta
         period_map = {
             "24h": timedelta(days=1),
@@ -134,7 +144,7 @@ class PortfolioService:
             else:
                 # Real data mode - would call chain adapters
                 value = Decimal("0")
-                
+
             balances.append(
                 {
                     "wallet_id": wallet.id,
@@ -148,3 +158,37 @@ class PortfolioService:
             )
 
         return balances
+    
+    def _get_asset_distribution(self) -> Dict[str, list]:
+        """Get asset distribution for portfolio chart"""
+        if not self.mock_data_enabled:
+            return {"labels": [], "values": []}
+        
+        # Mock asset distribution
+        assets = [
+            {"symbol": "ETH", "value": random.uniform(2000, 10000)},
+            {"symbol": "BTC", "value": random.uniform(5000, 20000)},
+            {"symbol": "SOL", "value": random.uniform(1000, 5000)},
+            {"symbol": "USDC", "value": random.uniform(500, 2000)},
+        ]
+        
+        # Filter out zero values and sort by value
+        assets = [a for a in assets if a["value"] > 0]
+        assets.sort(key=lambda x: x["value"], reverse=True)
+        
+        labels = [a["symbol"] for a in assets]
+        values = [round(a["value"], 2) for a in assets]
+        
+        return {"labels": labels, "values": values}
+    
+    def _get_top_performer(self) -> Dict[str, Any]:
+        """Get top performing asset in 24h"""
+        if not self.mock_data_enabled:
+            return {"symbol": "N/A", "change_24h": 0}
+        
+        # Mock top performer
+        assets = ["ETH", "BTC", "SOL", "MATIC", "LINK"]
+        return {
+            "symbol": random.choice(assets),
+            "change_24h": random.uniform(5, 25)  # Positive change for "top" performer
+        }

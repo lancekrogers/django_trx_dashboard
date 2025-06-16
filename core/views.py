@@ -58,14 +58,12 @@ def htmx_add_wallet(request):
         return render(request, "forms/add_wallet.html")
 
     # POST - Handle wallet creation
-    name = request.POST.get("name")
+    label = request.POST.get("name")  # Form uses 'name' but model uses 'label'
     chain = request.POST.get("chain")
     address = request.POST.get("address")
 
     # Validate inputs
     errors = {}
-    if not name:
-        errors["name"] = "Name is required"
     if not chain:
         errors["chain"] = "Chain is required"
     if not address:
@@ -75,7 +73,7 @@ def htmx_add_wallet(request):
         return render(
             request,
             "forms/add_wallet.html",
-            {"errors": errors, "name": name, "chain": chain, "address": address},
+            {"errors": errors, "name": label, "chain": chain, "address": address},
             status=400,
         )
 
@@ -85,8 +83,8 @@ def htmx_add_wallet(request):
             request,
             "forms/add_wallet.html",
             {
-                "error": "This wallet is already added to your account",
-                "name": name,
+                "error": "This wallet is already added",
+                "name": label,
                 "chain": chain,
                 "address": address,
             },
@@ -96,7 +94,7 @@ def htmx_add_wallet(request):
     try:
         # Create wallet
         wallet = Wallet.objects.create(
-            user=request.user, name=name, chain=chain, address=address
+            user=request.user, label=label, chain=chain, address=address
         )
 
         # Return wallet item partial
@@ -109,7 +107,7 @@ def htmx_add_wallet(request):
             "forms/add_wallet.html",
             {
                 "error": f"Failed to add wallet: {str(e)}",
-                "name": name,
+                "name": label,
                 "chain": chain,
                 "address": address,
             },
@@ -132,15 +130,11 @@ def htmx_delete_wallet(request, wallet_id):
 @require_http_methods(["GET"])
 def htmx_portfolio_summary(request):
     """Render portfolio summary partial."""
-    if request.htmx:
-        # Get portfolio data
-        service = PortfolioService(request.user)
-        summary = service.get_portfolio_summary()
+    # Get portfolio data
+    service = PortfolioService(request.user)
+    summary = service.get_portfolio_summary()
 
-        return render(request, "partials/portfolio_summary.html", {"summary": summary})
-    else:
-        # Full page request
-        return render(request, "dashboard.html")
+    return render(request, "partials/portfolio_summary.html", {"summary": summary})
 
 
 @login_required
@@ -190,15 +184,28 @@ def htmx_transactions(request):
     # Get all user wallets for filter dropdown
     wallets = Wallet.objects.filter(user=request.user)
 
-    # Return table rows only if this is a pagination request
-    if request.htmx and request.GET.get("page") and not request.headers.get("HX-Target") == "main-content":
+    # Check if this is an HTMX request
+    is_htmx = hasattr(request, 'htmx') and request.htmx
+    hx_target = request.headers.get("HX-Target", "") if is_htmx else ""
+    
+    # Return table rows only if this is a pagination request targeting the rows
+    if (
+        is_htmx
+        and request.GET.get("page")
+        and (hx_target == "transaction-rows" or hx_target == "transactions-table" or hx_target == "")
+        and not any([wallet_id, tx_type, search])  # Not a filter request
+    ):
         # Just return the rows for pagination
         return render(
             request, "partials/transaction_rows.html", {"transactions": page_obj}
         )
 
     # Check if this is a filter request (has filter params but not initial page load)
-    if request.htmx and any([wallet_id, tx_type, search]) and request.headers.get("HX-Target") == "transactions-table":
+    if (
+        is_htmx
+        and any([wallet_id, tx_type, search])
+        and hx_target == "transactions-table"
+    ):
         # Return just the table for filter updates
         return render(
             request,
@@ -223,9 +230,28 @@ def htmx_wallets(request):
     return render(request, "partials/wallets_page.html", {"wallets": wallets})
 
 
+@login_required
 def htmx_dashboard(request):
     """Main dashboard view that uses HTMX partials."""
-    return render(request, "dashboard.html")
+    # Get user's wallets
+    wallets = Wallet.objects.filter(user=request.user)
+    
+    # Get recent transactions
+    recent_transactions = Transaction.objects.filter(
+        wallet__user=request.user
+    ).order_by("-timestamp")[:5]
+    
+    # Get portfolio summary
+    service = PortfolioService(request.user)
+    summary = service.get_portfolio_summary()
+    
+    context = {
+        "wallets": wallets,
+        "recent_transactions": recent_transactions,
+        "summary": summary,
+    }
+    
+    return render(request, "dashboard.html", context)
 
 
 def home_view(request):
@@ -277,7 +303,9 @@ def htmx_settings(request):
 def htmx_logout(request):
     """Handle logout and return welcome content."""
     from django.contrib.auth import logout
+
     logout(request)
     response = render(request, "partials/welcome.html")
     response["X-Auth-Status"] = "unauthenticated"
+    response["HX-Trigger"] = "auth-change"
     return response

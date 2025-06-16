@@ -1,9 +1,9 @@
 <!-- Portfolio Summary Partial - Real-time updates via SSE -->
 <div id="portfolio-summary" 
      class="bg-white overflow-hidden shadow rounded-lg"
-     hx-ext="sse" 
-     sse-connect="/api/v1/portfolio/stream/"
-     sse-swap="message">
+     hx-trigger="load, refresh"
+     hx-get="{% url 'htmx:portfolio_summary' %}"
+     hx-swap="outerHTML">
     
     <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -17,11 +17,11 @@
                     Total Portfolio Value
                 </dt>
                 <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
-                    <span id="total-value">${{ portfolio.total_usd_value|floatformat:2|default:"0.00" }}</span>
+                    <span id="total-value">${{ summary.total_value_usd|floatformat:2|default:"0.00" }}</span>
                 </dd>
                 <p class="mt-2 flex items-center text-sm">
-                    <span id="value-change" class="{% if portfolio.change_24h >= 0 %}text-green-600{% else %}text-red-600{% endif %} flex items-center">
-                        {% if portfolio.change_24h >= 0 %}
+                    <span id="value-change" class="{% if summary.change_24h >= 0 %}text-green-600{% else %}text-red-600{% endif %} flex items-center">
+                        {% if summary.change_24h >= 0 %}
                         <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                         </svg>
@@ -30,7 +30,7 @@
                             <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                         </svg>
                         {% endif %}
-                        <span id="change-percent">{{ portfolio.change_24h|floatformat:2|default:"0.00" }}%</span>
+                        <span id="change-percent">{{ summary.change_24h|floatformat:2|default:"0.00" }}%</span>
                     </span>
                     <span class="text-gray-500 ml-2">24h change</span>
                 </p>
@@ -42,10 +42,10 @@
                     Total Assets
                 </dt>
                 <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
-                    <span id="total-assets">{{ portfolio.asset_count|default:0 }}</span>
+                    <span id="total-assets">{{ summary.asset_count|default:0 }}</span>
                 </dd>
                 <p class="mt-2 text-sm text-gray-500">
-                    Across <span id="chain-count">{{ portfolio.chain_count|default:0 }}</span> blockchains
+                    Across <span id="chain-count">{{ summary.chain_count|default:0 }}</span> blockchains
                 </p>
             </div>
 
@@ -55,10 +55,10 @@
                     Best Performer (24h)
                 </dt>
                 <dd class="mt-1 text-2xl font-semibold tracking-tight text-gray-900">
-                    <span id="top-asset">{{ portfolio.top_performer.symbol|default:"N/A" }}</span>
+                    <span id="top-asset">{{ summary.top_performer.symbol|default:"N/A" }}</span>
                 </dd>
                 <p class="mt-2 text-sm text-green-600">
-                    <span id="top-asset-change">+{{ portfolio.top_performer.change_24h|floatformat:2|default:"0.00" }}%</span>
+                    <span id="top-asset-change">+{{ summary.top_performer.change_24h|floatformat:2|default:"0.00" }}%</span>
                 </p>
             </div>
         </dl>
@@ -90,9 +90,9 @@
     const distributionChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: {{ portfolio.asset_labels|safe|default:"[]" }},
+            labels: {{ summary.asset_labels|safe|default:"[]" }},
             datasets: [{
-                data: {{ portfolio.asset_values|safe|default:"[]" }},
+                data: {{ summary.asset_values|safe|default:"[]" }},
                 backgroundColor: [
                     '#4F46E5', // indigo-600
                     '#7C3AED', // violet-600
@@ -123,41 +123,5 @@
         }
     });
 
-    // Handle SSE updates
-    document.addEventListener('sse:message', function(e) {
-        const data = JSON.parse(e.detail.data);
-        
-        // Update values
-        document.getElementById('total-value').textContent = '$' + data.total_usd_value.toFixed(2);
-        document.getElementById('total-assets').textContent = data.asset_count;
-        document.getElementById('chain-count').textContent = data.chain_count;
-        
-        // Update change indicator
-        const changeElement = document.getElementById('value-change');
-        const changePercent = document.getElementById('change-percent');
-        changePercent.textContent = data.change_24h.toFixed(2) + '%';
-        
-        if (data.change_24h >= 0) {
-            changeElement.classList.remove('text-red-600');
-            changeElement.classList.add('text-green-600');
-            changeElement.querySelector('svg').innerHTML = '<path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />';
-        } else {
-            changeElement.classList.remove('text-green-600');
-            changeElement.classList.add('text-red-600');
-            changeElement.querySelector('svg').innerHTML = '<path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />';
-        }
-        
-        // Update top performer
-        if (data.top_performer) {
-            document.getElementById('top-asset').textContent = data.top_performer.symbol;
-            document.getElementById('top-asset-change').textContent = '+' + data.top_performer.change_24h.toFixed(2) + '%';
-        }
-        
-        // Update chart
-        if (data.asset_distribution) {
-            distributionChart.data.labels = data.asset_distribution.labels;
-            distributionChart.data.datasets[0].data = data.asset_distribution.values;
-            distributionChart.update();
-        }
-    });
+    // Auto-refresh can be re-enabled if needed
 </script>

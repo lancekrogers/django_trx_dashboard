@@ -1,6 +1,6 @@
 # Portfolio Dashboard Makefile
 
-.PHONY: help setup install migrate collectstatic createsuperuser mock-data run test lint lint-strict format clean shell dbshell status
+.PHONY: help setup install migrate collectstatic createsuperuser mock-data mock-data-full reset-users fresh-start run kill-server server-status test test-django test-help test-pytest test-pytest-coverage test-specific format lint lint-strict clean shell dbshell status
 
 # Default target
 help: ## Show this help message
@@ -22,8 +22,8 @@ install: ## Install dependencies with uv
 	@if [ ! -d .venv ]; then \
 		echo "Creating virtual environment..."; \
 		uv venv .venv; \
-	fi && \
-	uv sync || uv pip install -r requirements/development.txt
+	fi
+	@uv sync --all-extras
 	@echo "Dependencies installed!"
 
 migrate: ## Run Django migrations
@@ -39,6 +39,21 @@ mock-data: ## Generate mock portfolio data
 	@uv run --project . python manage.py generate_mock_data
 	@echo "Mock data generated!"
 
+mock-data-full: ## Generate full mock data with superuser and multiple users
+	@echo "Generating full mock data set..."
+	@uv run --project . python manage.py generate_mock_data --superusers 1 --users 3 --transactions 50
+	@echo "Full mock data generated!"
+
+reset-users: ## Delete all users (WARNING: destructive!)
+	@echo "WARNING: This will delete ALL users!"
+	@echo "Press Ctrl+C to cancel, or Enter to continue..."
+	@read confirm
+	@echo "Deleting all users..."
+	@uv run --project . python reset_users.py
+	@echo "All users deleted!"
+
+fresh-start: reset-users createsuperuser ## Reset users and create new superuser
+
 # Development commands
 run: ## Run Django development server
 	@echo "Starting Django development server..."
@@ -48,11 +63,51 @@ run: ## Run Django development server
 	@echo ""
 	@uv run --project . python manage.py runserver
 
-# Testing commands
-test: ## Run all tests
+kill-server: ## Kill Django development server
+	@echo "Stopping Django development server..."
+	@pkill -f "manage.py runserver" || echo "No Django server process found"
+	@echo "Server stopped!"
+
+server-status: ## Check if Django server is running
+	@if pgrep -f "manage.py runserver" > /dev/null; then \
+		echo "✅ Django server is running"; \
+		echo "PID(s): $$(pgrep -f 'manage.py runserver')"; \
+	else \
+		echo "❌ Django server is not running"; \
+	fi
+
+# Testing commands - Direct uv usage examples
+test: ## Run all tests with pytest (recommended)
+	@echo "Running tests with pytest..."
+	@echo "Direct uv command: uv run pytest"
+	@uv run pytest
+
+test-django: ## Run tests with Django test runner
 	@echo "Running Django tests..."
-	@uv run --project . python manage.py test
-	@echo "Tests complete!"
+	@echo "Direct uv command: uv run python manage.py test"
+	@uv run python manage.py test --verbosity=2
+
+test-help: ## Show testing help and examples
+	@echo "Testing with uv - Quick Reference"
+	@echo "================================"
+	@echo ""
+	@echo "Run all tests:"
+	@echo "  $$ uv run pytest"
+	@echo ""
+	@echo "Run specific test file:"
+	@echo "  $$ uv run pytest core/test_views.py"
+	@echo ""
+	@echo "Run with coverage:"
+	@echo "  $$ uv run pytest --cov=."
+	@echo ""
+	@echo "Run by marker:"
+	@echo "  $$ uv run pytest -m unit"
+	@echo "  $$ uv run pytest -m integration"
+	@echo ""
+	@echo "Run in parallel:"
+	@echo "  $$ uv run pytest -n auto"
+	@echo ""
+	@echo "For more examples, see tests/README.md"
 
 format: ## Format Python code with Black
 	@echo "Formatting Python code with Black..."

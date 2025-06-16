@@ -74,6 +74,13 @@ class Wallet(models.Model):
     def __str__(self):
         return f"{self.label or self.address[:10]}... ({self.get_chain_display()})"
 
+    @property
+    def short_address(self):
+        """Return shortened version of address for display."""
+        if len(self.address) > 10:
+            return f"{self.address[:6]}...{self.address[-4:]}"
+        return self.address
+
 
 class UserSettings(models.Model):
     """User preference settings"""

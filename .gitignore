@@ -16,6 +16,10 @@ staticfiles/
 *.sqlite3
 *.db
 
+# Logs
+logs/
+server.log
+
 # IDE
 *.swp
 .vscode/

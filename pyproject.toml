@@ -22,6 +22,9 @@ dependencies = [
 dev = [
     "pytest==7.4.3",
     "pytest-django==4.7.0",
+    "pytest-cov==4.1.0",
+    "coverage==7.3.2",
+    "factory-boy==3.3.0",
     "mypy==1.7.1",
     "ruff==0.1.6",
     "ipython==8.17.2",
@@ -54,9 +57,55 @@ exclude = ["migrations/", "staticfiles/"]
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "-v --tb=short --strict-markers --ds=config.settings"
+markers = [
+    "unit: Unit tests that test individual functions/methods",
+    "integration: Integration tests that test multiple components",
+    "views: Tests for Django views",
+    "models: Tests for Django models",
+    "slow: Tests that take a long time to run",
+    "external: Tests that require external services",
+]
+testpaths = ["core", "wallets", "transactions", "portfolio", "tests"]
+norecursedirs = ["migrations", "static", "media", ".git", "*.egg", "dist", "build"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
+
+# Scripts are defined elsewhere, not as entry points
 
 [dependency-groups]
 dev = [
     "black>=25.1.0",
     "types-requests>=2.32.4.20250611",
+    "pytest-xdist>=3.5.0",
 ]
+
+[tool.coverage.run]
+source = "."
+omit = [
+    "*/migrations/*",
+    "*/venv/*",
+    "*/.venv/*",
+    "*/staticfiles/*",
+    "manage.py",
+    "*/settings/*",
+    "config/wsgi.py",
+    "config/asgi.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "class .*\\(Protocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"

@@ -32,7 +32,7 @@
         
         <!-- Menu items -->
         <button 
-            hx-get="/profile" 
+            hx-get="{% url 'htmx:settings' %}" 
             hx-target="#main-content" 
             hx-swap="innerHTML"
             @click="open = false"
@@ -45,7 +45,7 @@
         </button>
         
         <button 
-            hx-get="/settings" 
+            hx-get="{% url 'htmx:settings' %}" 
             hx-target="#main-content" 
             hx-swap="innerHTML"
             @click="open = false"
@@ -61,10 +61,11 @@
         <hr class="my-1">
         
         <button 
-            hx-post="/api/auth/logout/" 
+            hx-post="/htmx/logout/" 
             hx-target="#main-content" 
             hx-swap="innerHTML"
             hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            hx-trigger="click"
             @click="open = false"
             class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
         >

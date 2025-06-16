@@ -45,7 +45,7 @@
                                 </div>
                             </div>
                             <div class="ml-3">
-                                <h3 class="text-sm font-medium text-gray-900">{{ wallet.name }}</h3>
+                                <h3 class="text-sm font-medium text-gray-900">{{ wallet.label|default:"Unnamed Wallet" }}</h3>
                                 <p class="text-sm text-gray-500">{{ wallet.chain|title }}</p>
                             </div>
                         </div>
