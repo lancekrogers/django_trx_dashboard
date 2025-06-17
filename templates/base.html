@@ -6,39 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Portfolio Dashboard{% endblock %}</title>
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS - Compiled -->
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    
+    <!-- Franken UI (if needed) -->
+    <link rel="stylesheet" href="{% static 'css/franken-ui-core.css' %}">
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     
     <!-- Configure HTMX to include CSRF token -->
     <script>
-        // Configure HTMX to include CSRF token
-        document.body.addEventListener('htmx:configRequest', (event) => {
-            // Get CSRF token from cookie
-            let csrfToken = null;
-            const cookies = document.cookie.split(';');
-            for (let cookie of cookies) {
-                const [name, value] = cookie.trim().split('=');
-                if (name === 'csrftoken') {
-                    csrfToken = value;
-                    break;
+        // Configure HTMX to include CSRF token after DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.addEventListener('htmx:configRequest', (event) => {
+                // Get CSRF token from cookie
+                let csrfToken = null;
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [name, value] = cookie.trim().split('=');
+                    if (name === 'csrftoken') {
+                        csrfToken = value;
+                        break;
+                    }
                 }
-            }
-            
-            // If no cookie, try to get from meta tag or form
-            if (!csrfToken) {
-                const tokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
-                if (tokenInput) {
-                    csrfToken = tokenInput.value;
+                
+                // If no cookie, try to get from meta tag or form
+                if (!csrfToken) {
+                    const tokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+                    if (tokenInput) {
+                        csrfToken = tokenInput.value;
+                    }
                 }
-            }
-            
-            // Add token to request headers
-            if (csrfToken) {
-                event.detail.headers['X-CSRFToken'] = csrfToken;
-            }
+                
+                // Add token to request headers
+                if (csrfToken) {
+                    event.detail.headers['X-CSRFToken'] = csrfToken;
+                }
+            });
         });
     </script>
     

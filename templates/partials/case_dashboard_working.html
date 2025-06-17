@@ -52,6 +52,7 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                     + Add Wallet
                 </button>
                 {% endif %}
+                {% if user.is_authenticated %}
                 <button 
                     hx-post="{% url 'htmx:export_case_data' case.id %}"
                     hx-target="#modal-container"
@@ -68,6 +69,18 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                     class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                     Generate Report
                 </button>
+                {% else %}
+                <button 
+                    onclick="showNotification('This is a demo - export functions are disabled', 'info'); return false;"
+                    class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    Export Data
+                </button>
+                <button 
+                    onclick="showNotification('This is a demo - report generation is disabled', 'info'); return false;"
+                    class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    Generate Report
+                </button>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -243,6 +256,7 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
         <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-white">Case Wallets</h3>
+                {% if user.is_authenticated %}
                 <button 
                     hx-get="{% url 'htmx:add_wallet_to_case_form' case.id %}"
                     hx-target="#modal-container"
@@ -250,6 +264,13 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
                     + Add Wallet
                 </button>
+                {% else %}
+                <button 
+                    onclick="showNotification('This is a demo - account functions are disabled', 'info'); return false;"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                    + Add Wallet
+                </button>
+                {% endif %}
             </div>
             
             <div class="overflow-x-auto">

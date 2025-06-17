@@ -14,7 +14,7 @@ Investigation Cases Grid - Multi-portfolio dashboard with case management
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Demo Mode - Sign in or create an account to manage your own investigations
+                    Demo Mode - Viewing sample investigation cases (account functions disabled)
                 </p>
             </div>
             {% endif %}
@@ -194,6 +194,7 @@ Investigation Cases Grid - Multi-portfolio dashboard with case management
                     Updated {{ case.updated_at|timesince }} ago
                 </div>
                 <div class="flex space-x-2">
+                    {% if user_authenticated %}
                     <button 
                         hx-post="{% url 'htmx:export_case_data' case.id %}"
                         hx-target="#modal-container"
@@ -214,6 +215,22 @@ Investigation Cases Grid - Multi-portfolio dashboard with case management
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
                     </button>
+                    {% else %}
+                    <button 
+                        class="text-gray-400 hover:text-white p-1"
+                        onclick="event.stopPropagation(); showNotification('This is a demo - export is disabled', 'info'); return false;">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </button>
+                    <button 
+                        class="text-gray-400 hover:text-white p-1"
+                        onclick="event.stopPropagation(); showNotification('This is a demo - editing is disabled', 'info'); return false;">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -226,6 +243,7 @@ Investigation Cases Grid - Multi-portfolio dashboard with case management
             </div>
             <h3 class="text-xl font-semibold text-white mb-2">No Investigation Cases</h3>
             <p class="text-gray-400 mb-6">Create your first investigation case to start tracking suspicious activity</p>
+            {% if user_authenticated %}
             <button 
                 hx-get="{% url 'htmx:create_case_form' %}"
                 hx-target="#modal-container"
@@ -233,6 +251,13 @@ Investigation Cases Grid - Multi-portfolio dashboard with case management
                 class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                 Create Investigation Case
             </button>
+            {% else %}
+            <button 
+                onclick="showNotification('This is a demo - sign in to create cases', 'info'); return false;"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                Create Investigation Case
+            </button>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
