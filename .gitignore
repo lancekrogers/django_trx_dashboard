@@ -39,6 +39,7 @@ server.log
 
 # Security & sensitive files
 cookies.txt
+ai_docs/
 *.pem
 *.key
 *.crt

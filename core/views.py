@@ -312,6 +312,7 @@ def home_view(request):
     # Auto-login demo user for interview demo
     if not request.user.is_authenticated:
         from django.contrib.auth import login
+        from wallets.models import User
         try:
             demo_user = User.objects.get(email='lance@blockhead.consulting')
             if demo_user.is_active:
@@ -505,16 +506,26 @@ def htmx_cases_list(request):
         user_transactions = Transaction.objects.filter(wallet__user=request.user)
         is_demo_mode = False
     else:
-        # Demo mode - show all cases as read-only examples
-        cases = InvestigationCase.objects.all().prefetch_related(
-            'case_wallets__wallet',
-            'wallets'
-        ).annotate(
-            _wallet_count=models.Count('wallets', distinct=True),
-            _flagged_count=models.Count('case_wallets', filter=models.Q(case_wallets__flagged=True))
-        )
-        user_wallets = Wallet.objects.all()
-        user_transactions = Transaction.objects.all()
+        # Demo mode - show demo user's cases
+        try:
+            from wallets.models import User
+            demo_user = User.objects.get(email='lance@blockhead.consulting')
+            cases = InvestigationCase.objects.filter(
+                investigator=demo_user
+            ).prefetch_related(
+                'case_wallets__wallet',
+                'wallets'
+            ).annotate(
+                _wallet_count=models.Count('wallets', distinct=True),
+                _flagged_count=models.Count('case_wallets', filter=models.Q(case_wallets__flagged=True))
+            )
+            user_wallets = Wallet.objects.filter(user=demo_user)
+            user_transactions = Transaction.objects.filter(wallet__user=demo_user)
+        except User.DoesNotExist:
+            # Fallback if demo user doesn't exist
+            cases = InvestigationCase.objects.none()
+            user_wallets = Wallet.objects.none()
+            user_transactions = Transaction.objects.none()
         is_demo_mode = True
     
     # Calculate dashboard stats before any slicing
