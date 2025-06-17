@@ -1,0 +1,43 @@
+{% comment %}
+Dashboard Tabs Component - Tab navigation and content area
+Purpose: Tabbed interface for dashboard sections
+Usage: {% include "partials/dashboard_tabs.html" with recent_transactions=recent_transactions %}
+{% endcomment %}
+
+<div class="bg-dark-card border border-dark-border rounded-lg">
+    <div class="border-b border-dark-border">
+        <div class="flex items-center justify-between px-6">
+            <div class="flex items-center space-x-8">
+                <button class="py-4 border-b-2 border-indigo-500 text-dark-text font-medium">
+                    Outline
+                </button>
+                <button class="py-4 border-b-2 border-transparent text-dark-text-secondary hover:text-dark-text transition-colors">
+                    Past Performance
+                    <span class="ml-2 bg-dark-hover text-dark-text-secondary text-xs px-2 py-1 rounded">3</span>
+                </button>
+                <button class="py-4 border-b-2 border-transparent text-dark-text-secondary hover:text-dark-text transition-colors">
+                    Key Personnel
+                    <span class="ml-2 bg-dark-hover text-dark-text-secondary text-xs px-2 py-1 rounded">2</span>
+                </button>
+                <button class="py-4 border-b-2 border-transparent text-dark-text-secondary hover:text-dark-text transition-colors">
+                    Focus Documents
+                </button>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="flex items-center space-x-2 text-dark-text-secondary hover:text-dark-text transition-colors">
+                    <i data-feather="columns" class="w-4 h-4"></i>
+                    <span class="text-sm">Customize Columns</span>
+                </button>
+                <button class="bg-dark-hover hover:bg-dark-border text-dark-text px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                    <i data-feather="plus" class="w-4 h-4"></i>
+                    <span class="text-sm">Add Section</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tab Content -->
+    <div class="p-6">
+        {% include "partials/recent_activity.html" with transactions=recent_transactions %}
+    </div>
+</div>

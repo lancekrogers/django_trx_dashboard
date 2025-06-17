@@ -1,0 +1,134 @@
+{% comment %}
+Cases List Component - FrankenUI Table
+Purpose: Display investigation cases in a table format using FrankenUI components
+{% endcomment %}
+
+{% if cases %}
+<div class="uk-overflow-auto">
+    <table class="uk-table uk-table-hover uk-table-divider">
+        <thead>
+            <tr>
+                <th>Case Name</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Wallets</th>
+                <th>Transactions</th>
+                <th>Updated</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for case in cases %}
+            <tr>
+                <td>
+                    <div>
+                        <div class="font-medium">{{ case.name }}</div>
+                        {% if case.description %}
+                        <div class="text-sm text-muted-foreground">{{ case.description|truncatechars:50 }}</div>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    {% if case.status == 'active' %}
+                    <span class="uk-label uk-label-success">Active</span>
+                    {% elif case.status == 'pending' %}
+                    <span class="uk-label uk-label-warning">Pending</span>
+                    {% elif case.status == 'completed' %}
+                    <span class="uk-label">Completed</span>
+                    {% else %}
+                    <span class="uk-label uk-label-danger">Archived</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if case.priority == 'critical' %}
+                    <span class="uk-label uk-label-danger">Critical</span>
+                    {% elif case.priority == 'high' %}
+                    <span class="uk-label uk-label-warning">High</span>
+                    {% elif case.priority == 'medium' %}
+                    <span class="uk-label uk-label-primary">Medium</span>
+                    {% else %}
+                    <span class="uk-label">Low</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 002 2z"></path>
+                        </svg>
+                        {{ case.wallet_count }}
+                    </div>
+                </td>
+                <td>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-1 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        {{ case.transaction_count }}
+                    </div>
+                </td>
+                <td>
+                    <div class="text-sm text-muted-foreground">
+                        {{ case.updated_at|timesince }} ago
+                    </div>
+                </td>
+                <td>
+                    <div class="uk-button-group">
+                        <button 
+                            hx-get="{% url 'htmx:case_detail' case.id %}" 
+                            hx-target="#main-content" 
+                            hx-swap="innerHTML"
+                            class="uk-button uk-button-small uk-button-default"
+                            uk-tooltip="View Case">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </button>
+                        <button 
+                            hx-get="{% url 'htmx:edit_case_form' case.id %}" 
+                            hx-target="#case-form-modal" 
+                            hx-swap="innerHTML"
+                            class="uk-button uk-button-small uk-button-default"
+                            uk-tooltip="Edit Case">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                        {% if case.status != 'archived' %}
+                        <button 
+                            hx-post="{% url 'htmx:archive_case' case.id %}" 
+                            hx-target="#cases-list" 
+                            hx-swap="innerHTML"
+                            hx-confirm="Archive this case?"
+                            class="uk-button uk-button-small uk-button-danger"
+                            uk-tooltip="Archive Case">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column" style="height: 200px;">
+    <svg class="w-12 h-12 text-muted-foreground mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+    </svg>
+    <h3 class="uk-h4 uk-margin-small-bottom">No Investigation Cases</h3>
+    <p class="text-muted-foreground uk-text-center">
+        Create your first investigation case to start tracking blockchain addresses and transactions.
+    </p>
+    <button 
+        hx-get="{% url 'htmx:create_case_form' %}" 
+        hx-target="#case-form-modal" 
+        hx-swap="innerHTML"
+        class="uk-button uk-button-primary uk-margin-medium-top">
+        Create First Case
+    </button>
+</div>
+{% endif %}

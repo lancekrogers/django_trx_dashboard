@@ -1,0 +1,29 @@
+{% comment %}
+Metric Card Component - Reusable metric display card
+Purpose: Display a single metric with trend and description
+Usage: {% include "partials/metric_card.html" with title="Total Revenue" value="5000.00" trend="+12.5%" trend_type="up" description="Trending up this month" subtitle="Visitors for the last 6 months" %}
+{% endcomment %}
+
+<div class="bg-dark-card border border-dark-border rounded-lg p-6">
+    <div class="flex items-start justify-between">
+        <div>
+            <p class="text-dark-text-secondary text-sm">{{ title }}</p>
+            <p class="text-3xl font-bold text-dark-text mt-2">
+                {% if value_prefix %}{{ value_prefix }}{% endif %}{{ value|default:"0" }}
+            </p>
+        </div>
+        <div class="flex items-center space-x-1 {% if trend_type == 'up' %}text-green-500{% elif trend_type == 'down' %}text-red-500{% else %}text-blue-500{% endif %}">
+            <i data-feather="{% if trend_type == 'up' %}trending-up{% elif trend_type == 'down' %}trending-down{% else %}activity{% endif %}" class="w-4 h-4"></i>
+            <span class="text-sm font-medium">{{ trend|default:"0%" }}</span>
+        </div>
+    </div>
+    {% if description %}
+    <div class="mt-4 flex items-center space-x-2">
+        <i data-feather="{% if trend_type == 'up' %}trending-up{% elif trend_type == 'down' %}trending-down{% else %}bar-chart{% endif %}" class="w-4 h-4 text-dark-text-secondary"></i>
+        <p class="text-dark-text-secondary text-sm">{{ description }}</p>
+    </div>
+    {% endif %}
+    {% if subtitle %}
+    <p class="text-dark-text-secondary text-xs mt-2">{{ subtitle }}</p>
+    {% endif %}
+</div>

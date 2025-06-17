@@ -236,7 +236,7 @@ class TransactionViewsTestCase(TestCase):
     def test_transactions_page_with_mock_data_disabled(self):
         """Test transactions page with mock data disabled."""
         # Create user settings with mock data disabled
-        UserSettings.objects.create(user=self.user, mock_data_enabled=False)
+        UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': False})
         
         response = self.client.get("/htmx/transactions/")
         self.assertEqual(response.status_code, 200)
@@ -245,15 +245,17 @@ class TransactionViewsTestCase(TestCase):
     def test_transactions_page_with_mock_data_enabled(self):
         """Test transactions page with mock data enabled."""
         # Create user settings with mock data enabled
-        UserSettings.objects.create(user=self.user, mock_data_enabled=True)
+        UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': True})
         
         # Create test transaction
         Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x123456789abcdef",
-            transaction_type="send",
+            tx_hash="0x123456789abcdef",
+            block_number=12345,
+            transaction_type=TransactionType.SELL,
             amount=Decimal("1.0"),
-            asset=self.asset,
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=timezone.now()
         )
         
@@ -272,31 +274,37 @@ class TransactionViewsTestCase(TestCase):
         )
         
         # Enable mock data
-        UserSettings.objects.create(user=self.user, mock_data_enabled=True)
+        UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': True})
         
         # Create transactions for both wallets
         Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x111",
-            transaction_type="send",
+            tx_hash="0x111",
+            block_number=12345,
+            transaction_type=TransactionType.SELL,
             amount=Decimal("1.0"),
-            asset=self.asset,
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=timezone.now()
         )
         
-        btc_asset = Asset.objects.create(
+        btc_asset, created = Asset.objects.get_or_create(
             symbol="BTC",
-            name="Bitcoin",
             chain=Chain.BITCOIN,
-            decimals=8
+            defaults={
+                "name": "Bitcoin",
+                "decimals": 8
+            }
         )
         
         Transaction.objects.create(
             wallet=wallet2,
-            hash="0x222",
-            transaction_type="receive",
+            tx_hash="0x222",
+            block_number=12346,
+            transaction_type=TransactionType.BUY,
             amount=Decimal("0.5"),
-            asset=btc_asset,
+            asset_symbol=btc_asset.symbol,
+            gas_fee=Decimal("0.0001"),
             timestamp=timezone.now()
         )
         
@@ -306,23 +314,27 @@ class TransactionViewsTestCase(TestCase):
 
     def test_transactions_filtering_by_type(self):
         """Test filtering transactions by type."""
-        UserSettings.objects.create(user=self.user, mock_data_enabled=True)
+        UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': True})
         
         Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x111",
-            transaction_type="send",
+            tx_hash="0x111",
+            block_number=12345,
+            transaction_type=TransactionType.SELL,
             amount=Decimal("1.0"),
-            asset=self.asset,
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=timezone.now()
         )
         
         Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x222",
-            transaction_type="receive",
+            tx_hash="0x222",
+            block_number=12346,
+            transaction_type=TransactionType.BUY,
             amount=Decimal("2.0"),
-            asset=self.asset,
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=timezone.now()
         )
         
@@ -332,16 +344,16 @@ class TransactionViewsTestCase(TestCase):
 
     def test_transactions_search(self):
         """Test searching transactions."""
-        UserSettings.objects.create(user=self.user, mock_data_enabled=True)
+        UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': True})
         
         Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x123456789abcdef",
-            transaction_type="send",
+            tx_hash="0x123456789abcdef",
+            block_number=12345,
+            transaction_type=TransactionType.SELL,
             amount=Decimal("1.0"),
-            asset=self.asset,
-            from_address=self.wallet.address,
-            to_address="0x987654321fedcba",
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=timezone.now()
         )
         
@@ -355,16 +367,18 @@ class TransactionViewsTestCase(TestCase):
 
     def test_transactions_pagination(self):
         """Test transaction pagination."""
-        UserSettings.objects.create(user=self.user, mock_data_enabled=True)
+        UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': True})
         
         # Create multiple transactions
         for i in range(25):  # More than page size (20)
             Transaction.objects.create(
                 wallet=self.wallet,
-                hash=f"0x{i:064x}",
-                transaction_type="send",
+                tx_hash=f"0x{i:064x}",
+                block_number=12345 + i,
+                transaction_type=TransactionType.SELL,
                 amount=Decimal("1.0"),
-                asset=self.asset,
+                asset_symbol=self.asset.symbol,
+                gas_fee=Decimal("0.001"),
                 timestamp=timezone.now()
             )
         
@@ -378,16 +392,18 @@ class TransactionViewsTestCase(TestCase):
 
     def test_transactions_htmx_pagination(self):
         """Test HTMX-specific pagination behavior."""
-        UserSettings.objects.create(user=self.user, mock_data_enabled=True)
+        UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': True})
         
         # Create multiple transactions
         for i in range(25):
             Transaction.objects.create(
                 wallet=self.wallet,
-                hash=f"0x{i:064x}",
-                transaction_type="send",
+                tx_hash=f"0x{i:064x}",
+                block_number=12345 + i,
+                transaction_type=TransactionType.SELL,
                 amount=Decimal("1.0"),
-                asset=self.asset,
+                asset_symbol=self.asset.symbol,
+                gas_fee=Decimal("0.001"),
                 timestamp=timezone.now()
             )
         
@@ -436,10 +452,12 @@ class TransactionDataTestCase(TestCase):
         small_amount = Decimal("0.000000000000000001")  # 1 wei
         transaction = Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x123",
-            transaction_type="send",
+            tx_hash="0x123",
+            block_number=12345,
+            transaction_type=TransactionType.SELL,
             amount=small_amount,
-            asset=self.asset,
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=timezone.now()
         )
         
@@ -449,42 +467,30 @@ class TransactionDataTestCase(TestCase):
         large_amount = Decimal("1000000.123456789012345678")
         transaction2 = Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x456",
-            transaction_type="receive",
+            tx_hash="0x456",
+            block_number=12346,
+            transaction_type=TransactionType.BUY,
             amount=large_amount,
-            asset=self.asset,
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=timezone.now()
         )
         
         self.assertEqual(transaction2.amount, large_amount)
 
-    def test_transaction_status_choices(self):
-        """Test transaction status validation."""
-        valid_statuses = ["pending", "confirmed", "failed"]
-        
-        for status in valid_statuses:
-            transaction = Transaction.objects.create(
-                wallet=self.wallet,
-                hash=f"0x{status}",
-                transaction_type="send",
-                amount=Decimal("1.0"),
-                asset=self.asset,
-                status=status,
-                timestamp=timezone.now()
-            )
-            self.assertEqual(transaction.status, status)
-
     def test_transaction_type_choices(self):
         """Test transaction type validation."""
-        valid_types = ["send", "receive", "swap", "contract"]
+        valid_types = [TransactionType.BUY, TransactionType.SELL, TransactionType.TRANSFER]
         
         for tx_type in valid_types:
             transaction = Transaction.objects.create(
                 wallet=self.wallet,
-                hash=f"0x{tx_type}",
+                tx_hash=f"0x{tx_type.value}",
+                block_number=12345,
                 transaction_type=tx_type,
                 amount=Decimal("1.0"),
-                asset=self.asset,
+                asset_symbol=self.asset.symbol,
+                gas_fee=Decimal("0.001"),
                 timestamp=timezone.now()
             )
             self.assertEqual(transaction.transaction_type, tx_type)

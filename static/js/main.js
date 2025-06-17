@@ -44,26 +44,15 @@ function setupHTMXHandlers() {
 }
 
 /**
- * Show error notification toast
+ * Show error notification toast using the global toast system
  * @param {string} message - Error message to display
  */
 function showErrorNotification(message) {
-    // Create error toast notification
-    const toast = document.createElement('div');
-    toast.className = 'fixed top-4 right-4 bg-red-50 border border-red-200 rounded-lg p-4 shadow-lg z-50';
-    toast.innerHTML = `
-        <div class="flex items-center">
-            <svg class="w-5 h-5 text-red-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-            </svg>
-            <p class="text-sm text-red-800">${message}</p>
-        </div>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        toast.remove();
-    }, 5000);
+    // Use the global toast system from app.js
+    if (window.showToast) {
+        window.showToast(message, 'error');
+    } else {
+        // Fallback if app.js hasn't loaded yet
+        console.error('Error:', message);
+    }
 }

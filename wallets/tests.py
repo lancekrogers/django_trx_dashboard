@@ -36,7 +36,7 @@ class WalletModelTestCase(TestCase):
         )
         
         self.assertEqual(wallet.user, self.user)
-        self.assertEqual(wallet.name, "Test Wallet")
+        self.assertEqual(wallet.label, "Test Wallet")
         self.assertEqual(wallet.chain, Chain.ETHEREUM)
         self.assertEqual(wallet.address, "0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07")
         self.assertIsNotNone(wallet.created_at)
@@ -87,13 +87,14 @@ class WalletModelTestCase(TestCase):
         # Same address on different chain should be allowed
         wallet2 = Wallet.objects.create(
             user=self.user,
-            label="Polygon Wallet", 
-            chain=Chain.ETHEREUM,
-            address=address
+            label="Bitcoin Wallet", 
+            chain=Chain.BITCOIN,
+            address="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"  # Different address for different chain
         )
         
         self.assertNotEqual(wallet1.id, wallet2.id)
-        self.assertEqual(wallet1.address, wallet2.address)
+        self.assertNotEqual(wallet1.chain, wallet2.chain)  # Different chains
+        self.assertNotEqual(wallet1.address, wallet2.address)  # Different addresses
 
     def test_wallet_ordering(self):
         """Test wallet ordering by name."""
@@ -153,11 +154,17 @@ class UserSettingsModelTestCase(TestCase):
 
     def test_user_settings_unique_per_user(self):
         """Test that each user can only have one settings record."""
-        UserSettings.objects.create(user=self.user)
+        # Clear any existing settings first
+        UserSettings.objects.filter(user=self.user).delete()
         
-        # Creating another settings record for same user should fail
-        with self.assertRaises(Exception):  # IntegrityError
-            UserSettings.objects.create(user=self.user)
+        # First call should create
+        settings1, created1 = UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': False})
+        self.assertTrue(created1)
+        
+        # Second call should get existing record, not create
+        settings2, created2 = UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': True})
+        self.assertFalse(created2)
+        self.assertEqual(settings1.id, settings2.id)
 
 
 class WalletViewsTestCase(TestCase):

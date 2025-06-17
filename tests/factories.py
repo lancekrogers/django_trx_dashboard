@@ -10,7 +10,7 @@ from decimal import Decimal
 
 from wallets.models import Wallet, UserSettings
 from wallets.models import Chain
-from transactions.models import Transaction, Asset
+from transactions.models import Transaction, Asset, TransactionType
 
 User = get_user_model()
 
@@ -47,28 +47,34 @@ class WalletFactory(DjangoModelFactory):
         model = Wallet
     
     user = factory.SubFactory(UserFactory)
-    label = factory.Faker('word')
+    label = factory.Sequence(lambda n: f"Wallet {n}")
     chain = factory.Iterator([choice[0] for choice in Chain.choices])
-    address = factory.LazyAttribute(lambda obj: f"0x{factory.Faker('hex_string', length=40)}")
+    # Note: address is overridden by the @factory.lazy_attribute method below
     
     @factory.lazy_attribute
     def address(self):
         """Generate chain-appropriate addresses."""
+        import random
+        import string
         if self.chain == Chain.ETHEREUM:
-            return f"0x{factory.Faker('hex_string', length=40).evaluate(None, None, None)}"
+            return f"0x{''.join(random.choice(string.hexdigits.lower()) for _ in range(40))}"
         elif self.chain == Chain.BITCOIN:
-            return factory.Faker('bothify', text='?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#').evaluate(None, None, None)
+            return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(34))
         elif self.chain == Chain.SOLANA:
-            return factory.Faker('bothify', text='?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#?#').evaluate(None, None, None)
+            return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(44))
         else:
-            return f"0x{factory.Faker('hex_string', length=40).evaluate(None, None, None)}"
+            return f"0x{''.join(random.choice(string.hexdigits.lower()) for _ in range(40))}"
 
 
 class EthereumWalletFactory(WalletFactory):
     """Factory for creating Ethereum wallet instances."""
     
     chain = Chain.ETHEREUM
-    address = factory.LazyAttribute(lambda obj: f"0x{factory.Faker('hex_string', length=40).evaluate(None, None, None)}")
+    @factory.lazy_attribute
+    def address(self):
+        import random
+        import string
+        return f"0x{''.join(random.choice(string.hexdigits.lower()) for _ in range(40))}"
 
 
 class BitcoinWalletFactory(WalletFactory):
@@ -82,7 +88,11 @@ class SolanaWalletFactory(WalletFactory):
     """Factory for creating Solana wallet instances."""
     
     chain = Chain.SOLANA
-    address = factory.LazyAttribute(lambda obj: f"{factory.Faker('bothify', text='?#?#?#?#?#?#?#?#?#?#?#?#').evaluate(None, None, None)}")
+    @factory.lazy_attribute
+    def address(self):
+        import random
+        import string
+        return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(44))
 
 
 class AssetFactory(DjangoModelFactory):
@@ -94,7 +104,11 @@ class AssetFactory(DjangoModelFactory):
     symbol = factory.Faker('bothify', text='???')
     name = factory.Faker('company')
     chain = factory.Iterator([choice[0] for choice in Chain.choices])
-    contract_address = factory.LazyAttribute(lambda obj: f"0x{factory.Faker('hex_string', length=40).evaluate(None, None, None)}")
+    @factory.lazy_attribute
+    def contract_address(self):
+        import random
+        import string
+        return f"0x{''.join(random.choice(string.hexdigits.lower()) for _ in range(40))}"
     decimals = 18
 
 
@@ -123,46 +137,35 @@ class TransactionFactory(DjangoModelFactory):
         model = Transaction
     
     wallet = factory.SubFactory(WalletFactory)
-    hash = factory.LazyAttribute(lambda obj: f"0x{factory.Faker('hex_string', length=64).evaluate(None, None, None)}")
+    @factory.lazy_attribute
+    def tx_hash(self):
+        import random
+        import string
+        return f"0x{''.join(random.choice(string.hexdigits.lower()) for _ in range(64))}"
     block_number = factory.Faker('random_int', min=1000000, max=20000000)
-    transaction_type = factory.Iterator(['send', 'receive', 'swap', 'contract'])
-    amount = factory.LazyAttribute(lambda obj: Decimal(factory.Faker('pydecimal', left_digits=4, right_digits=6, positive=True).evaluate(None, None, None)))
-    asset = factory.SubFactory(AssetFactory)
-    from_address = factory.LazyAttribute(lambda obj: f"0x{factory.Faker('hex_string', length=40).evaluate(None, None, None)}")
-    to_address = factory.LazyAttribute(lambda obj: f"0x{factory.Faker('hex_string', length=40).evaluate(None, None, None)}")
-    gas_used = factory.Faker('random_int', min=21000, max=500000)
-    gas_price = factory.LazyAttribute(lambda obj: Decimal(factory.Faker('random_int', min=10, max=100).evaluate(None, None, None)))
-    status = factory.Iterator(['pending', 'confirmed', 'failed'])
-    timestamp = factory.LazyAttribute(lambda obj: timezone.now() - timezone.timedelta(
-        days=factory.Faker('random_int', min=0, max=365).evaluate(None, None, None)
-    ))
+    transaction_type = factory.Iterator([TransactionType.BUY, TransactionType.SELL, TransactionType.TRANSFER])
+    amount = factory.LazyAttribute(lambda obj: Decimal('1.234567'))
+    asset_symbol = factory.Faker('bothify', text='???')
+    gas_fee = factory.LazyAttribute(lambda obj: Decimal('0.001'))
+    timestamp = factory.LazyAttribute(lambda obj: timezone.now())
 
 
-class SendTransactionFactory(TransactionFactory):
-    """Factory for creating send transactions."""
+class BuyTransactionFactory(TransactionFactory):
+    """Factory for creating buy transactions."""
     
-    transaction_type = 'send'
-    from_address = factory.SelfAttribute('wallet.address')
+    transaction_type = TransactionType.BUY
 
 
-class ReceiveTransactionFactory(TransactionFactory):
-    """Factory for creating receive transactions."""
+class SellTransactionFactory(TransactionFactory):
+    """Factory for creating sell transactions."""
     
-    transaction_type = 'receive'
-    to_address = factory.SelfAttribute('wallet.address')
+    transaction_type = TransactionType.SELL
 
 
-class SwapTransactionFactory(TransactionFactory):
-    """Factory for creating swap transactions."""
+class TransferTransactionFactory(TransactionFactory):
+    """Factory for creating transfer transactions."""
     
-    transaction_type = 'swap'
-
-
-class ContractTransactionFactory(TransactionFactory):
-    """Factory for creating contract transactions."""
-    
-    transaction_type = 'contract'
-    gas_used = factory.Faker('random_int', min=50000, max=2000000)
+    transaction_type = TransactionType.TRANSFER
 
 
 # Utility functions for creating test data scenarios
@@ -191,20 +194,30 @@ def create_portfolio_with_transactions(user=None, num_transactions=10):
     else:
         wallets = [WalletFactory(user=user) for _ in range(3)]
     
-    # Create assets
-    eth_asset = EthereumAssetFactory(symbol='ETH', name='Ethereum')
-    btc_asset = BitcoinAssetFactory()
+    # Create assets using get_or_create to avoid unique constraint issues
+    from transactions.models import Asset
+    eth_asset, created = Asset.objects.get_or_create(
+        symbol='ETH', 
+        chain=Chain.ETHEREUM,
+        defaults={'name': 'Ethereum', 'decimals': 18}
+    )
+    btc_asset, created = Asset.objects.get_or_create(
+        symbol='BTC',
+        chain=Chain.BITCOIN, 
+        defaults={'name': 'Bitcoin', 'decimals': 8}
+    )
     
     transactions = []
     
     for i in range(num_transactions):
-        wallet = factory.Faker('random_element', elements=wallets).evaluate(None, None, None)
+        import random
+        wallet = random.choice(wallets)
         asset = eth_asset if wallet.chain == Chain.ETHEREUM else btc_asset
         
         if i % 2 == 0:
-            transaction = ReceiveTransactionFactory(wallet=wallet, asset=asset)
+            transaction = BuyTransactionFactory(wallet=wallet, asset_symbol=asset.symbol)
         else:
-            transaction = SendTransactionFactory(wallet=wallet, asset=asset)
+            transaction = SellTransactionFactory(wallet=wallet, asset_symbol=asset.symbol)
         
         transactions.append(transaction)
     

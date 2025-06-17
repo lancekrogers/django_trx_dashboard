@@ -16,7 +16,8 @@ from .factories import (
     UserFactory, 
     WalletFactory, 
     AssetFactory, 
-    TransactionFactory,
+    BuyTransactionFactory,
+    SellTransactionFactory,
     create_user_with_wallets,
     create_portfolio_with_transactions
 )
@@ -63,7 +64,7 @@ class UserWorkflowIntegrationTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify wallet was created
-        wallet = Wallet.objects.get(user=self.user)
+        wallet = Wallet.objects.filter(user=self.user, label="My ETH Wallet").first()
         self.assertEqual(wallet.label, "My ETH Wallet")
         self.assertEqual(wallet.chain, Chain.ETHEREUM)
 
@@ -96,11 +97,14 @@ class PortfolioCalculationIntegrationTestCase(TestCase):
     def test_portfolio_with_multiple_assets(self):
         """Test portfolio calculations with multiple assets and wallets."""
         # Create ETH asset and transactions
-        eth_asset = AssetFactory(
+        from transactions.models import Asset
+        eth_asset, created = Asset.objects.get_or_create(
             symbol="ETH",
-            name="Ethereum",
             chain=Chain.ETHEREUM,
-            decimals=18
+            defaults={
+                "name": "Ethereum",
+                "decimals": 18
+            }
         )
         
         eth_wallet = WalletFactory(
@@ -109,26 +113,26 @@ class PortfolioCalculationIntegrationTestCase(TestCase):
         )
 
         # Add some ETH transactions
-        TransactionFactory(
+        BuyTransactionFactory(
             wallet=eth_wallet,
-            asset=eth_asset,
-            transaction_type="receive",
+            asset_symbol=eth_asset.symbol,
             amount=Decimal("5.0")
         )
         
-        TransactionFactory(
+        SellTransactionFactory(
             wallet=eth_wallet,
-            asset=eth_asset,
-            transaction_type="send",
+            asset_symbol=eth_asset.symbol,
             amount=Decimal("1.5")
         )
 
         # Create BTC asset and transactions
-        btc_asset = AssetFactory(
+        btc_asset, created = Asset.objects.get_or_create(
             symbol="BTC",
-            name="Bitcoin",
             chain=Chain.BITCOIN,
-            decimals=8
+            defaults={
+                "name": "Bitcoin",
+                "decimals": 8
+            }
         )
         
         btc_wallet = WalletFactory(
@@ -136,10 +140,9 @@ class PortfolioCalculationIntegrationTestCase(TestCase):
             chain=Chain.BITCOIN
         )
 
-        TransactionFactory(
+        BuyTransactionFactory(
             wallet=btc_wallet,
-            asset=btc_asset,
-            transaction_type="receive",
+            asset_symbol=btc_asset.symbol,
             amount=Decimal("0.25")
         )
 
@@ -159,12 +162,19 @@ class PortfolioCalculationIntegrationTestCase(TestCase):
     def test_portfolio_with_user_settings(self):
         """Test portfolio behavior with different user settings."""
         # Test with mock data disabled
-        settings = UserSettings.objects.create(
+        # First clear any existing UserSettings that might have been created
+        UserSettings.objects.filter(user=self.user).delete()
+        settings, created = UserSettings.objects.get_or_create(
             user=self.user,
-            mock_data_enabled=False
+            defaults={'mock_data_enabled': False}
         )
 
-        summary = self.service.get_portfolio_summary()
+        # Clear any cached data and create a new service to pick up the updated settings
+        from transactions.models import PortfolioCache
+        PortfolioCache.objects.filter(user=self.user).delete()
+        
+        service = PortfolioService(self.user)
+        summary = service.get_portfolio_summary()
         self.assertEqual(summary['total_value_usd'], 0)  # Should be 0 with no mock data
 
         # Enable mock data
@@ -260,22 +270,20 @@ class APIIntegrationTestCase(TestCase):
         # Create test data
         wallet = WalletFactory(user=self.user)
         asset = AssetFactory()
-        UserSettings.objects.create(user=self.user, mock_data_enabled=True)
+        UserSettings.objects.get_or_create(user=self.user, defaults={'mock_data_enabled': True})
         
-        TransactionFactory(
+        SellTransactionFactory(
             wallet=wallet,
-            asset=asset,
-            transaction_type="send"
+            asset_symbol=asset.symbol
         )
         
-        TransactionFactory(
+        BuyTransactionFactory(
             wallet=wallet,
-            asset=asset,
-            transaction_type="receive"
+            asset_symbol=asset.symbol
         )
 
         # Test filtering by type
-        response = self.client.get("/htmx/transactions/?type=send")
+        response = self.client.get("/htmx/transactions/?type=sell")
         self.assertEqual(response.status_code, 200)
 
         # Test filtering by wallet

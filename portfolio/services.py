@@ -127,7 +127,7 @@ class PortfolioService:
             value = Decimal(str(current_value)) * Decimal(str(variation))
 
             data_points.append(
-                {"timestamp": timestamp.isoformat(), "value": float(value)}
+                {"timestamp": timestamp.isoformat(), "total_value_usd": float(value)}
             )
 
         return data_points

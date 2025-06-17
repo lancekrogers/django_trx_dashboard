@@ -1,0 +1,50 @@
+{% comment %}
+Transaction Filters Component - Filter form for transactions
+Purpose: Reusable filter interface for transaction filtering
+Usage: {% include "partials/transaction_filters.html" with wallets=user_wallets %}
+{% endcomment %}
+
+<div class="bg-dark-card border border-dark-border rounded-lg p-4 mb-6">
+    <form hx-get="{% url 'htmx:transactions' %}" 
+          hx-target="#transactions-table" 
+          hx-swap="innerHTML"
+          class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <div>
+            <label for="wallet" class="block text-sm font-medium text-dark-text mb-2">Wallet</label>
+            <select name="wallet" id="wallet" 
+                    class="w-full px-3 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="">All Wallets</option>
+                {% for wallet in wallets %}
+                <option value="{{ wallet.id }}">{{ wallet.label|default:wallet.chain|title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div>
+            <label for="type" class="block text-sm font-medium text-dark-text mb-2">Type</label>
+            <select name="type" id="type" 
+                    class="w-full px-3 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="">All Types</option>
+                <option value="SEND">Send</option>
+                <option value="RECEIVE">Receive</option>
+                <option value="SWAP">Swap</option>
+                <option value="CONTRACT">Contract</option>
+            </select>
+        </div>
+        
+        <div>
+            <label for="search" class="block text-sm font-medium text-dark-text mb-2">Search</label>
+            <input type="text" name="search" id="search" 
+                   placeholder="Hash or address..."
+                   class="w-full px-3 py-2 bg-dark-bg border border-dark-border rounded-lg text-dark-text placeholder-dark-text-secondary focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        
+        <div class="flex items-end">
+            <button type="submit" 
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                Filter
+            </button>
+        </div>
+    </form>
+</div>

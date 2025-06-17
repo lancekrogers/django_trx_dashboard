@@ -59,7 +59,9 @@ class Wallet(models.Model):
     address = models.CharField(max_length=100)
     chain = models.CharField(max_length=20, choices=Chain.choices)
     label = models.CharField(max_length=100, blank=True)
+    notes = models.TextField(blank=True, help_text="Investigation notes for this wallet")
     is_active = models.BooleanField(default=True)
+    is_monitored = models.BooleanField(default=False, help_text="Enable real-time monitoring alerts")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -99,7 +101,7 @@ class UserSettings(models.Model):
     """User preference settings"""
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="settings")
-    mock_data_enabled = models.BooleanField(default=False)
+    mock_data_enabled = models.BooleanField(default=True)  # Default to mock data enabled
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

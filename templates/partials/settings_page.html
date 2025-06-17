@@ -1,167 +1,112 @@
-<!-- Settings Page -->
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Settings</h1>
-        <p class="mt-2 text-gray-600">Manage your account preferences and configuration.</p>
-    </div>
+{% comment %}
+Dark Settings Page - User settings with dark theme
+Purpose: Allow users to manage their settings including mock data
+Features: Mock data toggle, profile information, dark styling
+Used by: Dark theme settings view
+{% endcomment %}
 
-    <!-- Success Message -->
+<div class="p-6">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-dark-text">Settings</h2>
+        <p class="text-dark-text-secondary mt-1">Manage your account preferences</p>
+    </div>
+    
     {% if success %}
-    <div class="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <div class="ml-3">
-                <p class="text-sm font-medium text-green-800">{{ success }}</p>
-            </div>
-        </div>
+    <div class="bg-green-900/20 border border-green-800 text-green-400 px-4 py-3 rounded-lg mb-6">
+        <p class="text-sm">{{ success }}</p>
     </div>
     {% endif %}
-
-    <!-- Settings Form -->
-    <div class="bg-white shadow rounded-lg divide-y divide-gray-200">
-        <!-- Mock Data Section -->
-        <div class="p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Data Preferences</h3>
+    
+    {% if error %}
+    <div class="bg-red-900/20 border border-red-800 text-red-400 px-4 py-3 rounded-lg mb-6">
+        <p class="text-sm">{{ error }}</p>
+    </div>
+    {% endif %}
+    
+    <!-- Profile Information -->
+    <div class="bg-dark-card border border-dark-border rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-dark-text mb-4">Profile Information</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-dark-text-secondary mb-1">Email</label>
+                <p class="text-dark-text">{{ user.email }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-dark-text-secondary mb-1">Member Since</label>
+                <p class="text-dark-text">{{ user.created_at|date:"F d, Y" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data Settings -->
+    <div class="bg-dark-card border border-dark-border rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-dark-text mb-4">Data Settings</h3>
+        
+        <form hx-post="{% url 'htmx:settings' %}" 
+              hx-target="#main-content" 
+              hx-swap="innerHTML"
+              class="space-y-4">
+            {% csrf_token %}
             
-            <form hx-post="/settings/" hx-target="#main-content" hx-swap="innerHTML">
-                {% csrf_token %}
-                <div class="space-y-6">
-                    <!-- Mock Data Toggle -->
-                    <div class="flex items-start">
-                        <div class="flex items-center h-5">
-                            <input 
-                                id="mock_data_enabled" 
-                                name="mock_data_enabled" 
-                                type="checkbox" 
-                                {% if settings.mock_data_enabled %}checked{% endif %}
-                                class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                            >
-                        </div>
-                        <div class="ml-3 text-sm">
-                            <label for="mock_data_enabled" class="font-medium text-gray-700">
-                                Enable Mock Data
-                            </label>
-                            <p class="text-gray-500">
-                                When enabled, your portfolio will display mock transactions and balances for demonstration purposes. 
-                                This is useful for testing and demos when you don't have real blockchain data.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Mock Data Info -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <h4 class="text-sm font-medium text-blue-800">About Mock Data</h4>
-                                <div class="mt-2 text-sm text-blue-700">
-                                    <ul class="list-disc list-inside space-y-1">
-                                        <li>Mock data includes sample transactions across Ethereum, Bitcoin, and Solana</li>
-                                        <li>Portfolio values and historical data are generated for demonstration</li>
-                                        <li>Real blockchain connections are disabled when mock data is active</li>
-                                        <li>You can toggle this setting anytime without losing your wallet configuration</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Current Status -->
-                    <div class="bg-gray-50 rounded-md p-4">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                {% if settings.mock_data_enabled %}
-                                <div class="h-2 w-2 bg-green-400 rounded-full"></div>
-                                {% else %}
-                                <div class="h-2 w-2 bg-gray-400 rounded-full"></div>
-                                {% endif %}
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-900">
-                                    Current Status: 
-                                    {% if settings.mock_data_enabled %}
-                                        <span class="text-green-600">Mock Data Enabled</span>
-                                    {% else %}
-                                        <span class="text-gray-600">Real Data Mode</span>
-                                    {% endif %}
-                                </p>
-                                <p class="text-xs text-gray-500 mt-1">
-                                    {% if settings.mock_data_enabled %}
-                                        Your dashboard is currently showing mock/demo data for testing purposes.
-                                    {% else %}
-                                        Your dashboard will attempt to connect to real blockchain data sources.
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="flex justify-end">
-                        <button 
-                            type="submit"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Save Settings
-                        </button>
-                    </div>
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <label for="mock_data_enabled" class="text-dark-text font-medium">
+                        Enable Mock Data
+                    </label>
+                    <p class="text-dark-text-secondary text-sm mt-1">
+                        Use simulated data for demonstration purposes. Enable this to see example portfolio values and transactions.
+                    </p>
                 </div>
-            </form>
-
-            <!-- Refresh Mock Data Button -->
-            {% if settings.mock_data_enabled %}
-            <div class="mt-6 pt-6 border-t border-gray-200">
-                <h4 class="text-sm font-medium text-gray-900 mb-3">Mock Data Management</h4>
-                <p class="text-sm text-gray-600 mb-4">
-                    Refresh mock data to update all transaction dates to the current date. This is useful for testing charts with recent data.
-                </p>
-                <button 
-                    hx-post="/refresh-mock-data/"
-                    hx-target="#main-content"
-                    hx-swap="innerHTML"
-                    class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                >
-                    Refresh Mock Data
+                <div class="ml-4">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" 
+                               id="mock_data_enabled"
+                               name="mock_data_enabled" 
+                               {% if settings.mock_data_enabled %}checked{% endif %}
+                               class="sr-only peer">
+                        <div class="w-11 h-6 bg-dark-border peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="pt-4">
+                <button type="submit" 
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    Save Changes
                 </button>
             </div>
-            {% endif %}
+        </form>
+        
+        {% if settings.mock_data_enabled %}
+        <div class="mt-6 pt-6 border-t border-dark-border">
+            <h4 class="text-dark-text font-medium mb-3">Mock Data Actions</h4>
+            <button hx-post="{% url 'htmx:refresh_mock_data' %}"
+                    hx-target="#main-content"
+                    hx-swap="innerHTML"
+                    class="bg-dark-hover hover:bg-dark-border text-dark-text px-4 py-2 rounded-lg transition-colors">
+                <i data-feather="refresh-cw" class="w-4 h-4 inline mr-2"></i>
+                Refresh Mock Data
+            </button>
+            <p class="text-dark-text-secondary text-xs mt-2">
+                This will update all mock transactions with recent dates
+            </p>
         </div>
-
-        <!-- Account Information Section -->
-        <div class="p-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Account Information</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Email</label>
-                    <div class="mt-1 text-sm text-gray-900">{{ user.email }}</div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Account Type</label>
-                    <div class="mt-1 text-sm text-gray-900">
-                        {% if user.is_superuser %}
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                Administrator
-                            </span>
-                        {% else %}
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                Standard User
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Member Since</label>
-                    <div class="mt-1 text-sm text-gray-900">{{ user.date_joined|date:"F j, Y" }}</div>
-                </div>
+        {% endif %}
+    </div>
+    
+    <!-- Danger Zone -->
+    <div class="bg-dark-card border border-red-900/50 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-red-400 mb-4">Danger Zone</h3>
+        <div class="space-y-4">
+            <div>
+                <p class="text-dark-text-secondary text-sm mb-3">
+                    Once you delete your account, there is no going back. Please be certain.
+                </p>
+                <button class="border border-red-800 text-red-400 hover:bg-red-900/20 px-4 py-2 rounded-lg transition-colors">
+                    Delete Account
+                </button>
             </div>
         </div>
     </div>
 </div>
+

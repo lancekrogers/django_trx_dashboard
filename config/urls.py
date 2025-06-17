@@ -13,15 +13,15 @@ from transactions.api import router as transactions_router
 from wallets.api import router as wallets_router
 
 api = NinjaAPI(
-    title="Portfolio Dashboard API",
+    title="Blockchain Investigation API",
     version="1.0.0",
-    description="Multi-chain cryptocurrency portfolio tracker API",
+    description="Multi-chain blockchain investigation and analysis platform API",
 )
 
 # Add routers
 api.add_router("/auth/", auth_router, tags=["Authentication"])
 api.add_router("/v1/wallets/", wallets_router, tags=["Wallets"])
-api.add_router("/v1/portfolio/", portfolio_router, tags=["Portfolio"])
+api.add_router("/v1/investigations/", portfolio_router, tags=["Investigations"])
 api.add_router("/v1/transactions/", transactions_router, tags=["Transactions"])
 
 urlpatterns = [
