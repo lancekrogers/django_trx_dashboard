@@ -2,22 +2,34 @@
 .envrc
 .direnv/
 .env
+.env.*
 .venv/
+venv/
+env/
 
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
 *.so
 *.egg-info/
 .pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
 
 # Django
 staticfiles/
+media/
 *.sqlite3
 *.db
+portfolio.db
+db.sqlite3
 
 # Logs
 logs/
+*.log
 server.log
 
 # IDE
@@ -25,10 +37,30 @@ server.log
 .vscode/
 .idea/
 
+# Security & sensitive files
+cookies.txt
+*.pem
+*.key
+*.crt
+*.p12
+.htpasswd
+
 # Docs (auto-generated)
 MAKEFILE_GUIDE.md
 
 # Node/Frontend
 node_modules/
 package-lock.json
+yarn.lock
 static/css/output.css
+
+# OS files
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# Backup files
+*.bak
+*.backup
+*~

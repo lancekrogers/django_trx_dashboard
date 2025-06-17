@@ -58,18 +58,29 @@ class InvestigationCase(models.Model):
     @property
     def wallet_count(self):
         """Number of wallets in this case"""
+        # Use annotated value if available (more efficient)
+        if hasattr(self, '_wallet_count'):
+            return self._wallet_count
         return self.wallets.count()
     
     @property 
     def transaction_count(self):
         """Total transactions across all wallets in this case"""
+        # Use annotated value if available
+        if hasattr(self, '_transaction_count'):
+            return self._transaction_count
         from transactions.models import Transaction
         wallet_ids = self.wallets.values_list('id', flat=True)
-        return Transaction.objects.filter(wallet_id__in=wallet_ids).count()
+        if wallet_ids:
+            return Transaction.objects.filter(wallet_id__in=wallet_ids).count()
+        return 0
     
     @property
     def flagged_count(self):
         """Number of flagged wallets in this case"""
+        # Use annotated value if available (more efficient)
+        if hasattr(self, '_flagged_count'):
+            return self._flagged_count
         return self.case_wallets.filter(flagged=True).count()
 
 

@@ -6,6 +6,7 @@ import os
 import warnings
 from datetime import timedelta
 from pathlib import Path
+from decouple import config, Csv
 
 # Suppress pkg_resources deprecation warning from djangorestframework-simplejwt
 warnings.filterwarnings("ignore", message=".*pkg_resources is deprecated.*")
@@ -14,12 +15,12 @@ warnings.filterwarnings("ignore", message=".*pkg_resources is deprecated.*")
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-dev-key-replace-in-production"
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-only-for-local-development')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver', cast=Csv())
 
 # Application definition
 INSTALLED_APPS = [
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     # Third party
     "django_extensions",
     "corsheaders",

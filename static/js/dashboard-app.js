@@ -274,6 +274,31 @@ function initializeCharts() {
         return;
     }
 
+    // Skip initialization if we're on the case dashboard (it has its own chart init)
+    if (window.caseChartsInitialized) {
+        console.log('Case dashboard charts already initialized, skipping dashboard-app initialization');
+        return;
+    }
+
+    // Check if charts already exist on the canvas elements (from case dashboard)
+    const portfolioCanvas = document.getElementById('portfolio-chart');
+    const activityCanvas = document.getElementById('activity-chart');
+    
+    if (portfolioCanvas && portfolioCanvas.chartInstance) {
+        console.log('Charts already initialized by case dashboard, skipping');
+        return;
+    }
+
+    // Destroy existing charts if they exist
+    if (window.DashboardApp.charts.portfolio) {
+        window.DashboardApp.charts.portfolio.destroy();
+        window.DashboardApp.charts.portfolio = null;
+    }
+    if (window.DashboardApp.charts.activity) {
+        window.DashboardApp.charts.activity.destroy();
+        window.DashboardApp.charts.activity = null;
+    }
+
     // Portfolio Chart
     const portfolioCtx = document.getElementById('portfolio-chart');
     if (portfolioCtx && !window.DashboardApp.charts.portfolio) {
@@ -478,8 +503,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // HTMX after request handler
     document.addEventListener('htmx:afterRequest', function(e) {
-        // Re-initialize charts after HTMX content loads
-        setTimeout(initializeCharts, 100);
+        // Only initialize charts if we're not on the case dashboard
+        if (!window.caseChartsInitialized) {
+            setTimeout(initializeCharts, 100);
+        }
         
         // Start real-time updates if we're on a case detail page
         const path = new URL(e.detail.xhr.responseURL).pathname;

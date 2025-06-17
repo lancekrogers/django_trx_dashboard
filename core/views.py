@@ -309,7 +309,27 @@ def home_view(request):
     from django.middleware.csrf import get_token
     get_token(request)
     
-    # Always show the cases list, but context changes based on auth
+    # Auto-login demo user for interview demo
+    if not request.user.is_authenticated:
+        from django.contrib.auth import login
+        try:
+            demo_user = User.objects.get(email='lance@blockhead.consulting')
+            if demo_user.is_active:
+                # Log in without password for demo
+                demo_user.backend = 'django.contrib.auth.backends.ModelBackend'
+                login(request, demo_user)
+                
+                # Redirect to Arbitrage Bot case for demo
+                arbitrage_case = InvestigationCase.objects.filter(
+                    investigator=demo_user,
+                    name__icontains='arbitrage'
+                ).first()
+                if arbitrage_case:
+                    return htmx_case_detail(request, arbitrage_case.id)
+        except User.DoesNotExist:
+            pass
+    
+    # Show cases list if already authenticated or if auto-login failed
     return htmx_cases_list(request)
 
 
@@ -472,13 +492,27 @@ def htmx_refresh_mock_data(request):
 def htmx_cases_list(request):
     """Return the list of investigation cases with filtering and stats - public or authenticated."""
     if request.user.is_authenticated:
-        cases = InvestigationCase.objects.filter(investigator=request.user).prefetch_related('case_wallets__wallet')
+        cases = InvestigationCase.objects.filter(
+            investigator=request.user
+        ).prefetch_related(
+            'case_wallets__wallet',
+            'wallets'  # Prefetch wallets for wallet_count property
+        ).annotate(
+            _wallet_count=models.Count('wallets', distinct=True),
+            _flagged_count=models.Count('case_wallets', filter=models.Q(case_wallets__flagged=True))
+        )
         user_wallets = Wallet.objects.filter(user=request.user)
         user_transactions = Transaction.objects.filter(wallet__user=request.user)
         is_demo_mode = False
     else:
         # Demo mode - show all cases as read-only examples
-        cases = InvestigationCase.objects.all().prefetch_related('case_wallets__wallet')
+        cases = InvestigationCase.objects.all().prefetch_related(
+            'case_wallets__wallet',
+            'wallets'
+        ).annotate(
+            _wallet_count=models.Count('wallets', distinct=True),
+            _flagged_count=models.Count('case_wallets', filter=models.Q(case_wallets__flagged=True))
+        )
         user_wallets = Wallet.objects.all()
         user_transactions = Transaction.objects.all()
         is_demo_mode = True
@@ -512,9 +546,10 @@ def htmx_cases_list(request):
     if priority:
         cases = cases.filter(priority=priority)
     
-    # Apply slicing for demo mode after all filtering
-    if is_demo_mode:
-        cases = cases[:10]
+    # Don't limit cases in demo mode - show all available cases
+    # This ensures the statistics match what's displayed
+    # if is_demo_mode:
+    #     cases = cases[:10]
     
     context = {
         'investigation_cases': cases,
@@ -621,7 +656,16 @@ def htmx_case_detail(request, case_id):
     wallet_ids = case_wallets.values_list('wallet_id', flat=True)
     
     # Calculate metrics
-    transactions = Transaction.objects.filter(wallet_id__in=wallet_ids)
+    if wallet_ids:
+        transactions = Transaction.objects.filter(wallet_id__in=wallet_ids)
+    else:
+        # If no wallets in case, show all user transactions as fallback
+        if request.user.is_authenticated:
+            transactions = Transaction.objects.filter(wallet__user=request.user)
+        else:
+            # Demo mode - show sample transactions
+            transactions = Transaction.objects.all()[:100]
+    
     transaction_count = transactions.count()
     
     # Calculate total value
@@ -683,7 +727,17 @@ def htmx_case_detail(request, case_id):
         timeline_data.append(count)
     
     # Get recent transactions for case wallets
-    recent_transactions = transactions.select_related('wallet').order_by('-timestamp')[:10]
+    if wallet_ids:
+        recent_transactions = transactions.select_related('wallet').order_by('-timestamp')[:10]
+    else:
+        # Show recent user transactions if no case wallets
+        if request.user.is_authenticated:
+            recent_transactions = Transaction.objects.filter(
+                wallet__user=request.user
+            ).select_related('wallet').order_by('-timestamp')[:10]
+        else:
+            # Demo mode - show sample transactions
+            recent_transactions = Transaction.objects.all().select_related('wallet').order_by('-timestamp')[:10]
     
     import json
     
@@ -706,29 +760,68 @@ def htmx_case_detail(request, case_id):
     return render(request, "partials/case_dashboard_working.html", context)
 
 
-@login_required
 @require_http_methods(["GET"])
 def htmx_case_transactions(request, case_id):
     """Get paginated transactions for a case."""
-    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
-    case_wallets = CaseWallet.objects.filter(case=case)
-    wallet_ids = case_wallets.values_list('wallet_id', flat=True)
+    # Handle both authenticated and demo mode
+    is_demo_mode = not request.user.is_authenticated
     
-    # Get transactions for all wallets in this case
-    transactions = Transaction.objects.filter(
-        wallet_id__in=wallet_ids
-    ).select_related('wallet').order_by('-timestamp')
+    # For testing/demo, also check if this is the demo user viewing their own data
+    if request.user.is_authenticated and request.user.email == 'lance@blockhead.consulting':
+        # Treat demo user as regular authenticated user to show real data
+        is_demo_mode = False
     
-    # Paginate
-    paginator = Paginator(transactions, 20)
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
+    if is_demo_mode:
+        # In demo mode, find case by ID without auth check
+        case = get_object_or_404(InvestigationCase, id=case_id)
+        
+        # Get case wallets to show real transactions
+        case_wallets = CaseWallet.objects.filter(case=case)
+        wallet_ids = case_wallets.values_list('wallet_id', flat=True)
+        
+        if wallet_ids:
+            # Get real transactions for these wallets
+            transactions = Transaction.objects.filter(
+                wallet_id__in=wallet_ids
+            ).select_related('wallet').order_by('-timestamp')
+        else:
+            # Fallback to all transactions if no wallets in case
+            transactions = Transaction.objects.all().select_related('wallet').order_by('-timestamp')[:100]
+        
+        # Create a manual paginator
+        paginator = Paginator(transactions, 20)
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+        
+    else:
+        # Authenticated mode
+        case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+        case_wallets = CaseWallet.objects.filter(case=case)
+        wallet_ids = case_wallets.values_list('wallet_id', flat=True)
+        
+        # Get real transactions
+        if wallet_ids:
+            transactions = Transaction.objects.filter(
+                wallet_id__in=wallet_ids
+            ).select_related('wallet').order_by('-timestamp')
+        else:
+            # If no wallets in case, show all user transactions as fallback
+            transactions = Transaction.objects.filter(
+                wallet__user=request.user
+            ).select_related('wallet').order_by('-timestamp')
+        
+        # Paginate
+        paginator = Paginator(transactions, 20)
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
     
     context = {
         'case': case,
         'transactions': page_obj,
         'page_obj': page_obj,
         'is_paginated': page_obj.has_other_pages(),
+        'is_demo_mode': is_demo_mode,
+        'user_authenticated': request.user.is_authenticated,
     }
     
     return render(request, "partials/case_transactions.html", context)

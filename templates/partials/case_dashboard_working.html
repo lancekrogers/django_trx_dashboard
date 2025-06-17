@@ -92,8 +92,8 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Total Transactions</p>
-                        <p class="text-3xl font-bold text-white mt-2">{{ transaction_count|default:500 }}</p>
-                        <p class="text-green-400 text-sm mt-1 font-medium">+12% vs last week</p>
+                        <p class="text-3xl font-bold text-white mt-2" id="transaction-count">{{ transaction_count|default:0 }}</p>
+                        <p class="text-green-400 text-sm mt-1 font-medium" id="transaction-trend">+12% vs last week</p>
                     </div>
                     <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
                         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,8 +107,8 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Tracked Wallets</p>
-                        <p class="text-3xl font-bold text-white mt-2">{{ case_wallets.count|default:8 }}</p>
-                        <p class="text-blue-400 text-sm mt-1 font-medium">4 chains</p>
+                        <p class="text-3xl font-bold text-white mt-2" id="wallet-count">{{ case_wallets.count|default:0 }}</p>
+                        <p class="text-blue-400 text-sm mt-1 font-medium" id="chain-info">4 chains</p>
                     </div>
                     <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
                         <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +122,7 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Portfolio Value</p>
-                        <p class="text-3xl font-bold text-white mt-2" id="portfolio-value">$2.4M</p>
+                        <p class="text-3xl font-bold text-white mt-2" id="portfolio-value">${{ total_value|floatformat:0|intcomma|default:"0" }}</p>
                         <p class="text-green-400 text-sm mt-1 font-medium" id="portfolio-change">+5.67% (24h)</p>
                     </div>
                     <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
@@ -137,8 +137,8 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm font-medium uppercase tracking-wide">Risk Score</p>
-                        <p class="text-3xl font-bold text-white mt-2">{{ suspicious_count|default:23 }}</p>
-                        <p class="text-yellow-400 text-sm mt-1 font-medium">Medium risk</p>
+                        <p class="text-3xl font-bold text-white mt-2" id="suspicious-count">{{ suspicious_count|default:0 }}</p>
+                        <p class="text-yellow-400 text-sm mt-1 font-medium" id="risk-level">Medium risk</p>
                     </div>
                     <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
                         <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -557,6 +557,9 @@ function updateChartsWithTimeframe(caseId, timeframe) {
 
 // Function to update chart data
 function updateChartData(simulationData) {
+    // Store latest simulation data globally for statistics updates
+    window.latestSimulationData = simulationData;
+    
     const portfolioChart = document.getElementById('portfolio-chart');
     const activityChart = document.getElementById('activity-chart');
     
@@ -808,6 +811,9 @@ function simulateNewTransaction() {
     const tbody = document.getElementById('transactions-tbody');
     if (!tbody) return;
     
+    // Set flag for statistics update
+    window.transactionAdded = true;
+    
     // Remove "no transactions" row if it exists
     const noTxRow = document.getElementById('no-transactions-row');
     if (noTxRow) {
@@ -881,5 +887,51 @@ function simulateNewTransaction() {
     
     // Update charts when transaction is added
     updateChartsOnTransaction(scenario);
+    
+    // Update statistics dynamically
+    updateCaseStatistics();
 }
+
+// Function to update case statistics
+function updateCaseStatistics() {
+    // Increment transaction count only when new transactions are added
+    const transactionCountEl = document.getElementById('transaction-count');
+    if (transactionCountEl && window.transactionAdded) {
+        const currentCount = parseInt(transactionCountEl.textContent) || 0;
+        transactionCountEl.textContent = currentCount + 1;
+        window.transactionAdded = false; // Reset flag
+        
+        // Add flash effect
+        transactionCountEl.classList.add('animate-pulse');
+        setTimeout(() => transactionCountEl.classList.remove('animate-pulse'), 1000);
+    }
+    
+    // Update suspicious count randomly (for demo)
+    const suspiciousCountEl = document.getElementById('suspicious-count');
+    if (suspiciousCountEl && Math.random() > 0.7) { // 30% chance of suspicious
+        const currentSuspicious = parseInt(suspiciousCountEl.textContent) || 0;
+        suspiciousCountEl.textContent = currentSuspicious + 1;
+    }
+    
+    // Update portfolio value based on simulation
+    if (window.latestSimulationData && window.latestSimulationData.summary) {
+        const portfolioValueEl = document.getElementById('portfolio-value');
+        if (portfolioValueEl) {
+            const totalBalance = window.latestSimulationData.summary.total_balance;
+            portfolioValueEl.textContent = '$' + (totalBalance / 1000000).toFixed(2) + 'M';
+        }
+        
+        const portfolioChangeEl = document.getElementById('portfolio-change');
+        if (portfolioChangeEl && window.latestSimulationData.summary.change_percent) {
+            const changePercent = window.latestSimulationData.summary.change_percent;
+            portfolioChangeEl.textContent = changePercent + '% (24h)';
+            portfolioChangeEl.className = parseFloat(changePercent) >= 0 ? 
+                'text-green-400 text-sm mt-1 font-medium' : 
+                'text-red-400 text-sm mt-1 font-medium';
+        }
+    }
+}
+
+// Poll for statistics updates every 5 seconds
+setInterval(updateCaseStatistics, 5000);
 </script>

@@ -1,0 +1,26 @@
+# Demo Database Setup
+
+If you want to include a pre-populated demo database with your deployment:
+
+1. Generate your demo data locally:
+   ```bash
+   make mock-data-full
+   ```
+
+2. Copy the database for demo purposes:
+   ```bash
+   cp portfolio.db portfolio_demo.db
+   ```
+
+3. Update your deployment settings to use the demo database:
+   - Set DATABASE_NAME environment variable to 'portfolio_demo.db'
+   - Or modify settings.py to check for demo database first
+
+4. Add to version control (update .gitignore):
+   ```bash
+   # In .gitignore, add exception for demo database
+   *.db
+   !portfolio_demo.db
+   ```
+
+This approach ensures consistent demo data across all deployments.
