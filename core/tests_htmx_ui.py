@@ -341,9 +341,9 @@ class WalletManagementTests(HTMXTestMixin, TestCase):
             },
         )
         self.assertHTMXResponse(response)
-        # The template uses |title filter which converts "ETH" to "Eth"
-        self.assertContains(response, "My Eth Wallet")
-        self.assertContains(response, "0x1234567890123456789012345678901234567890")
+        # The wallet label is displayed as-is (not title-cased)
+        self.assertContains(response, "My ETH Wallet")
+        self.assertContains(response, "0x1234...7890")
 
         # Verify wallet was created
         wallet = Wallet.objects.filter(user=self.user, label="My ETH Wallet").first()

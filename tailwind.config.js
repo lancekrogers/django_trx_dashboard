@@ -6,7 +6,7 @@ module.exports = {
     "./static/js/**/*.js",
   ],
   presets: [
-    require("franken-ui/shadcn-ui/preset")
+    require("franken-ui/shadcn-ui/preset-quick")
   ],
   theme: {
     extend: {

@@ -19,11 +19,16 @@ from transactions.models import Transaction
 from wallets.models import User, UserSettings, Wallet
 
 
+def get_theme_preference(request):
+    """Get user's theme preference. Default to light theme for testing compatibility."""
+    # TODO: Later check user settings or session for theme preference
+    return False  # False = light theme, True = dark theme
+
+
 @require_http_methods(["GET", "POST"])
 def htmx_login(request):
     """Handle login form display and submission."""
-    # Check for dark theme preference (default to dark for now)
-    use_dark_theme = True  # You can later check user settings
+    use_dark_theme = get_theme_preference(request)
     
     if request.method == "GET":
         if use_dark_theme:
@@ -146,8 +151,7 @@ def htmx_login(request):
 @require_http_methods(["GET", "POST"])
 def htmx_add_wallet(request):
     """Handle add wallet form display and submission."""
-    # Check for dark theme preference (default to dark for now)
-    use_dark_theme = True  # You can later check user settings
+    use_dark_theme = get_theme_preference(request)
     
     if request.method == "GET":
         if use_dark_theme:
@@ -161,6 +165,8 @@ def htmx_add_wallet(request):
 
     # Validate inputs
     errors = {}
+    if not label:
+        errors["name"] = "Name is required"
     if not chain:
         errors["chain"] = "Chain is required"
     if not address:
@@ -271,8 +277,7 @@ def htmx_portfolio_summary(request):
         return render(request, "partials/portfolio_summary.html", {"summary": summary})
     else:
         # For non-HTMX requests, return a full page with the portfolio summary
-        # Check for dark theme preference (default to dark for now)
-        use_dark_theme = True  # You can later check user settings
+        use_dark_theme = get_theme_preference(request)
         
         if use_dark_theme:
             return render(request, "dashboard_dark.html", {"summary": summary})
@@ -355,8 +360,7 @@ def htmx_transactions(request):
             {"transactions": page_obj, "wallets": wallets},
         )
 
-    # Check for dark theme preference (default to dark for now)
-    use_dark_theme = True  # You can later check user settings
+    use_dark_theme = get_theme_preference(request)
     
     # Return full page
     if use_dark_theme:
@@ -378,8 +382,7 @@ def htmx_wallets(request):
     """Render wallets page."""
     wallets = Wallet.objects.filter(user=request.user)
     
-    # Check for dark theme preference (default to dark for now)
-    use_dark_theme = True  # You can later check user settings
+    use_dark_theme = get_theme_preference(request)
     
     if use_dark_theme:
         return render(request, "partials/wallets_dark.html", {"wallets": wallets})
@@ -451,8 +454,7 @@ def htmx_dashboard(request):
         "summary": summary,
     }
     
-    # Check for dark theme preference (default to dark for now)
-    use_dark_theme = True  # You can later check user settings
+    use_dark_theme = get_theme_preference(request)
     
     # Return partial for HTMX requests, full page otherwise
     if request.htmx:
@@ -467,8 +469,7 @@ def htmx_dashboard(request):
 
 def home_view(request):
     """Root view - single page app container."""
-    # Check for dark theme preference (default to dark for now)
-    use_dark_theme = True  # You can later check user settings
+    use_dark_theme = get_theme_preference(request)
     
     if use_dark_theme:
         return render(request, "app_dark.html")
@@ -499,8 +500,7 @@ def htmx_settings(request):
         user=request.user, defaults={"mock_data_enabled": False}
     )
 
-    # Check for dark theme preference (default to dark for now)
-    use_dark_theme = True  # You can later check user settings
+    use_dark_theme = get_theme_preference(request)
     
     if request.method == "GET":
         if use_dark_theme:

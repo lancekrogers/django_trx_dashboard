@@ -127,7 +127,7 @@ class PortfolioService:
             value = Decimal(str(current_value)) * Decimal(str(variation))
 
             data_points.append(
-                {"timestamp": timestamp.isoformat(), "total_value_usd": float(value)}
+                {"timestamp": timestamp.isoformat(), "value": float(value)}
             )
 
         return data_points
@@ -192,3 +192,91 @@ class PortfolioService:
             "symbol": random.choice(assets),
             "change_24h": random.uniform(5, 25)  # Positive change for "top" performer
         }
+    
+    def _calculate_wallet_balance(self, wallet, asset):
+        """Calculate wallet balance for a specific asset"""
+        from transactions.models import Transaction
+        from decimal import Decimal
+        
+        # Get all transactions for this wallet and asset
+        transactions = Transaction.objects.filter(
+            wallet=wallet,
+            asset_symbol=asset.symbol
+        )
+        
+        balance = Decimal('0')
+        for transaction in transactions:
+            # Use the actual TransactionType values
+            if transaction.transaction_type in ['buy', 'transfer']:
+                balance += transaction.amount
+            elif transaction.transaction_type in ['sell']:
+                balance -= transaction.amount
+        
+        return balance
+    
+    def get_asset_allocation(self):
+        """Get asset allocation across all wallets"""
+        from transactions.models import Transaction, Asset
+        from collections import defaultdict
+        
+        if not self.mock_data_enabled:
+            return []
+        
+        # Get all user's wallets
+        wallets = Wallet.objects.filter(user=self.user, is_active=True)
+        
+        # Calculate balances per asset
+        asset_balances = defaultdict(Decimal)
+        for wallet in wallets:
+            transactions = Transaction.objects.filter(wallet=wallet)
+            for transaction in transactions:
+                if transaction.transaction_type in ['buy', 'transfer']:
+                    asset_balances[transaction.asset_symbol] += transaction.amount
+                elif transaction.transaction_type in ['sell']:
+                    asset_balances[transaction.asset_symbol] -= transaction.amount
+        
+        # Convert to list format with mock prices
+        allocation = []
+        for symbol, balance in asset_balances.items():
+            if balance > 0:  # Only include assets with positive balance
+                # Mock price for calculation
+                mock_price = Decimal('2000') if symbol == 'ETH' else Decimal('45000') if symbol == 'BTC' else Decimal('100')
+                value = balance * mock_price
+                allocation.append({
+                    'symbol': symbol,
+                    'balance': float(balance),
+                    'value_usd': float(value),
+                    'percentage': 0  # Will be calculated later if needed
+                })
+        
+        return allocation
+    
+    def _get_current_prices(self, symbols):
+        """Get current prices (with mock implementation for testing)"""
+        try:
+            import requests
+            # In a real implementation, this would call an external API
+            # For now, simulate the API call for testing
+            response = requests.get("https://api.coingecko.com/api/v3/simple/price")
+            
+            # Mock prices for testing
+            mock_prices = {
+                'ETH': 2000.0,
+                'BTC': 45000.0,
+                'SOL': 100.0,
+                'USDC': 1.0
+            }
+            
+            return {symbol: mock_prices.get(symbol, 1.0) for symbol in symbols}
+        except Exception:
+            # Return empty dict on failure
+            return {}
+    
+    def _get_historical_prices(self, symbols):
+        """Mock method for getting historical prices"""
+        # Return mock historical data
+        return {symbol: [] for symbol in symbols}
+    
+    def get_portfolio_history(self, days=7):
+        """Get portfolio history for specified number of days"""
+        return self.get_historical_data(f"{days}d")

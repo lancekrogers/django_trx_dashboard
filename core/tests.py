@@ -69,7 +69,7 @@ class HTMXViewsTestCase(TestCase):
             "password": "wrongpassword"
         })
         self.assertEqual(response.status_code, 401)
-        self.assertContains(response, "Invalid username or password")
+        self.assertContains(response, "Invalid username or password", status_code=401)
         self.assertTemplateUsed(response, "forms/login.html")
 
     def test_htmx_login_post_missing_fields(self):
@@ -79,7 +79,7 @@ class HTMXViewsTestCase(TestCase):
             "password": ""
         })
         self.assertEqual(response.status_code, 400)
-        self.assertContains(response, "Username and password are required")
+        self.assertContains(response, "Username and password are required", status_code=400)
 
     def test_htmx_logout(self):
         """Test logout via HTMX."""

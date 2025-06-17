@@ -153,8 +153,8 @@ class PortfolioCalculationIntegrationTestCase(TestCase):
         # Test portfolio summary
         summary = self.service.get_portfolio_summary()
         self.assertIsInstance(summary, dict)
-        self.assertIn('total_value', summary)
-        self.assertIn('assets', summary)
+        self.assertIn('total_value_usd', summary)
+        self.assertIn('asset_labels', summary)
 
     def test_portfolio_with_user_settings(self):
         """Test portfolio behavior with different user settings."""
@@ -165,7 +165,7 @@ class PortfolioCalculationIntegrationTestCase(TestCase):
         )
 
         summary = self.service.get_portfolio_summary()
-        self.assertEqual(summary['total_value'], 0)  # Should be 0 with no mock data
+        self.assertEqual(summary['total_value_usd'], 0)  # Should be 0 with no mock data
 
         # Enable mock data
         settings.mock_data_enabled = True
@@ -173,7 +173,7 @@ class PortfolioCalculationIntegrationTestCase(TestCase):
 
         # Portfolio should now show calculated values
         summary = self.service.get_portfolio_summary()
-        self.assertIsInstance(summary['total_value'], (int, float))
+        self.assertIsInstance(summary['total_value_usd'], (int, float))
 
 
 class HTMXIntegrationTestCase(TestCase):
@@ -189,10 +189,10 @@ class HTMXIntegrationTestCase(TestCase):
 
     def test_htmx_navigation_flow(self):
         """Test navigation between pages using HTMX."""
-        # Test dashboard
+        # Test dashboard (HTMX request returns partial)
         response = self.client.get("/htmx/dashboard/", HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "dashboard.html")
+        self.assertTemplateUsed(response, "partials/dashboard_content.html")
 
         # Test wallets page
         response = self.client.get("/htmx/wallets/", HTTP_HX_REQUEST="true")
@@ -234,8 +234,8 @@ class HTMXIntegrationTestCase(TestCase):
         }, HTTP_HX_REQUEST="true")
         
         self.assertEqual(response.status_code, 400)
-        self.assertContains(response, "Chain is required")
-        self.assertContains(response, "Address is required")
+        self.assertContains(response, "Chain is required", status_code=400)
+        self.assertContains(response, "Address is required", status_code=400)
 
 
 class APIIntegrationTestCase(TestCase):

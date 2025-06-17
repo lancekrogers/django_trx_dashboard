@@ -72,7 +72,9 @@ class Wallet(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.label or self.address[:10]}... ({self.get_chain_display()})"
+        if self.label:
+            return f"{self.label} ({self.get_chain_display()})"
+        return f"{self.address[:10]}... ({self.get_chain_display()})"
 
     @property
     def short_address(self):

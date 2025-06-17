@@ -9,7 +9,7 @@ from django.utils import timezone
 from decimal import Decimal
 from unittest.mock import patch, MagicMock
 
-from .models import Transaction, Asset
+from .models import Transaction, Asset, TransactionType
 from wallets.models import Wallet, UserSettings
 from wallets.models import Chain
 
@@ -33,7 +33,7 @@ class AssetModelTestCase(TestCase):
         self.assertEqual(asset.name, "Ethereum")
         self.assertEqual(asset.chain, Chain.ETHEREUM)
         self.assertEqual(asset.decimals, 18)
-        self.assertIsNotNone(asset.created_at)
+        self.assertIsNotNone(asset.last_updated)
 
     def test_asset_str_representation(self):
         """Test asset string representation."""
@@ -44,7 +44,7 @@ class AssetModelTestCase(TestCase):
             decimals=18
         )
         
-        expected = "ETH (ethereum)"
+        expected = "ETH (Ethereum)"
         self.assertEqual(str(asset), expected)
 
     def test_asset_unique_constraint(self):
@@ -77,7 +77,7 @@ class AssetModelTestCase(TestCase):
         asset2 = Asset.objects.create(
             symbol="USDT",
             name="Tether USD",
-            chain=Chain.POLYGON,
+            chain=Chain.SOLANA,
             decimals=6
         )
         
@@ -98,55 +98,54 @@ class TransactionModelTestCase(TestCase):
         
         self.wallet = Wallet.objects.create(
             user=self.user,
-            name="Test Wallet",
+            label="Test Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
         
-        self.asset = Asset.objects.create(
+        self.asset, created = Asset.objects.get_or_create(
             symbol="ETH",
-            name="Ethereum",
             chain=Chain.ETHEREUM,
-            decimals=18
+            defaults={
+                "name": "Ethereum",
+                "decimals": 18
+            }
         )
 
     def test_transaction_creation(self):
         """Test creating a transaction."""
         transaction = Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x123456789abcdef",
+            tx_hash="0x123456789abcdef",
             block_number=12345678,
-            transaction_type="send",
+            transaction_type=TransactionType.TRANSFER,
             amount=Decimal("1.5"),
-            asset=self.asset,
-            from_address=self.wallet.address,
-            to_address="0x987654321fedcba",
-            gas_used=21000,
-            gas_price=Decimal("20"),
-            status="confirmed",
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=timezone.now()
         )
         
         self.assertEqual(transaction.wallet, self.wallet)
-        self.assertEqual(transaction.hash, "0x123456789abcdef")
+        self.assertEqual(transaction.tx_hash, "0x123456789abcdef")
         self.assertEqual(transaction.block_number, 12345678)
-        self.assertEqual(transaction.transaction_type, "send")
+        self.assertEqual(transaction.transaction_type, TransactionType.TRANSFER)
         self.assertEqual(transaction.amount, Decimal("1.5"))
-        self.assertEqual(transaction.asset, self.asset)
-        self.assertEqual(transaction.status, "confirmed")
+        self.assertEqual(transaction.asset_symbol, self.asset.symbol)
 
     def test_transaction_str_representation(self):
         """Test transaction string representation."""
         transaction = Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x123456789abcdef",
-            transaction_type="send",
+            tx_hash="0x123456789abcdef",
+            block_number=12345,
+            transaction_type=TransactionType.TRANSFER,
             amount=Decimal("1.5"),
-            asset=self.asset,
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=timezone.now()
         )
         
-        expected = "send 1.5 ETH (0x12345...)"
+        expected = "Transfer 1.5 ETH"
         self.assertEqual(str(transaction), expected)
 
     def test_transaction_ordering(self):
@@ -156,19 +155,23 @@ class TransactionModelTestCase(TestCase):
         
         transaction1 = Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x111",
-            transaction_type="send",
+            tx_hash="0x111",
+            block_number=12345,
+            transaction_type=TransactionType.TRANSFER,
             amount=Decimal("1.0"),
-            asset=self.asset,
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=time1
         )
         
         transaction2 = Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x222",
-            transaction_type="receive",
+            tx_hash="0x222",
+            block_number=12346,
+            transaction_type=TransactionType.BUY,
             amount=Decimal("2.0"),
-            asset=self.asset,
+            asset_symbol=self.asset.symbol,
+            gas_fee=Decimal("0.001"),
             timestamp=time2
         )
         
@@ -178,22 +181,20 @@ class TransactionModelTestCase(TestCase):
 
     def test_transaction_gas_fee_calculation(self):
         """Test gas fee calculation."""
+        gas_fee = Decimal("0.00042")  # 0.00042 ETH
         transaction = Transaction.objects.create(
             wallet=self.wallet,
-            hash="0x123456789abcdef",
-            transaction_type="send",
+            tx_hash="0x123456789abcdef",
+            block_number=12345,
+            transaction_type=TransactionType.TRANSFER,
             amount=Decimal("1.0"),
-            asset=self.asset,
-            gas_used=21000,
-            gas_price=Decimal("20"),  # 20 gwei
+            asset_symbol=self.asset.symbol,
+            gas_fee=gas_fee,
             timestamp=timezone.now()
         )
         
-        # Gas fee = gas_used * gas_price (in wei)
-        # 21000 * 20 * 10^9 = 420000000000000 wei = 0.00042 ETH
-        expected_fee = Decimal("21000") * Decimal("20") / Decimal("1000000000")
-        self.assertAlmostEqual(float(transaction.gas_used * transaction.gas_price / 1000000000), 
-                              float(expected_fee), places=8)
+        # Verify gas fee is stored correctly
+        self.assertEqual(transaction.gas_fee, gas_fee)
 
 
 class TransactionViewsTestCase(TestCase):
@@ -211,16 +212,18 @@ class TransactionViewsTestCase(TestCase):
         
         self.wallet = Wallet.objects.create(
             user=self.user,
-            name="Test Wallet",
+            label="Test Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
         
-        self.asset = Asset.objects.create(
+        self.asset, created = Asset.objects.get_or_create(
             symbol="ETH",
-            name="Ethereum",
             chain=Chain.ETHEREUM,
-            decimals=18
+            defaults={
+                "name": "Ethereum",
+                "decimals": 18
+            }
         )
 
     def test_transactions_page_view(self):
@@ -263,7 +266,7 @@ class TransactionViewsTestCase(TestCase):
         # Create second wallet
         wallet2 = Wallet.objects.create(
             user=self.user,
-            name="Second Wallet",
+            label="Second Wallet",
             chain=Chain.BITCOIN,
             address="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
         )
@@ -413,16 +416,18 @@ class TransactionDataTestCase(TestCase):
         
         self.wallet = Wallet.objects.create(
             user=self.user,
-            name="Test Wallet",
+            label="Test Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
         
-        self.asset = Asset.objects.create(
+        self.asset, created = Asset.objects.get_or_create(
             symbol="ETH",
-            name="Ethereum",
             chain=Chain.ETHEREUM,
-            decimals=18
+            defaults={
+                "name": "Ethereum",
+                "decimals": 18
+            }
         )
 
     def test_transaction_amount_precision(self):

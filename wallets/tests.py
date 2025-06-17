@@ -30,7 +30,7 @@ class WalletModelTestCase(TestCase):
         """Test creating a wallet."""
         wallet = Wallet.objects.create(
             user=self.user,
-            name="Test Wallet",
+            label="Test Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
@@ -46,19 +46,19 @@ class WalletModelTestCase(TestCase):
         """Test wallet string representation."""
         wallet = Wallet.objects.create(
             user=self.user,
-            name="Test Wallet",
+            label="Test Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
         
-        expected = "Test Wallet (ethereum)"
+        expected = "Test Wallet (Ethereum)"
         self.assertEqual(str(wallet), expected)
 
     def test_wallet_unique_constraint(self):
         """Test that user cannot have duplicate wallets."""
         Wallet.objects.create(
             user=self.user,
-            name="Test Wallet",
+            label="Test Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
@@ -67,7 +67,7 @@ class WalletModelTestCase(TestCase):
         with self.assertRaises(Exception):  # IntegrityError
             Wallet.objects.create(
                 user=self.user,
-                name="Duplicate Wallet",
+                label="Duplicate Wallet",
                 chain=Chain.ETHEREUM,
                 address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
             )
@@ -79,7 +79,7 @@ class WalletModelTestCase(TestCase):
         # Create wallet on Ethereum
         wallet1 = Wallet.objects.create(
             user=self.user,
-            name="ETH Wallet",
+            label="ETH Wallet",
             chain=Chain.ETHEREUM,
             address=address
         )
@@ -87,7 +87,7 @@ class WalletModelTestCase(TestCase):
         # Same address on different chain should be allowed
         wallet2 = Wallet.objects.create(
             user=self.user,
-            name="Polygon Wallet", 
+            label="Polygon Wallet", 
             chain=Chain.ETHEREUM,
             address=address
         )
@@ -99,13 +99,13 @@ class WalletModelTestCase(TestCase):
         """Test wallet ordering by name."""
         wallet_b = Wallet.objects.create(
             user=self.user,
-            name="B Wallet",
+            label="B Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
         wallet_a = Wallet.objects.create(
             user=self.user,
-            name="A Wallet",
+            label="A Wallet",
             chain=Chain.BITCOIN,
             address="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
         )
@@ -128,9 +128,9 @@ class UserSettingsModelTestCase(TestCase):
 
     def test_user_settings_creation(self):
         """Test creating user settings."""
-        settings = UserSettings.objects.create(
+        settings, created = UserSettings.objects.get_or_create(
             user=self.user,
-            mock_data_enabled=True
+            defaults={'mock_data_enabled': True}
         )
         
         self.assertEqual(settings.user, self.user)
@@ -140,14 +140,14 @@ class UserSettingsModelTestCase(TestCase):
 
     def test_user_settings_default_values(self):
         """Test user settings default values."""
-        settings = UserSettings.objects.create(user=self.user)
+        settings, created = UserSettings.objects.get_or_create(user=self.user)
         
         self.assertEqual(settings.user, self.user)
-        self.assertFalse(settings.mock_data_enabled)  # Default should be False
+        self.assertTrue(settings.mock_data_enabled)  # Signal sets to True by default
 
     def test_user_settings_str_representation(self):
         """Test user settings string representation."""
-        settings = UserSettings.objects.create(user=self.user)
+        settings, created = UserSettings.objects.get_or_create(user=self.user)
         expected = f"Settings for {self.user.email}"
         self.assertEqual(str(settings), expected)
 
@@ -185,7 +185,7 @@ class WalletViewsTestCase(TestCase):
         # Create test wallet
         wallet = Wallet.objects.create(
             user=self.user,
-            name="Test Wallet",
+            label="Test Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
@@ -212,7 +212,7 @@ class WalletViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Wallet.objects.filter(
             user=self.user,
-            name="New Wallet",
+            label="New Wallet",
             chain=Chain.ETHEREUM
         ).exists())
 
@@ -225,16 +225,16 @@ class WalletViewsTestCase(TestCase):
         })
         
         self.assertEqual(response.status_code, 400)
-        self.assertContains(response, "Name is required")
-        self.assertContains(response, "Chain is required")
-        self.assertContains(response, "Address is required")
+        self.assertContains(response, "Name is required", status_code=400)
+        self.assertContains(response, "Chain is required", status_code=400)
+        self.assertContains(response, "Address is required", status_code=400)
 
     def test_add_wallet_post_duplicate(self):
         """Test adding duplicate wallet."""
         # Create initial wallet
         Wallet.objects.create(
             user=self.user,
-            name="Test Wallet",
+            label="Test Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
@@ -247,13 +247,13 @@ class WalletViewsTestCase(TestCase):
         })
         
         self.assertEqual(response.status_code, 400)
-        self.assertContains(response, "This wallet is already added")
+        self.assertContains(response, "This wallet is already added", status_code=400)
 
     def test_delete_wallet(self):
         """Test wallet deletion."""
         wallet = Wallet.objects.create(
             user=self.user,
-            name="Test Wallet",
+            label="Test Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
@@ -277,7 +277,7 @@ class WalletViewsTestCase(TestCase):
         )
         wallet = Wallet.objects.create(
             user=other_user,
-            name="Other Wallet",
+            label="Other Wallet",
             chain=Chain.ETHEREUM,
             address="0x742d35Cc6631C0532925a3b8D86d6E4C6Ed3C07"
         )
@@ -318,7 +318,7 @@ class ChainChoicesTestCase(TestCase):
             chain_value = chain[0]
             wallet = Wallet.objects.create(
                 user=user,
-                name=f"Test Wallet {chain_value}",
+                label=f"Test Wallet {chain_value}",
                 chain=chain_value,
                 address=f"test_address_{chain_value}"
             )

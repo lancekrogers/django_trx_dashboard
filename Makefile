@@ -29,6 +29,8 @@ setup-node: ## Install Node.js if not present
 install-npm: setup-node ## Install npm dependencies including Franken UI
 	@echo "Installing npm dependencies..."
 	@npm install
+	@echo "Updating browserslist database..."
+	@npx update-browserslist-db@latest
 	@echo "Initializing Franken UI..."
 	@npx franken-ui init -p || echo "Franken UI already initialized"
 	@echo "npm dependencies installed!"
@@ -118,10 +120,10 @@ server-status: ## Check if Django server is running
 	fi
 
 # Testing commands - Direct uv usage examples
-test: ## Run all tests with pytest (recommended)
-	@echo "Running tests with pytest..."
-	@echo "Direct uv command: uv run pytest"
-	@uv run pytest
+test: ## Run all tests with Django test runner (recommended)
+	@echo "Running tests with Django test runner..."
+	@echo "Direct uv command: uv run python manage.py test"
+	@uv run --project . python manage.py test
 
 test-django: ## Run tests with Django test runner
 	@echo "Running Django tests..."
