@@ -2,6 +2,8 @@
 
 A Django application for investigating cryptocurrency wallets across multiple blockchains, built with Django, HTMX, and Django Ninja.
 
+![Demo](docs/images/demo-small.gif)
+
 ## Features
 
 - Track wallets across Ethereum, Bitcoin, and Solana (mock data)
