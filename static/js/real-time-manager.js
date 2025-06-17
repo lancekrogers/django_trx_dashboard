@@ -1,4 +1,9 @@
-export class RealTimeManager {
+/**
+ * RealTimeManager - Handles SSE connections and real-time data updates
+ * Manages connection status, reconnection logic, and UI updates
+ * Features: Auto-reconnect, connection indicators, heartbeat monitoring
+ */
+class RealTimeManager {
     constructor() {
         this.connected = false;
         this.reconnectAttempts = 0;
@@ -93,3 +98,6 @@ export class RealTimeManager {
         }
     }
 }
+
+// Make class available globally
+window.RealTimeManager = RealTimeManager;

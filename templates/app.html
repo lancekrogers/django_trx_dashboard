@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{# App Template - Single Page Application container and entry point #}
+{# Purpose: Main SPA wrapper that loads initial content based on auth status #}
+{# Features: Dynamic content loading, toast notifications, modal container #}
+{# Usage: Root template loaded by home_view, contains HTMX SPA logic #}
 {% load static %}
 
 {% block title %}Multi-Chain Portfolio Dashboard{% endblock %}
@@ -6,33 +10,11 @@
 {% block content %}
 <!-- Single Page App Container -->
 <div id="app" class="min-h-screen bg-gray-50">
-    <!-- Navigation Bar (always visible) -->
-    <nav class="bg-white shadow-sm border-b border-gray-200" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <h1 class="text-xl font-semibold">Multi-Chain Portfolio</h1>
-                </div>
-                <div class="flex items-center"
-                     id="nav-content"
-                     hx-get="{% if user.is_authenticated %}{% url 'htmx:nav_authenticated' %}{% else %}{% url 'htmx:nav_unauthenticated' %}{% endif %}"
-                     hx-trigger="load, auth-change from:body"
-                     hx-swap="innerHTML">
-                    <!-- Navigation will be loaded here -->
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content Area -->
-    <main id="main-content" class="flex-1">
+    <!-- Main Content Area (Navigation is in base.html) -->
         <!-- Initial content loaded based on auth status -->
-        <div 
-            hx-get="{% if user.is_authenticated %}{% url 'htmx:dashboard' %}{% else %}{% url 'htmx:welcome' %}{% endif %}"
-            hx-trigger="load"
-            hx-target="this"
-            hx-swap="outerHTML"
-        >
+        <div hx-get="{% if user.is_authenticated %}{% url 'htmx:dashboard' %}{% else %}{% url 'htmx:welcome' %}{% endif %}"
+             hx-trigger="load delay:100ms"
+             hx-swap="innerHTML">
             <!-- Loading state -->
             <div class="flex items-center justify-center min-h-screen">
                 <div class="text-center">
@@ -46,7 +28,6 @@
                 </div>
             </div>
         </div>
-    </main>
 
     <!-- Modal Container (for forms and dialogs) -->
     <div id="modal-container"></div>

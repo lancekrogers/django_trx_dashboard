@@ -176,6 +176,9 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
+# Django-HTMX Configuration
+DJANGO_HTMX_USE_CDN = False  # Use bundled HTMX instead of CDN
+
 # Logging Configuration
 LOG_DIR = BASE_DIR / "logs"
 LOG_DIR.mkdir(exist_ok=True)

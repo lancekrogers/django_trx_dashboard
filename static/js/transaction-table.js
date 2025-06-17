@@ -1,4 +1,9 @@
-export class TransactionTable {
+/**
+ * TransactionTable - Enhances transaction table with filtering and infinite scroll
+ * Handles: Dynamic filtering, infinite scroll pagination, export functionality
+ * Features: Real-time filter updates, intersection observer for pagination
+ */
+class TransactionTable {
     constructor(container) {
         this.container = container;
         this.setupFilters();
@@ -76,3 +81,6 @@ export class TransactionTable {
         }
     }
 }
+
+// Make class available globally
+window.TransactionTable = TransactionTable;

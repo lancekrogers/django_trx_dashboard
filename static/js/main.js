@@ -1,53 +1,52 @@
-import { PortfolioChart } from './portfolio-chart.js';
-import { RealTimeManager } from './real-time-manager.js';
-import { TransactionTable } from './transaction-table.js';
+/**
+ * Main Application JavaScript
+ * Initializes all components and handles global HTMX event coordination
+ * Dependencies: PortfolioChart, RealTimeManager, TransactionTable classes
+ * Note: All JS files must be loaded before this script
+ */
 
 // Initialize modules when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize portfolio chart
+    // Initialize portfolio chart (if PortfolioChart class is available)
     const chartElement = document.getElementById('portfolio-chart');
-    if (chartElement) {
-        window.portfolioChart = new PortfolioChart(chartElement);
+    if (chartElement && window.PortfolioChart) {
+        window.portfolioChart = new window.PortfolioChart(chartElement);
     }
 
-    // Initialize real-time connection manager
-    window.realTimeManager = new RealTimeManager();
+    // Initialize real-time connection manager (if RealTimeManager class is available)
+    if (window.RealTimeManager) {
+        window.realTimeManager = new window.RealTimeManager();
+    }
 
-    // Initialize transaction table enhancements
+    // Initialize transaction table enhancements (if TransactionTable class is available)
     const transactionContainer = document.getElementById('transaction-container');
-    if (transactionContainer) {
-        new TransactionTable(transactionContainer);
+    if (transactionContainer && window.TransactionTable) {
+        new window.TransactionTable(transactionContainer);
     }
 
     // Setup HTMX event handlers
     setupHTMXHandlers();
 });
 
+/**
+ * Setup global HTMX event handlers
+ * Handles error reporting and cross-component event coordination
+ */
 function setupHTMXHandlers() {
-    // Handle SSE messages
-    document.addEventListener('htmx:sseMessage', (evt) => {
-        if (evt.detail.type === 'portfolio-update' && window.portfolioChart) {
-            const data = JSON.parse(evt.detail.data);
-            window.portfolioChart.addDataPoint(data);
-        }
-    });
-
-    // Handle connection status
-    document.addEventListener('htmx:sseOpen', () => {
-        window.realTimeManager?.setConnected(true);
-    });
-
-    document.addEventListener('htmx:sseClose', () => {
-        window.realTimeManager?.setConnected(false);
-    });
-
     // Handle AJAX errors
     document.addEventListener('htmx:responseError', (evt) => {
         console.error('HTMX Error:', evt.detail);
         showErrorNotification('An error occurred. Please try again.');
     });
+    
+    // Note: SSE event handlers are now in portfolio_sse.html
+    // to ensure they're properly scoped to the SSE connection
 }
 
+/**
+ * Show error notification toast
+ * @param {string} message - Error message to display
+ */
 function showErrorNotification(message) {
     // Create error toast notification
     const toast = document.createElement('div');

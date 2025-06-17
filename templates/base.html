@@ -1,4 +1,11 @@
+{% comment %}
+Base Template - Main layout template for the Multi-Chain Portfolio Dashboard
+Purpose: Provides shared layout, navigation, and JavaScript initialization
+Features: Responsive navbar, HTMX configuration, global notification system
+Used by: All main page templates (app.html, dashboard.html, etc.)
+{% endcomment %}
 {% load static %}
+{% load django_htmx %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +18,10 @@
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.10/dist/ext/sse.js"></script>
+    
+    <!-- HTMX SSE Extension (not included in django-htmx) -->
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -236,10 +246,12 @@
         }
     </script>
     
-    <!-- Application JavaScript -->
+    <!-- Application JavaScript - Load order is important -->
+    <!-- 1. Load component classes first -->
     <script src="{% static 'js/portfolio-chart.js' %}"></script>
     <script src="{% static 'js/real-time-manager.js' %}"></script>
     <script src="{% static 'js/transaction-table.js' %}"></script>
+    <!-- 2. Load main app initialization last -->
     <script src="{% static 'js/main.js' %}"></script>
     
     {% block extra_scripts %}{% endblock %}

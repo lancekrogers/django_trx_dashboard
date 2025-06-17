@@ -1,3 +1,10 @@
+{% comment %}
+Portfolio Summary Partial - Real-time portfolio overview component
+Purpose: Displays total portfolio value, 24h change, and live chart
+Features: SSE real-time updates, Chart.js integration, refresh trigger
+Usage: Included in dashboard, can be refreshed independently via HTMX
+Dependencies: portfolio-chart.js for chart functionality
+{% endcomment %}
 <!-- Portfolio Summary Partial - Real-time updates via SSE -->
 <div id="portfolio-summary" 
      class="bg-white overflow-hidden shadow rounded-lg"

@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
+from django_htmx.http import HttpResponseClientRedirect, trigger_client_event
 
 from portfolio.services import PortfolioService
 from transactions.models import Transaction
@@ -39,7 +40,8 @@ def htmx_login(request):
         # Return dashboard content and signal auth status
         response = render(request, "dashboard.html")
         response["X-Auth-Status"] = "authenticated"
-        response["HX-Trigger"] = "auth-change"
+        # Use django-htmx helper to trigger client event
+        trigger_client_event(response, "auth-change")
         return response
     else:
         return render(
@@ -184,8 +186,8 @@ def htmx_transactions(request):
     # Get all user wallets for filter dropdown
     wallets = Wallet.objects.filter(user=request.user)
 
-    # Check if this is an HTMX request
-    is_htmx = hasattr(request, 'htmx') and request.htmx
+    # Check if this is an HTMX request using django-htmx
+    is_htmx = request.htmx
     hx_target = request.headers.get("HX-Target", "") if is_htmx else ""
     
     # Return table rows only if this is a pagination request targeting the rows
@@ -251,6 +253,9 @@ def htmx_dashboard(request):
         "summary": summary,
     }
     
+    # Return partial for HTMX requests, full page otherwise
+    if request.htmx:
+        return render(request, "partials/dashboard_content.html", context)
     return render(request, "dashboard.html", context)
 
 
@@ -307,5 +312,6 @@ def htmx_logout(request):
     logout(request)
     response = render(request, "partials/welcome.html")
     response["X-Auth-Status"] = "unauthenticated"
-    response["HX-Trigger"] = "auth-change"
+    # Use django-htmx helper to trigger client event
+    trigger_client_event(response, "auth-change")
     return response

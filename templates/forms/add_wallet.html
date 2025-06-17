@@ -1,3 +1,9 @@
+{% comment %}
+Add Wallet Form Partial - HTMX-compatible wallet creation form
+Purpose: Handles adding new cryptocurrency wallets with validation
+Features: Chain selection, address validation, error handling, loading states
+Usage: Loaded by htmx_add_wallet view, displays as modal or inline form
+{% endcomment %}
 <!-- Add Wallet Form Partial - HTMX-friendly -->
 <form id="add-wallet-form" 
       hx-post="{% url 'htmx:add_wallet' %}" 

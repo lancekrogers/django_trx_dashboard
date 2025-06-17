@@ -1,0 +1,81 @@
+{% comment %}
+Portfolio SSE Partial - Server-Sent Events connection for real-time updates
+Purpose: Manages SSE connection to portfolio stream endpoint
+Features: Real-time value updates, connection status management, error handling
+Usage: Included in dashboard templates to enable live data updates
+Dependencies: HTMX SSE extension, real-time-manager.js, portfolio-chart.js
+{% endcomment %}
+<!-- Real-time Portfolio Updates via SSE -->
+<div id="portfolio-sse-container"
+     hx-ext="sse"
+     sse-connect="/api/v1/portfolio/stream"
+     class="hidden">
+    
+    <!-- This div will receive portfolio-update events -->
+    <div sse-swap="portfolio-update" 
+         hx-trigger="sse:portfolio-update"
+         hx-target="#portfolio-summary"
+         hx-swap="none">
+        <!-- SSE updates will be processed via JavaScript -->
+    </div>
+    
+    <!-- Error handling -->
+    <div sse-swap="error"
+         hx-trigger="sse:error">
+        <!-- Error events will be handled -->
+    </div>
+</div>
+
+<script>
+    // Handle SSE portfolio updates
+    document.body.addEventListener('sse:portfolio-update', function(evt) {
+        const data = JSON.parse(evt.detail.data);
+        
+        // Update portfolio total value
+        const totalValueEl = document.getElementById('total-value');
+        if (totalValueEl) {
+            totalValueEl.textContent = '$' + data.total_value_usd.toFixed(2);
+        }
+        
+        // Update 24h change
+        const changeEl = document.getElementById('change-percent');
+        const changeContainer = document.getElementById('value-change');
+        if (changeEl && changeContainer) {
+            changeEl.textContent = data.change_24h.toFixed(2) + '%';
+            
+            // Update color based on positive/negative change
+            if (data.change_24h >= 0) {
+                changeContainer.classList.remove('text-red-600');
+                changeContainer.classList.add('text-green-600');
+            } else {
+                changeContainer.classList.remove('text-green-600');
+                changeContainer.classList.add('text-red-600');
+            }
+        }
+        
+        // Trigger chart update if available
+        if (window.portfolioChart) {
+            window.portfolioChart.addDataPoint({
+                timestamp: data.timestamp,
+                value: data.total_value_usd
+            });
+        }
+    });
+    
+    // Handle SSE errors
+    document.body.addEventListener('sse:error', function(evt) {
+        console.error('SSE Error:', evt.detail);
+        window.realTimeManager?.setConnected(false);
+    });
+    
+    // Handle SSE connection events
+    document.body.addEventListener('htmx:sseOpen', function(evt) {
+        console.log('SSE Connected');
+        window.realTimeManager?.setConnected(true);
+    });
+    
+    document.body.addEventListener('htmx:sseClose', function(evt) {
+        console.log('SSE Disconnected');
+        window.realTimeManager?.setConnected(false);
+    });
+</script>

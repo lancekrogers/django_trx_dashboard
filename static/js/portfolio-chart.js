@@ -1,4 +1,9 @@
-export class PortfolioChart {
+/**
+ * PortfolioChart - Manages real-time portfolio value visualization
+ * Handles Chart.js integration for displaying portfolio value over time
+ * Features: Real-time updates, responsive design, summary value updates
+ */
+class PortfolioChart {
   constructor(canvasElement) {
     this.chart = new Chart(canvasElement.getContext("2d"), {
       type: "line",
@@ -116,3 +121,6 @@ export class PortfolioChart {
     }
   }
 }
+
+// Make class available globally
+window.PortfolioChart = PortfolioChart;

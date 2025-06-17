@@ -1,3 +1,9 @@
+{% comment %}
+Login Form Partial - HTMX-compatible authentication form
+Purpose: Handles user login with inline error display and loading states
+Features: CSRF protection, error handling, loading spinner, client events
+Usage: Loaded by htmx_login view, swapped into login page container
+{% endcomment %}
 <!-- Login Form Partial - HTMX-friendly -->
 <form id="login-form" 
       hx-post="/htmx/login/" 
