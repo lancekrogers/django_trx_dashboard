@@ -32,9 +32,6 @@ def htmx_login(request):
     username = request.POST.get("username")
     password = request.POST.get("password")
 
-    print(f"DEBUG: Login attempt - username: '{username}', password length: {len(password) if password else 0}")
-    print(f"DEBUG: POST data: {dict(request.POST)}")
-
     if not username or not password:
         return render(
             request,
@@ -43,15 +40,40 @@ def htmx_login(request):
             status=400,
         )
 
+    # Try authenticating with email as username
     user = authenticate(request, username=username, password=password)
-    print(f"DEBUG: Authentication result: {user}")
+    if user is None and '@' in username:
+        # If username looks like email, try finding user by email
+        try:
+            from wallets.models import User
+            email_user = User.objects.get(email=username)
+            user = authenticate(request, username=email_user.username, password=password)
+        except User.DoesNotExist:
+            pass
+    
     if user is not None:
         login(request, user)
         
-        # Always redirect to dashboard page after login
-        from django.shortcuts import redirect
-        response = redirect('/')
+        # Get cases data manually instead of calling the view (which has @login_required)
+        cases = InvestigationCase.objects.filter(investigator=user).prefetch_related('case_wallets__wallet')
+        active_cases_count = cases.filter(status='active').count()
+        total_wallets_count = Wallet.objects.filter(user=user).count()
+        flagged_wallets_count = CaseWallet.objects.filter(case__investigator=user, flagged=True).count()
+        from transactions.models import Transaction
+        total_transactions_count = Transaction.objects.filter(wallet__user=user).count()
+        chains_count = Wallet.objects.filter(user=user).values('chain').distinct().count()
         
+        context = {
+            'investigation_cases': cases,
+            'active_cases_count': active_cases_count,
+            'total_wallets_count': total_wallets_count,
+            'total_transactions_count': total_transactions_count,
+            'flagged_wallets_count': flagged_wallets_count,
+            'chains_count': chains_count,
+            'show_cases_list': True
+        }
+        
+        response = render(request, "dashboard.html", context)
         response["X-Auth-Status"] = "authenticated"
         trigger_client_event(response, "auth-change")
         return response
@@ -265,12 +287,8 @@ def htmx_dashboard(request):
 def home_view(request):
     """Root view - redirect to login or dashboard."""
     if request.user.is_authenticated:
-        # Redirect authenticated users to their first case or cases list
-        first_case = InvestigationCase.objects.filter(investigator=request.user).first()
-        if first_case:
-            return render(request, "dashboard.html", {"case": first_case})
-        else:
-            return render(request, "dashboard.html", {"show_cases_list": True})
+        # Always show the cases list for authenticated users
+        return htmx_cases_list(request)
     else:
         # Show login for unauthenticated users
         return render(request, "forms/login.html")
@@ -386,7 +404,7 @@ def htmx_refresh_mock_data(request):
 @require_http_methods(["GET"])
 def htmx_cases_list(request):
     """Return the list of investigation cases with filtering and stats."""
-    cases = InvestigationCase.objects.filter(investigator=request.user)
+    cases = InvestigationCase.objects.filter(investigator=request.user).prefetch_related('case_wallets__wallet')
     
     # Calculate dashboard stats
     active_cases_count = cases.filter(status='active').count()
@@ -427,8 +445,13 @@ def htmx_cases_list(request):
         'chains_count': chains_count,
     }
     
-    # Return grid view
-    return render(request, "partials/cases_grid.html", context)
+    # Return grid view - use dashboard.html for full page, cases_grid.html for HTMX partial
+    if request.htmx:
+        return render(request, "partials/cases_grid.html", context)
+    else:
+        # For non-HTMX requests (like homepage), return full page
+        context['show_cases_list'] = True
+        return render(request, "dashboard.html", context)
 
 
 @login_required

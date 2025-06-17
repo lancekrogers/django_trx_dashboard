@@ -13,7 +13,10 @@
             <p class="text-gray-400 mt-2">Sign in to access your multi-chain investigation platform</p>
         </div>
         
-        <form method="post" action="{% url 'htmx:login' %}" class="space-y-6">
+        <form hx-post="{% url 'htmx:login' %}" 
+              hx-target="#main-container" 
+              hx-swap="innerHTML"
+              class="space-y-6">
             {% csrf_token %}
             
             {% if error %}

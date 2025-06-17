@@ -1,0 +1,336 @@
+/**
+ * Multi-Chain Portfolio Dashboard JavaScript
+ * Handles navigation, buttons, charts, and HTMX interactions
+ */
+
+// Global state management
+window.DashboardApp = {
+    currentCase: null,
+    charts: {},
+    notifications: []
+};
+
+// Notification system
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg max-w-sm z-50 ${
+        type === 'success' ? 'bg-green-600' : 
+        type === 'error' ? 'bg-red-600' : 
+        type === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
+    } text-white`;
+    
+    notification.innerHTML = `
+        <div class="flex items-start space-x-3">
+            <svg class="w-5 h-5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                ${type === 'success' ? 
+                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>' :
+                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+                }
+            </svg>
+            <div>
+                <p class="font-semibold">${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+                <p class="text-sm opacity-90">${message}</p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+
+// Button functionality
+function handleAddWallet() {
+    showNotification('Add Wallet modal would open here', 'info');
+}
+
+function handleExportData() {
+    showNotification('Exporting case data...', 'info');
+    // Simulate export process
+    setTimeout(() => {
+        showNotification('Data exported successfully!', 'success');
+    }, 1000);
+}
+
+function handleGenerateReport() {
+    showNotification('Generating comprehensive report...', 'info');
+    // Simulate report generation
+    setTimeout(() => {
+        showNotification('Report generated successfully!', 'success');
+    }, 2000);
+}
+
+function handleRefreshData() {
+    showNotification('Refreshing portfolio data...', 'info');
+    // Simulate data refresh
+    setTimeout(() => {
+        showNotification('Portfolio data updated!', 'success');
+        // Refresh charts if they exist
+        Object.values(window.DashboardApp.charts).forEach(chart => {
+            if (chart && typeof chart.update === 'function') {
+                chart.update();
+            }
+        });
+    }, 1500);
+}
+
+// Chart timeframe switching
+function switchTimeframe(timeframe, caseId) {
+    showNotification(`Switching to ${timeframe} view...`, 'info');
+    
+    // Update button states
+    document.querySelectorAll('.timeframe-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white');
+        btn.classList.add('bg-gray-700', 'text-gray-300');
+    });
+    
+    // Highlight selected button
+    event.target.classList.remove('bg-gray-700', 'text-gray-300');
+    event.target.classList.add('bg-blue-600', 'text-white');
+    
+    // If we have a case ID, fetch new chart data
+    if (caseId) {
+        fetch(`/htmx/cases/${caseId}/chart-data/${timeframe}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateChartData(data);
+                    showNotification(`Updated to ${timeframe} timeframe`, 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching chart data:', error);
+                showNotification('Failed to update chart data', 'error');
+            });
+    }
+}
+
+// Update chart with new data
+function updateChartData(data) {
+    const portfolioChart = window.DashboardApp.charts.portfolio;
+    if (portfolioChart && data.data) {
+        // Update chart data points
+        portfolioChart.data.datasets[0].data = data.data.map(point => point.value);
+        portfolioChart.data.labels = data.data.map(point => point.time);
+        portfolioChart.update('none'); // No animation for real-time feel
+    }
+}
+
+// Initialize charts when DOM is ready
+function initializeCharts() {
+    // Only initialize if Chart.js is available and we haven't initialized yet
+    if (typeof Chart === 'undefined') {
+        console.warn('Chart.js not available, skipping chart initialization');
+        return;
+    }
+
+    // Portfolio Chart
+    const portfolioCtx = document.getElementById('portfolio-chart');
+    if (portfolioCtx && !window.DashboardApp.charts.portfolio) {
+        try {
+            // Check if we have data from Django context
+            let flowLabels, inflowData, outflowData;
+            
+            try {
+                // Try to get data from template variables (will be undefined if not in case detail)
+                flowLabels = typeof window.chartData !== 'undefined' ? window.chartData.flowLabels : 
+                    ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+                inflowData = typeof window.chartData !== 'undefined' ? window.chartData.inflowData : 
+                    [120000, 85000, 95000, 110000, 78000, 130000, 102000];
+                outflowData = typeof window.chartData !== 'undefined' ? window.chartData.outflowData : 
+                    [45000, 62000, 38000, 71000, 56000, 49000, 84000];
+            } catch (e) {
+                // Fallback to demo data
+                flowLabels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+                inflowData = [120000, 85000, 95000, 110000, 78000, 130000, 102000];
+                outflowData = [45000, 62000, 38000, 71000, 56000, 49000, 84000];
+            }
+            
+            window.DashboardApp.charts.portfolio = new Chart(portfolioCtx, {
+                type: 'line',
+                data: {
+                    labels: flowLabels,
+                    datasets: [{
+                        label: 'Inflow',
+                        data: inflowData,
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: false,
+                        tension: 0.4
+                    }, {
+                        label: 'Outflow',
+                        data: outflowData,
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: false,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            labels: { color: '#9CA3AF' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                },
+                                color: '#9CA3AF'
+                            },
+                            grid: { color: '#374151' }
+                        },
+                        x: {
+                            ticks: { color: '#9CA3AF' },
+                            grid: { color: '#374151' }
+                        }
+                    }
+                }
+            });
+            console.log('Portfolio chart initialized successfully');
+        } catch (error) {
+            console.error('Error initializing portfolio chart:', error);
+        }
+    }
+
+    // Activity Chart
+    const activityCtx = document.getElementById('activity-chart');
+    if (activityCtx && !window.DashboardApp.charts.activity) {
+        try {
+            let timelineLabels, timelineData;
+            
+            try {
+                timelineLabels = typeof window.chartData !== 'undefined' ? window.chartData.timelineLabels : 
+                    ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                timelineData = typeof window.chartData !== 'undefined' ? window.chartData.timelineData : 
+                    [45, 62, 38, 71];
+            } catch (e) {
+                timelineLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                timelineData = [45, 62, 38, 71];
+            }
+            
+            window.DashboardApp.charts.activity = new Chart(activityCtx, {
+                type: 'bar',
+                data: {
+                    labels: timelineLabels,
+                    datasets: [{
+                        label: 'Transactions',
+                        data: timelineData,
+                        backgroundColor: '#8B5CF6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                color: '#9CA3AF',
+                                stepSize: 1
+                            },
+                            grid: { color: '#374151' }
+                        },
+                        x: {
+                            ticks: { 
+                                color: '#9CA3AF',
+                                maxTicksLimit: 10
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            console.log('Activity chart initialized successfully');
+        } catch (error) {
+            console.error('Error initializing activity chart:', error);
+        }
+    }
+}
+
+// HTMX event handlers
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard app initializing...');
+    
+    // Initialize charts
+    initializeCharts();
+    
+    // Add global button event listeners
+    document.addEventListener('click', function(e) {
+        // Handle timeframe buttons
+        if (e.target.classList.contains('timeframe-btn')) {
+            e.preventDefault();
+            const timeframe = e.target.textContent.trim();
+            const caseId = e.target.dataset.caseId;
+            switchTimeframe(timeframe, caseId);
+        }
+        
+        // Handle action buttons
+        if (e.target.closest('[data-action]')) {
+            e.preventDefault();
+            const action = e.target.closest('[data-action]').dataset.action;
+            
+            switch (action) {
+                case 'add-wallet':
+                    handleAddWallet();
+                    break;
+                case 'export-data':
+                    handleExportData();
+                    break;
+                case 'generate-report':
+                    handleGenerateReport();
+                    break;
+                case 'refresh-data':
+                    handleRefreshData();
+                    break;
+                default:
+                    showNotification(`Action "${action}" triggered`, 'info');
+            }
+        }
+    });
+    
+    // HTMX after request handler
+    document.addEventListener('htmx:afterRequest', function(e) {
+        // Re-initialize charts after HTMX content loads
+        setTimeout(initializeCharts, 100);
+        
+        // Show success message for successful HTMX requests
+        if (e.detail.xhr.status === 200) {
+            const path = new URL(e.detail.xhr.responseURL).pathname;
+            if (path.includes('/cases/')) {
+                showNotification('Navigation completed', 'success');
+            }
+        }
+    });
+    
+    // HTMX error handler
+    document.addEventListener('htmx:responseError', function(e) {
+        showNotification('Navigation error occurred', 'error');
+        console.error('HTMX error:', e.detail);
+    });
+    
+    console.log('Dashboard app initialized successfully');
+});
+
+// Global functions for template usage
+window.showNotification = showNotification;
+window.switchTimeframe = switchTimeframe;
+window.handleAddWallet = handleAddWallet;
+window.handleExportData = handleExportData;
+window.handleGenerateReport = handleGenerateReport;
+window.handleRefreshData = handleRefreshData;

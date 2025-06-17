@@ -66,6 +66,11 @@ class InvestigationCase(models.Model):
         from transactions.models import Transaction
         wallet_ids = self.wallets.values_list('id', flat=True)
         return Transaction.objects.filter(wallet_id__in=wallet_ids).count()
+    
+    @property
+    def flagged_count(self):
+        """Number of flagged wallets in this case"""
+        return self.case_wallets.filter(flagged=True).count()
 
 
 class WalletCategory(models.TextChoices):
@@ -82,8 +87,8 @@ class WalletCategory(models.TextChoices):
 class CaseWallet(models.Model):
     """Through model for investigation case to wallet relationship with additional metadata"""
     
-    case = models.ForeignKey(InvestigationCase, on_delete=models.CASCADE)
-    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    case = models.ForeignKey(InvestigationCase, on_delete=models.CASCADE, related_name='case_wallets')
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='case_wallets')
     category = models.CharField(
         max_length=20,
         choices=WalletCategory.choices,

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +12,14 @@
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js - Use local version for better performance -->
+    <script src="{% static 'js/vendor/chart.umd.min.js' %}"></script>
+    <script>
+        // Fallback to CDN if local Chart.js fails to load
+        if (typeof Chart === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');
+        }
+    </script>
     
     <!-- Custom CSS -->
     <style>
@@ -36,6 +43,9 @@
     <!-- Modal container for HTMX -->
     <div id="modal-container"></div>
 
+    <!-- Dashboard Application JavaScript -->
+    <script src="{% static 'js/dashboard-app.js' %}"></script>
+    
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

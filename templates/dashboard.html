@@ -6,7 +6,7 @@
     {% include "partials/case_dashboard_working.html" %}
 {% elif show_cases_list %}
     <!-- Show cases list if no specific case -->
-    {% include "partials/cases_grid.html" %}
+    {% include "partials/cases_grid.html" with investigation_cases=investigation_cases active_cases_count=active_cases_count total_wallets_count=total_wallets_count total_transactions_count=total_transactions_count flagged_wallets_count=flagged_wallets_count chains_count=chains_count %}
 {% elif show_dashboard_content %}
     <!-- Show dashboard content with portfolio summary -->
     {% include "partials/dashboard_content.html" %}
