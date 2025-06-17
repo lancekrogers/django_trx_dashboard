@@ -159,24 +159,23 @@ SIMPLE_JWT = {
     "TOKEN_TYPE_CLAIM": "token_type",
 }
 
-# CORS Configuration for development
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite dev server
-    "http://127.0.0.1:5173",
-    "http://localhost:5174",  # Alternative Vite port
-    "http://127.0.0.1:5174",
-]
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=Csv())
 
 # Allow credentials to be included in CORS requests (needed for auth)
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF Configuration for HTMX
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",
-]
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=Csv())
+
+# Add production domain to CSRF if in production
+if not DEBUG:
+    csrf_origins = CSRF_TRUSTED_ORIGINS.copy() if isinstance(CSRF_TRUSTED_ORIGINS, list) else []
+    allowed_hosts_str = config('ALLOWED_HOSTS', default='', cast=str)
+    for host in allowed_hosts_str.split(','):
+        if host and not host.startswith('.'):
+            csrf_origins.append(f'https://{host}')
+    CSRF_TRUSTED_ORIGINS = csrf_origins
 
 # Session cookie settings for development
 SESSION_COOKIE_SAMESITE = "Lax"
