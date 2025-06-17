@@ -20,20 +20,35 @@ python manage.py collectstatic --no-input --clear
 python manage.py migrate
 
 # Generate demo data if database is empty
-python -c "
-import os
-import django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
-django.setup()
+echo "Checking for existing data..."
+python manage.py shell <<EOF
 from django.contrib.auth import get_user_model
 User = get_user_model()
-if User.objects.count() == 0:
-    print('No users found. Generating demo data...')
-    from django.core.management import call_command
-    call_command('generate_mock_data', '--superusers', '1', '--users', '5', '--transactions', '100')
-    call_command('generate_investigation_data')
-    call_command('generate_portfolio_cases')
-    print('Demo data generated successfully!')
+print(f"Current user count: {User.objects.count()}")
+EOF
+
+# Load demo data from fixtures
+echo "Loading demo data from fixtures..."
+python manage.py loaddata fixtures/wallets.json || echo "Failed to load wallets data"
+python manage.py loaddata fixtures/core.json || echo "Failed to load core data"
+python manage.py loaddata fixtures/portfolio.json || echo "Failed to load portfolio data"
+python manage.py loaddata fixtures/transactions.json || echo "Failed to load transactions data"
+
+# Create a superuser with known credentials
+echo "Creating superuser..."
+python manage.py shell <<EOF
+from django.contrib.auth import get_user_model
+User = get_user_model()
+if not User.objects.filter(email='admin@example.com').exists():
+    User.objects.create_superuser(
+        username='admin@example.com',
+        email='admin@example.com',
+        password='admin123'
+    )
+    print("Superuser created: admin@example.com / admin123")
 else:
-    print(f'Database already has {User.objects.count()} users.')
-"
+    print("Superuser already exists")
+EOF
+
+echo "Demo data setup complete!"
+

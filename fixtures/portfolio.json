@@ -434,6 +434,314 @@
   }
 },
 {
+  "model": "portfolio.investigationcase",
+  "pk": 32,
+  "fields": {
+    "name": "CASE-7938-HNNK: NFT Wash Trading Investigation",
+    "description": "Investigating suspicious NFT trading patterns",
+    "investigator": 1,
+    "status": "active",
+    "priority": "medium",
+    "notes": "Circular trading pattern detected between 4 wallets. Volume inflation suspected.\n\nCase opened: 2025-06-06 20:46:09",
+    "created_at": "2025-06-17T12:56:23.182Z",
+    "updated_at": "2025-06-17T12:56:23.182Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 33,
+  "fields": {
+    "name": "CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "description": "Tracking suspicious donations to flagged addresses",
+    "investigator": 1,
+    "status": "active",
+    "priority": "critical",
+    "notes": "Suspicious activity flagged by monitoring system.\n\nCase opened: 2025-06-06 13:23:12",
+    "created_at": "2025-06-17T12:56:23.311Z",
+    "updated_at": "2025-06-17T12:56:23.311Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 34,
+  "fields": {
+    "name": "CASE-6968-XDGV: Pump and Dump Scheme",
+    "description": "Tracking coordinated token manipulation",
+    "investigator": 1,
+    "status": "active",
+    "priority": "high",
+    "notes": "Coordinated social media campaign detected 24 hours before dump.\n\nCase opened: 2025-06-08 11:31:40",
+    "created_at": "2025-06-17T12:56:23.406Z",
+    "updated_at": "2025-06-17T12:56:23.406Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 35,
+  "fields": {
+    "name": "CASE-3437-GJFV: NFT Wash Trading Investigation",
+    "description": "Investigating suspicious NFT trading patterns",
+    "investigator": 2,
+    "status": "pending",
+    "priority": "medium",
+    "notes": "Same wallets trading MOON token repeatedly. No external participants.\n\nCase opened: 2025-06-01 16:29:37",
+    "created_at": "2025-06-17T12:56:23.446Z",
+    "updated_at": "2025-06-17T12:56:23.446Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 36,
+  "fields": {
+    "name": "CASE-7994-QKCM: Exchange Compliance Check",
+    "description": "Regular compliance verification of exchange hot wallets",
+    "investigator": 2,
+    "status": "completed",
+    "priority": "medium",
+    "notes": "Pattern analysis indicates potential illicit activity.\n\nCase opened: 2025-06-02 19:47:15",
+    "created_at": "2025-06-17T12:56:23.539Z",
+    "updated_at": "2025-06-17T12:56:23.539Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 37,
+  "fields": {
+    "name": "CASE-5078-JYAT: Ransomware Payment Tracking",
+    "description": "Following ransomware payment through mixing services",
+    "investigator": 2,
+    "status": "active",
+    "priority": "critical",
+    "notes": "Victim organization: Healthcare provider. Critical systems encrypted.\n\nCase opened: 2025-06-08 17:09:23",
+    "created_at": "2025-06-17T12:56:23.612Z",
+    "updated_at": "2025-06-17T12:56:23.612Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 38,
+  "fields": {
+    "name": "CASE-0539-RQCM: Terrorist Financing Investigation",
+    "description": "Tracking suspicious donations to flagged addresses",
+    "investigator": 3,
+    "status": "active",
+    "priority": "critical",
+    "notes": "Suspicious activity flagged by monitoring system.\n\nCase opened: 2025-06-13 09:57:58",
+    "created_at": "2025-06-17T12:56:23.628Z",
+    "updated_at": "2025-06-17T12:56:23.628Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 39,
+  "fields": {
+    "name": "CASE-7081-AMDE: Ransomware Payment Tracking",
+    "description": "Following ransomware payment through mixing services",
+    "investigator": 3,
+    "status": "active",
+    "priority": "critical",
+    "notes": "Victim organization: Healthcare provider. Critical systems encrypted.\n\nCase opened: 2025-06-03 04:42:37",
+    "created_at": "2025-06-17T12:56:23.664Z",
+    "updated_at": "2025-06-17T12:56:23.664Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 40,
+  "fields": {
+    "name": "CASE-1272-TREN: ICO Exit Scam Analysis",
+    "description": "Investigating disappearing ICO funds",
+    "investigator": 3,
+    "status": "pending",
+    "priority": "high",
+    "notes": "Multiple red flags identified. Further investigation required.\n\nCase opened: 2025-06-09 13:23:44",
+    "created_at": "2025-06-17T12:56:23.672Z",
+    "updated_at": "2025-06-17T12:56:23.672Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 41,
+  "fields": {
+    "name": "CASE-3023-MHXX: ICO Exit Scam Analysis",
+    "description": "Investigating disappearing ICO funds",
+    "investigator": 4,
+    "status": "active",
+    "priority": "high",
+    "notes": "Pattern analysis indicates potential illicit activity.\n\nCase opened: 2025-06-04 01:50:09",
+    "created_at": "2025-06-17T12:56:23.698Z",
+    "updated_at": "2025-06-17T12:56:23.698Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 42,
+  "fields": {
+    "name": "CASE-2892-CVFB: Exchange Compliance Check",
+    "description": "Regular compliance verification of exchange hot wallets",
+    "investigator": 4,
+    "status": "pending",
+    "priority": "medium",
+    "notes": "Pattern analysis indicates potential illicit activity.\n\nCase opened: 2025-06-03 08:38:53",
+    "created_at": "2025-06-17T12:56:23.736Z",
+    "updated_at": "2025-06-17T12:56:23.736Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 43,
+  "fields": {
+    "name": "CASE-3924-BSCI: Terrorist Financing Investigation",
+    "description": "Tracking suspicious donations to flagged addresses",
+    "investigator": 4,
+    "status": "active",
+    "priority": "critical",
+    "notes": "Suspicious activity flagged by monitoring system.\n\nCase opened: 2025-06-08 14:49:17",
+    "created_at": "2025-06-17T12:56:23.830Z",
+    "updated_at": "2025-06-17T12:56:23.830Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 44,
+  "fields": {
+    "name": "CASE-4121-IAAQ: Money Laundering Network",
+    "description": "Complex network of wallets involved in layering transactions",
+    "investigator": 5,
+    "status": "pending",
+    "priority": "high",
+    "notes": "Pattern consistent with Hydra market operators. High-frequency small transactions.\n\nCase opened: 2025-06-14 07:59:26",
+    "created_at": "2025-06-17T12:56:23.864Z",
+    "updated_at": "2025-06-17T12:56:23.864Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 45,
+  "fields": {
+    "name": "CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "description": "Investigating suspicious NFT trading patterns",
+    "investigator": 5,
+    "status": "active",
+    "priority": "medium",
+    "notes": "Same wallets trading MOON token repeatedly. No external participants.\n\nCase opened: 2025-06-10 09:11:52",
+    "created_at": "2025-06-17T12:56:23.884Z",
+    "updated_at": "2025-06-17T12:56:23.884Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 46,
+  "fields": {
+    "name": "CASE-5445-CTFB: Pump and Dump Scheme",
+    "description": "Tracking coordinated token manipulation",
+    "investigator": 5,
+    "status": "active",
+    "priority": "high",
+    "notes": "Coordinated social media campaign detected 24 hours before dump.\n\nCase opened: 2025-06-07 17:20:32",
+    "created_at": "2025-06-17T12:56:24.001Z",
+    "updated_at": "2025-06-17T12:56:24.001Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 47,
+  "fields": {
+    "name": "CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "description": "Investigating suspicious NFT trading patterns",
+    "investigator": 6,
+    "status": "active",
+    "priority": "medium",
+    "notes": "Trading bots identified. Coordinated pump scheme across multiple DEXs.\n\nCase opened: 2025-06-11 15:46:56",
+    "created_at": "2025-06-17T12:56:24.026Z",
+    "updated_at": "2025-06-17T12:56:24.026Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 48,
+  "fields": {
+    "name": "CASE-3547-ARDM: Exchange Compliance Check",
+    "description": "Regular compliance verification of exchange hot wallets",
+    "investigator": 6,
+    "status": "completed",
+    "priority": "medium",
+    "notes": "Suspicious activity flagged by monitoring system.\n\nCase opened: 2025-06-01 15:32:42",
+    "created_at": "2025-06-17T12:56:24.111Z",
+    "updated_at": "2025-06-17T12:56:24.111Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 49,
+  "fields": {
+    "name": "CASE-9757-IPDL: Money Laundering Network",
+    "description": "Complex network of wallets involved in layering transactions",
+    "investigator": 6,
+    "status": "active",
+    "priority": "high",
+    "notes": "Funds originated from known darknet marketplace. Using DeFi protocols for obfuscation.\n\nCase opened: 2025-06-11 10:42:05",
+    "created_at": "2025-06-17T12:56:24.137Z",
+    "updated_at": "2025-06-17T12:56:24.137Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 50,
+  "fields": {
+    "name": "CASE-5377-WFHV: Money Laundering Network",
+    "description": "Complex network of wallets involved in layering transactions",
+    "investigator": 7,
+    "status": "active",
+    "priority": "high",
+    "notes": "Pattern consistent with Hydra market operators. High-frequency small transactions.\n\nCase opened: 2025-06-02 20:09:35",
+    "created_at": "2025-06-17T12:56:24.151Z",
+    "updated_at": "2025-06-17T12:56:24.151Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 51,
+  "fields": {
+    "name": "CASE-0575-RTIF: Exchange Compliance Check",
+    "description": "Regular compliance verification of exchange hot wallets",
+    "investigator": 7,
+    "status": "pending",
+    "priority": "medium",
+    "notes": "Multiple red flags identified. Further investigation required.\n\nCase opened: 2025-06-08 00:46:35",
+    "created_at": "2025-06-17T12:56:24.167Z",
+    "updated_at": "2025-06-17T12:56:24.167Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 52,
+  "fields": {
+    "name": "CASE-9320-OOGL: Ransomware Payment Tracking",
+    "description": "Following ransomware payment through mixing services",
+    "investigator": 7,
+    "status": "active",
+    "priority": "critical",
+    "notes": "Victim organization: Healthcare provider. Critical systems encrypted.\n\nCase opened: 2025-06-17 05:22:06",
+    "created_at": "2025-06-17T12:56:24.214Z",
+    "updated_at": "2025-06-17T12:56:24.214Z"
+  }
+},
+{
+  "model": "portfolio.investigationcase",
+  "pk": 53,
+  "fields": {
+    "name": "Arbitrage Bot Strategy Tracker",
+    "description": "Cross-chain MEV bot tracking arbitrage opportunities across Ethereum L2s",
+    "investigator": 1,
+    "status": "active",
+    "priority": "high",
+    "notes": "Tracking sophisticated arbitrage bot operations across multiple DEXs and chains. Bot appears to be using flash loans for capital efficiency.",
+    "created_at": "2025-06-17T13:05:07.785Z",
+    "updated_at": "2025-06-17T13:05:07.785Z"
+  }
+},
+{
   "model": "portfolio.casewallet",
   "pk": 1,
   "fields": {
@@ -3035,6 +3343,1710 @@
     "notes": "Wallet shows signs of automated trading. Possible bot activity.",
     "flagged": true,
     "added_at": "2025-06-17T10:09:07.202Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 218,
+  "fields": {
+    "case": 32,
+    "wallet": 239,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.185Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 219,
+  "fields": {
+    "case": 32,
+    "wallet": 240,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.187Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 220,
+  "fields": {
+    "case": 32,
+    "wallet": 241,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.188Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 221,
+  "fields": {
+    "case": 32,
+    "wallet": 242,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.190Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 222,
+  "fields": {
+    "case": 33,
+    "wallet": 243,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.313Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 223,
+  "fields": {
+    "case": 33,
+    "wallet": 244,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.314Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 224,
+  "fields": {
+    "case": 33,
+    "wallet": 245,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.315Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 225,
+  "fields": {
+    "case": 33,
+    "wallet": 246,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.316Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 226,
+  "fields": {
+    "case": 33,
+    "wallet": 247,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.317Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 227,
+  "fields": {
+    "case": 33,
+    "wallet": 248,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.318Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 228,
+  "fields": {
+    "case": 33,
+    "wallet": 249,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.319Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 229,
+  "fields": {
+    "case": 33,
+    "wallet": 250,
+    "category": "mixer",
+    "notes": "Using privacy protocol for transaction obfuscation.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.320Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 230,
+  "fields": {
+    "case": 33,
+    "wallet": 251,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.321Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 231,
+  "fields": {
+    "case": 33,
+    "wallet": 252,
+    "category": "mixer",
+    "notes": "Tornado Cash deposit detected. 100 ETH mixed in 10 ETH chunks.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.322Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 232,
+  "fields": {
+    "case": 34,
+    "wallet": 253,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.408Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 233,
+  "fields": {
+    "case": 34,
+    "wallet": 254,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.409Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 234,
+  "fields": {
+    "case": 34,
+    "wallet": 255,
+    "category": "exchange",
+    "notes": "Centralized exchange deposit address. Subpoena possible.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.410Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 235,
+  "fields": {
+    "case": 34,
+    "wallet": 256,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.412Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 236,
+  "fields": {
+    "case": 34,
+    "wallet": 257,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.413Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 237,
+  "fields": {
+    "case": 34,
+    "wallet": 258,
+    "category": "exchange",
+    "notes": "Binance hot wallet identified. KYC potentially available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.414Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 238,
+  "fields": {
+    "case": 34,
+    "wallet": 259,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.415Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 239,
+  "fields": {
+    "case": 34,
+    "wallet": 260,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.416Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 240,
+  "fields": {
+    "case": 35,
+    "wallet": 261,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.447Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 241,
+  "fields": {
+    "case": 35,
+    "wallet": 262,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.448Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 242,
+  "fields": {
+    "case": 35,
+    "wallet": 263,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.449Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 243,
+  "fields": {
+    "case": 35,
+    "wallet": 264,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.450Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 244,
+  "fields": {
+    "case": 35,
+    "wallet": 265,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.451Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 245,
+  "fields": {
+    "case": 35,
+    "wallet": 266,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.452Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 246,
+  "fields": {
+    "case": 35,
+    "wallet": 267,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.453Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 247,
+  "fields": {
+    "case": 35,
+    "wallet": 268,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.454Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 248,
+  "fields": {
+    "case": 36,
+    "wallet": 269,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.540Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 249,
+  "fields": {
+    "case": 36,
+    "wallet": 270,
+    "category": "exchange",
+    "notes": "Binance hot wallet identified. KYC potentially available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.541Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 250,
+  "fields": {
+    "case": 36,
+    "wallet": 271,
+    "category": "exchange",
+    "notes": "Binance hot wallet identified. KYC potentially available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.542Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 251,
+  "fields": {
+    "case": 36,
+    "wallet": 272,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.543Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 252,
+  "fields": {
+    "case": 36,
+    "wallet": 273,
+    "category": "exchange",
+    "notes": "Centralized exchange deposit address. Subpoena possible.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.545Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 253,
+  "fields": {
+    "case": 36,
+    "wallet": 274,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.546Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 254,
+  "fields": {
+    "case": 36,
+    "wallet": 275,
+    "category": "exchange",
+    "notes": "Centralized exchange deposit address. Subpoena possible.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.547Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 255,
+  "fields": {
+    "case": 36,
+    "wallet": 276,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.548Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 256,
+  "fields": {
+    "case": 36,
+    "wallet": 277,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.549Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 257,
+  "fields": {
+    "case": 36,
+    "wallet": 278,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.550Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 258,
+  "fields": {
+    "case": 37,
+    "wallet": 279,
+    "category": "mixer",
+    "notes": "CoinJoin participation confirmed. Multiple mixing rounds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.613Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 259,
+  "fields": {
+    "case": 37,
+    "wallet": 280,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.614Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 260,
+  "fields": {
+    "case": 37,
+    "wallet": 281,
+    "category": "victim",
+    "notes": "Phishing attack victim. Signed malicious transaction.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.615Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 261,
+  "fields": {
+    "case": 37,
+    "wallet": 282,
+    "category": "mixer",
+    "notes": "CoinJoin participation confirmed. Multiple mixing rounds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.616Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 262,
+  "fields": {
+    "case": 37,
+    "wallet": 283,
+    "category": "mixer",
+    "notes": "CoinJoin participation confirmed. Multiple mixing rounds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.617Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 263,
+  "fields": {
+    "case": 37,
+    "wallet": 284,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.619Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 264,
+  "fields": {
+    "case": 37,
+    "wallet": 285,
+    "category": "mixer",
+    "notes": "CoinJoin participation confirmed. Multiple mixing rounds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.620Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 265,
+  "fields": {
+    "case": 37,
+    "wallet": 286,
+    "category": "victim",
+    "notes": "Compromised wallet. Private keys potentially exposed.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.621Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 266,
+  "fields": {
+    "case": 37,
+    "wallet": 287,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.622Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 267,
+  "fields": {
+    "case": 37,
+    "wallet": 288,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.623Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 268,
+  "fields": {
+    "case": 38,
+    "wallet": 289,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.629Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 269,
+  "fields": {
+    "case": 38,
+    "wallet": 290,
+    "category": "mixer",
+    "notes": "Using privacy protocol for transaction obfuscation.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.630Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 270,
+  "fields": {
+    "case": 38,
+    "wallet": 291,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.631Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 271,
+  "fields": {
+    "case": 38,
+    "wallet": 292,
+    "category": "mixer",
+    "notes": "CoinJoin participation confirmed. Multiple mixing rounds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.632Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 272,
+  "fields": {
+    "case": 38,
+    "wallet": 293,
+    "category": "mixer",
+    "notes": "Using privacy protocol for transaction obfuscation.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.633Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 273,
+  "fields": {
+    "case": 39,
+    "wallet": 294,
+    "category": "victim",
+    "notes": "Hot wallet breach. Security audit recommended.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.665Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 274,
+  "fields": {
+    "case": 39,
+    "wallet": 295,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.666Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 275,
+  "fields": {
+    "case": 39,
+    "wallet": 296,
+    "category": "mixer",
+    "notes": "Tornado Cash deposit detected. 100 ETH mixed in 10 ETH chunks.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.667Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 276,
+  "fields": {
+    "case": 39,
+    "wallet": 297,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.668Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 277,
+  "fields": {
+    "case": 40,
+    "wallet": 298,
+    "category": "victim",
+    "notes": "Phishing attack victim. Signed malicious transaction.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.673Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 278,
+  "fields": {
+    "case": 40,
+    "wallet": 299,
+    "category": "victim",
+    "notes": "Compromised wallet. Private keys potentially exposed.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.674Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 279,
+  "fields": {
+    "case": 40,
+    "wallet": 300,
+    "category": "victim",
+    "notes": "Hot wallet breach. Security audit recommended.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.675Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 280,
+  "fields": {
+    "case": 40,
+    "wallet": 301,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.676Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 281,
+  "fields": {
+    "case": 41,
+    "wallet": 302,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.699Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 282,
+  "fields": {
+    "case": 41,
+    "wallet": 303,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.701Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 283,
+  "fields": {
+    "case": 41,
+    "wallet": 304,
+    "category": "exchange",
+    "notes": "Centralized exchange deposit address. Subpoena possible.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.702Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 284,
+  "fields": {
+    "case": 41,
+    "wallet": 305,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.703Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 285,
+  "fields": {
+    "case": 41,
+    "wallet": 306,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.704Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 286,
+  "fields": {
+    "case": 42,
+    "wallet": 307,
+    "category": "exchange",
+    "notes": "Binance hot wallet identified. KYC potentially available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.738Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 287,
+  "fields": {
+    "case": 42,
+    "wallet": 308,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.740Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 288,
+  "fields": {
+    "case": 42,
+    "wallet": 309,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.742Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 289,
+  "fields": {
+    "case": 42,
+    "wallet": 310,
+    "category": "exchange",
+    "notes": "Binance hot wallet identified. KYC potentially available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.743Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 290,
+  "fields": {
+    "case": 42,
+    "wallet": 311,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.745Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 291,
+  "fields": {
+    "case": 42,
+    "wallet": 312,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.746Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 292,
+  "fields": {
+    "case": 42,
+    "wallet": 313,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.748Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 293,
+  "fields": {
+    "case": 42,
+    "wallet": 314,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.750Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 294,
+  "fields": {
+    "case": 42,
+    "wallet": 315,
+    "category": "exchange",
+    "notes": "Binance hot wallet identified. KYC potentially available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.754Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 295,
+  "fields": {
+    "case": 42,
+    "wallet": 316,
+    "category": "exchange",
+    "notes": "Binance hot wallet identified. KYC potentially available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.756Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 296,
+  "fields": {
+    "case": 43,
+    "wallet": 317,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.831Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 297,
+  "fields": {
+    "case": 43,
+    "wallet": 318,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.833Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 298,
+  "fields": {
+    "case": 43,
+    "wallet": 319,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.834Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 299,
+  "fields": {
+    "case": 43,
+    "wallet": 320,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.836Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 300,
+  "fields": {
+    "case": 44,
+    "wallet": 321,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.866Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 301,
+  "fields": {
+    "case": 44,
+    "wallet": 322,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.867Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 302,
+  "fields": {
+    "case": 44,
+    "wallet": 323,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.868Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 303,
+  "fields": {
+    "case": 44,
+    "wallet": 324,
+    "category": "mixer",
+    "notes": "CoinJoin participation confirmed. Multiple mixing rounds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.869Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 304,
+  "fields": {
+    "case": 44,
+    "wallet": 325,
+    "category": "mixer",
+    "notes": "Using privacy protocol for transaction obfuscation.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.871Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 305,
+  "fields": {
+    "case": 45,
+    "wallet": 326,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.885Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 306,
+  "fields": {
+    "case": 45,
+    "wallet": 327,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.887Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 307,
+  "fields": {
+    "case": 45,
+    "wallet": 328,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.888Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 308,
+  "fields": {
+    "case": 45,
+    "wallet": 329,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.889Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 309,
+  "fields": {
+    "case": 45,
+    "wallet": 330,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.890Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 310,
+  "fields": {
+    "case": 45,
+    "wallet": 331,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.892Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 311,
+  "fields": {
+    "case": 45,
+    "wallet": 332,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.893Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 312,
+  "fields": {
+    "case": 45,
+    "wallet": 333,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:23.894Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 313,
+  "fields": {
+    "case": 45,
+    "wallet": 334,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:23.896Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 314,
+  "fields": {
+    "case": 46,
+    "wallet": 335,
+    "category": "victim",
+    "notes": "Phishing attack victim. Signed malicious transaction.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.002Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 315,
+  "fields": {
+    "case": 46,
+    "wallet": 336,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.004Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 316,
+  "fields": {
+    "case": 46,
+    "wallet": 337,
+    "category": "exchange",
+    "notes": "Centralized exchange deposit address. Subpoena possible.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.005Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 317,
+  "fields": {
+    "case": 46,
+    "wallet": 338,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.006Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 318,
+  "fields": {
+    "case": 46,
+    "wallet": 339,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.007Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 319,
+  "fields": {
+    "case": 47,
+    "wallet": 340,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.028Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 320,
+  "fields": {
+    "case": 47,
+    "wallet": 341,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.029Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 321,
+  "fields": {
+    "case": 47,
+    "wallet": 342,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.030Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 322,
+  "fields": {
+    "case": 47,
+    "wallet": 343,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.031Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 323,
+  "fields": {
+    "case": 47,
+    "wallet": 344,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.033Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 324,
+  "fields": {
+    "case": 47,
+    "wallet": 345,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.034Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 325,
+  "fields": {
+    "case": 47,
+    "wallet": 346,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.035Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 326,
+  "fields": {
+    "case": 47,
+    "wallet": 347,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.036Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 327,
+  "fields": {
+    "case": 47,
+    "wallet": 348,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.037Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 328,
+  "fields": {
+    "case": 48,
+    "wallet": 349,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.112Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 329,
+  "fields": {
+    "case": 48,
+    "wallet": 350,
+    "category": "exchange",
+    "notes": "Centralized exchange deposit address. Subpoena possible.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.114Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 330,
+  "fields": {
+    "case": 48,
+    "wallet": 351,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.115Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 331,
+  "fields": {
+    "case": 49,
+    "wallet": 352,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.138Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 332,
+  "fields": {
+    "case": 49,
+    "wallet": 353,
+    "category": "exchange",
+    "notes": "Binance hot wallet identified. KYC potentially available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.139Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 333,
+  "fields": {
+    "case": 49,
+    "wallet": 354,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.140Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 334,
+  "fields": {
+    "case": 50,
+    "wallet": 355,
+    "category": "mixer",
+    "notes": "Using privacy protocol for transaction obfuscation.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.152Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 335,
+  "fields": {
+    "case": 50,
+    "wallet": 356,
+    "category": "mixer",
+    "notes": "Tornado Cash deposit detected. 100 ETH mixed in 10 ETH chunks.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.155Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 336,
+  "fields": {
+    "case": 50,
+    "wallet": 357,
+    "category": "suspect",
+    "notes": "Multiple small transactions to avoid detection thresholds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.156Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 337,
+  "fields": {
+    "case": 51,
+    "wallet": 358,
+    "category": "unknown",
+    "notes": "Newly created wallet. No transaction history prior to case.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.168Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 338,
+  "fields": {
+    "case": 51,
+    "wallet": 359,
+    "category": "exchange",
+    "notes": "Binance hot wallet identified. KYC potentially available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.169Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 339,
+  "fields": {
+    "case": 51,
+    "wallet": 360,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.170Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 340,
+  "fields": {
+    "case": 51,
+    "wallet": 361,
+    "category": "exchange",
+    "notes": "Centralized exchange deposit address. Subpoena possible.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.171Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 341,
+  "fields": {
+    "case": 51,
+    "wallet": 362,
+    "category": "exchange",
+    "notes": "DEX aggregator wallet. No KYC available.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.172Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 342,
+  "fields": {
+    "case": 51,
+    "wallet": 363,
+    "category": "exchange",
+    "notes": "Centralized exchange deposit address. Subpoena possible.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.174Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 343,
+  "fields": {
+    "case": 51,
+    "wallet": 364,
+    "category": "unknown",
+    "notes": "Wallet purpose unclear. Requires further analysis.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.175Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 344,
+  "fields": {
+    "case": 51,
+    "wallet": 365,
+    "category": "exchange",
+    "notes": "Centralized exchange deposit address. Subpoena possible.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.176Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 345,
+  "fields": {
+    "case": 51,
+    "wallet": 366,
+    "category": "unknown",
+    "notes": "Potentially compromised address. Monitor for activity.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.178Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 346,
+  "fields": {
+    "case": 52,
+    "wallet": 367,
+    "category": "mixer",
+    "notes": "CoinJoin participation confirmed. Multiple mixing rounds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.215Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 347,
+  "fields": {
+    "case": 52,
+    "wallet": 368,
+    "category": "mixer",
+    "notes": "Tornado Cash deposit detected. 100 ETH mixed in 10 ETH chunks.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.216Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 348,
+  "fields": {
+    "case": 52,
+    "wallet": 369,
+    "category": "victim",
+    "notes": "Phishing attack victim. Signed malicious transaction.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.217Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 349,
+  "fields": {
+    "case": 52,
+    "wallet": 370,
+    "category": "suspect",
+    "notes": "Connected to known malicious smart contracts.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.218Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 350,
+  "fields": {
+    "case": 52,
+    "wallet": 371,
+    "category": "mixer",
+    "notes": "Tornado Cash deposit detected. 100 ETH mixed in 10 ETH chunks.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.219Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 351,
+  "fields": {
+    "case": 52,
+    "wallet": 372,
+    "category": "victim",
+    "notes": "Compromised wallet. Private keys potentially exposed.",
+    "flagged": false,
+    "added_at": "2025-06-17T12:56:24.220Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 352,
+  "fields": {
+    "case": 52,
+    "wallet": 373,
+    "category": "mixer",
+    "notes": "Tornado Cash deposit detected. 100 ETH mixed in 10 ETH chunks.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.221Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 353,
+  "fields": {
+    "case": 52,
+    "wallet": 374,
+    "category": "suspect",
+    "notes": "Wallet shows signs of automated trading. Possible bot activity.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.222Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 354,
+  "fields": {
+    "case": 52,
+    "wallet": 375,
+    "category": "mixer",
+    "notes": "CoinJoin participation confirmed. Multiple mixing rounds.",
+    "flagged": true,
+    "added_at": "2025-06-17T12:56:24.223Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 355,
+  "fields": {
+    "case": 53,
+    "wallet": 260,
+    "category": "suspect",
+    "notes": "Bot wallet identified through on-chain analysis",
+    "flagged": true,
+    "added_at": "2025-06-17T13:05:07.787Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 356,
+  "fields": {
+    "case": 53,
+    "wallet": 259,
+    "category": "suspect",
+    "notes": "Bot wallet identified through on-chain analysis",
+    "flagged": true,
+    "added_at": "2025-06-17T13:05:07.788Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 357,
+  "fields": {
+    "case": 53,
+    "wallet": 258,
+    "category": "suspect",
+    "notes": "Bot wallet identified through on-chain analysis",
+    "flagged": true,
+    "added_at": "2025-06-17T13:05:07.788Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 358,
+  "fields": {
+    "case": 53,
+    "wallet": 257,
+    "category": "suspect",
+    "notes": "Bot wallet identified through on-chain analysis",
+    "flagged": true,
+    "added_at": "2025-06-17T13:05:07.789Z"
+  }
+},
+{
+  "model": "portfolio.casewallet",
+  "pk": 359,
+  "fields": {
+    "case": 53,
+    "wallet": 256,
+    "category": "suspect",
+    "notes": "Bot wallet identified through on-chain analysis",
+    "flagged": true,
+    "added_at": "2025-06-17T13:05:07.789Z"
   }
 }
 ]

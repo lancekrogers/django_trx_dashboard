@@ -4,11 +4,11 @@
   "pk": 1,
   "fields": {
     "password": "pbkdf2_sha256$600000$JqR6qrO6I4vOxRPFwK9vpv$Zl0fHi70fXuN5VfHusQ3b/WEHqqfgt2y6P4ZPMCi96o=",
-    "last_login": "2025-06-17T10:36:22.550Z",
+    "last_login": "2025-06-17T13:40:58.070Z",
     "is_superuser": true,
     "username": "admin@example.com",
-    "first_name": "Admin",
-    "last_name": "User",
+    "first_name": "",
+    "last_name": "",
     "is_staff": true,
     "is_active": true,
     "date_joined": "2025-06-17T09:50:29.019Z",
@@ -3700,6 +3700,2061 @@
     "is_monitored": false,
     "created_at": "2025-06-17T11:30:01.427Z",
     "updated_at": "2025-06-17T11:30:01.427Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 239,
+  "fields": {
+    "user": 1,
+    "address": "0x2b02d27f13d53cc3f366bf185018e79802fe05e1",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 1",
+    "notes": "Flagged as unknown in CASE-7938-HNNK: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.184Z",
+    "updated_at": "2025-06-17T12:56:23.184Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 240,
+  "fields": {
+    "user": 1,
+    "address": "bc1qHHtINolCmMVbDpXwbVWFLQNlfwdLWgKSMkRtbw",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 2",
+    "notes": "Flagged as suspect in CASE-7938-HNNK: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.186Z",
+    "updated_at": "2025-06-17T12:56:23.186Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 241,
+  "fields": {
+    "user": 1,
+    "address": "onBzFHnqGzKqgiIjeHdYvLzijCDntTZnMMvsTvKqzdXw",
+    "chain": "solana",
+    "label": "Suspect Wallet 3",
+    "notes": "Flagged as suspect in CASE-7938-HNNK: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.187Z",
+    "updated_at": "2025-06-17T12:56:23.187Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 242,
+  "fields": {
+    "user": 1,
+    "address": "bc1qhBEvwYGwzfyhACkMJLSOPpYmopLGIPSAumFkZz",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 4",
+    "notes": "Flagged as unknown in CASE-7938-HNNK: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.189Z",
+    "updated_at": "2025-06-17T12:56:23.189Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 243,
+  "fields": {
+    "user": 1,
+    "address": "0x2347d2b956b4ae5313ecc9e6bc68cb5a5155cf85",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 1",
+    "notes": "Flagged as suspect in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.312Z",
+    "updated_at": "2025-06-17T12:56:23.312Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 244,
+  "fields": {
+    "user": 1,
+    "address": "bc1qbdIXQkBCLNcKNaFGEakjERHcUIGghBFiGRrkgJ",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 2",
+    "notes": "Flagged as unknown in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.313Z",
+    "updated_at": "2025-06-17T12:56:23.313Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 245,
+  "fields": {
+    "user": 1,
+    "address": "0x5ec56da7c75a7622263cace39e83810ceb2aa9dd",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 3",
+    "notes": "Flagged as unknown in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.314Z",
+    "updated_at": "2025-06-17T12:56:23.314Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 246,
+  "fields": {
+    "user": 1,
+    "address": "WpqLFuMIpNXUGgVzAXncOonqDPeICvgsoCUhaJMOEeiE",
+    "chain": "solana",
+    "label": "Suspect Wallet 4",
+    "notes": "Flagged as suspect in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.315Z",
+    "updated_at": "2025-06-17T12:56:23.315Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 247,
+  "fields": {
+    "user": 1,
+    "address": "0x7f306e50ab5539ac2efe6df5c40072f8c9709f81",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 5",
+    "notes": "Flagged as suspect in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.317Z",
+    "updated_at": "2025-06-17T12:56:23.317Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 248,
+  "fields": {
+    "user": 1,
+    "address": "0x98db675aba487817ebfe6d306c10116da758b6eb",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 6",
+    "notes": "Flagged as unknown in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.318Z",
+    "updated_at": "2025-06-17T12:56:23.318Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 249,
+  "fields": {
+    "user": 1,
+    "address": "bc1qnuEwFCxfNQanAhcfKVjrmCqFTLyFsKPUKEHnlc",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 7",
+    "notes": "Flagged as unknown in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.319Z",
+    "updated_at": "2025-06-17T12:56:23.319Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 250,
+  "fields": {
+    "user": 1,
+    "address": "0x8a1d1eb33bd1e9006fc122d536b450b76bcdfb30",
+    "chain": "ethereum",
+    "label": "Mixer Wallet 8",
+    "notes": "Flagged as mixer in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.320Z",
+    "updated_at": "2025-06-17T12:56:23.320Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 251,
+  "fields": {
+    "user": 1,
+    "address": "KzZDOBEZXutLFUogZJuZAtJVKeKJBWySWYVflgfYFXEy",
+    "chain": "solana",
+    "label": "Unknown Wallet 9",
+    "notes": "Flagged as unknown in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.321Z",
+    "updated_at": "2025-06-17T12:56:23.321Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 252,
+  "fields": {
+    "user": 1,
+    "address": "bc1qAsEzqvnlbrLeGWpytxhCDupkevzkCgLltRYULZ",
+    "chain": "bitcoin",
+    "label": "Mixer Wallet 10",
+    "notes": "Flagged as mixer in CASE-8029-EGVJ: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.322Z",
+    "updated_at": "2025-06-17T12:56:23.322Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 253,
+  "fields": {
+    "user": 1,
+    "address": "DbxCnmDrQPpUSqEjjfhrcooZUSyEZlRpUdrWhdZenfcd",
+    "chain": "solana",
+    "label": "Suspect Wallet 1",
+    "notes": "Flagged as suspect in CASE-6968-XDGV: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.407Z",
+    "updated_at": "2025-06-17T12:56:23.407Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 254,
+  "fields": {
+    "user": 1,
+    "address": "bc1qlVgWzBrhzEXHeqZcbNMfdPKcVRrASNWFkNHwlV",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 2",
+    "notes": "Flagged as suspect in CASE-6968-XDGV: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.409Z",
+    "updated_at": "2025-06-17T12:56:23.409Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 255,
+  "fields": {
+    "user": 1,
+    "address": "BLISpQDsqlqEFYuLLvKGCsDiRxDneewEkVvNduSvCuVq",
+    "chain": "solana",
+    "label": "Exchange Wallet 3",
+    "notes": "Flagged as exchange in CASE-6968-XDGV: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.410Z",
+    "updated_at": "2025-06-17T12:56:23.410Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 256,
+  "fields": {
+    "user": 1,
+    "address": "bc1qLHfRrZcCbNwHnCeZxRGLJBQAOBheZrBWQViJIt",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 4",
+    "notes": "Flagged as suspect in CASE-6968-XDGV: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.411Z",
+    "updated_at": "2025-06-17T12:56:23.411Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 257,
+  "fields": {
+    "user": 1,
+    "address": "IyPMLIkGWpAcZGJcHhTocmFYceFHFxsUJEwsTBaahRsi",
+    "chain": "solana",
+    "label": "Suspect Wallet 5",
+    "notes": "Flagged as suspect in CASE-6968-XDGV: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.413Z",
+    "updated_at": "2025-06-17T12:56:23.413Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 258,
+  "fields": {
+    "user": 1,
+    "address": "whrYhvFKTnPOVMWSUXYckTOqGROEmOWDXJZBHlLPEhFL",
+    "chain": "solana",
+    "label": "Exchange Wallet 6",
+    "notes": "Flagged as exchange in CASE-6968-XDGV: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.414Z",
+    "updated_at": "2025-06-17T12:56:23.414Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 259,
+  "fields": {
+    "user": 1,
+    "address": "0xe53467562ac164188c759d7d2cc64647424c133c",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 7",
+    "notes": "Flagged as suspect in CASE-6968-XDGV: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.415Z",
+    "updated_at": "2025-06-17T12:56:23.415Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 260,
+  "fields": {
+    "user": 1,
+    "address": "dpqykeeEaaBHSaXJRbAoUFwZMTjBeuICtYrWpmFHBctT",
+    "chain": "solana",
+    "label": "Suspect Wallet 8",
+    "notes": "Flagged as suspect in CASE-6968-XDGV: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.416Z",
+    "updated_at": "2025-06-17T12:56:23.416Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 261,
+  "fields": {
+    "user": 2,
+    "address": "ZfdSxVxXzaQVlUqRCPGMVXtITdyLRThNStSlEguHIFIz",
+    "chain": "solana",
+    "label": "Suspect Wallet 1",
+    "notes": "Flagged as suspect in CASE-3437-GJFV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.446Z",
+    "updated_at": "2025-06-17T12:56:23.446Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 262,
+  "fields": {
+    "user": 2,
+    "address": "hLsUuSEKPECBJGgAbyKbnocJcZKKopRqCAvGJvVPPTQd",
+    "chain": "solana",
+    "label": "Unknown Wallet 2",
+    "notes": "Flagged as unknown in CASE-3437-GJFV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.448Z",
+    "updated_at": "2025-06-17T12:56:23.448Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 263,
+  "fields": {
+    "user": 2,
+    "address": "0x4853dad6329cdb3c98b4908633c1dc861ec87e82",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 3",
+    "notes": "Flagged as unknown in CASE-3437-GJFV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.449Z",
+    "updated_at": "2025-06-17T12:56:23.449Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 264,
+  "fields": {
+    "user": 2,
+    "address": "bc1qpZvqfYGleZTZUkEoDLHREFKlQwBJhaZTtFaEBy",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 4",
+    "notes": "Flagged as suspect in CASE-3437-GJFV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.450Z",
+    "updated_at": "2025-06-17T12:56:23.450Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 265,
+  "fields": {
+    "user": 2,
+    "address": "bc1qfEVDBxNtgzXEjdgvotAujyoxYuZauJGiFvIVDX",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 5",
+    "notes": "Flagged as suspect in CASE-3437-GJFV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.451Z",
+    "updated_at": "2025-06-17T12:56:23.451Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 266,
+  "fields": {
+    "user": 2,
+    "address": "paSEDxIOUzKMtpEPtupFjZkREvEtNYOetcwNUZEgnkVt",
+    "chain": "solana",
+    "label": "Suspect Wallet 6",
+    "notes": "Flagged as suspect in CASE-3437-GJFV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.452Z",
+    "updated_at": "2025-06-17T12:56:23.452Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 267,
+  "fields": {
+    "user": 2,
+    "address": "0xe90cddd1335dc249d0ce56f7a43536cb41e39021",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 7",
+    "notes": "Flagged as suspect in CASE-3437-GJFV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.453Z",
+    "updated_at": "2025-06-17T12:56:23.453Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 268,
+  "fields": {
+    "user": 2,
+    "address": "0x35450bf8f8111d3ae2e8561ece49939de0288b2f",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 8",
+    "notes": "Flagged as suspect in CASE-3437-GJFV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.454Z",
+    "updated_at": "2025-06-17T12:56:23.454Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 269,
+  "fields": {
+    "user": 2,
+    "address": "0x28b8813fc938943c89e96a0b7d02ad3cc6ab3084",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 1",
+    "notes": "Flagged as unknown in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.540Z",
+    "updated_at": "2025-06-17T12:56:23.540Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 270,
+  "fields": {
+    "user": 2,
+    "address": "bc1qFVUkujrvjvDvMSikYawwlQHroPKosZhozoCUaH",
+    "chain": "bitcoin",
+    "label": "Exchange Wallet 2",
+    "notes": "Flagged as exchange in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.541Z",
+    "updated_at": "2025-06-17T12:56:23.541Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 271,
+  "fields": {
+    "user": 2,
+    "address": "bc1qiqZPVCuJFfqmxmclTdrDkDNiOKtzgdvzVWhuPO",
+    "chain": "bitcoin",
+    "label": "Exchange Wallet 3",
+    "notes": "Flagged as exchange in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.542Z",
+    "updated_at": "2025-06-17T12:56:23.542Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 272,
+  "fields": {
+    "user": 2,
+    "address": "EOvxYFcNzSGSZsvigaWEFOcECKGgDrjXzjkiPRaXOlrM",
+    "chain": "solana",
+    "label": "Unknown Wallet 4",
+    "notes": "Flagged as unknown in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.543Z",
+    "updated_at": "2025-06-17T12:56:23.543Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 273,
+  "fields": {
+    "user": 2,
+    "address": "YuguisdOXbCyxwdbAJBdDNrBeakkwrEuEMMsGIiRHphO",
+    "chain": "solana",
+    "label": "Exchange Wallet 5",
+    "notes": "Flagged as exchange in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.544Z",
+    "updated_at": "2025-06-17T12:56:23.544Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 274,
+  "fields": {
+    "user": 2,
+    "address": "bc1qubhntZntmcfppOWufhduxNblGydLzEkfVojqsk",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 6",
+    "notes": "Flagged as unknown in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.545Z",
+    "updated_at": "2025-06-17T12:56:23.545Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 275,
+  "fields": {
+    "user": 2,
+    "address": "ikMtijiFdaGmDETpSHhdllNuzRZLPWQfsDnJJejOIcqk",
+    "chain": "solana",
+    "label": "Exchange Wallet 7",
+    "notes": "Flagged as exchange in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.546Z",
+    "updated_at": "2025-06-17T12:56:23.546Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 276,
+  "fields": {
+    "user": 2,
+    "address": "0xa5a763bb1e7786c960040807d4d18adaae95cf52",
+    "chain": "ethereum",
+    "label": "Exchange Wallet 8",
+    "notes": "Flagged as exchange in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.547Z",
+    "updated_at": "2025-06-17T12:56:23.547Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 277,
+  "fields": {
+    "user": 2,
+    "address": "0x41ed1cb377f79af140175634329f8abbc08821fe",
+    "chain": "ethereum",
+    "label": "Exchange Wallet 9",
+    "notes": "Flagged as exchange in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.548Z",
+    "updated_at": "2025-06-17T12:56:23.548Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 278,
+  "fields": {
+    "user": 2,
+    "address": "0x5e374739c3ae5e864903f897e8b2d606711f66e5",
+    "chain": "ethereum",
+    "label": "Exchange Wallet 10",
+    "notes": "Flagged as exchange in CASE-7994-QKCM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.549Z",
+    "updated_at": "2025-06-17T12:56:23.549Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 279,
+  "fields": {
+    "user": 2,
+    "address": "GHXyPBTOafgCmWpYtHnulMtvuXAWEBKNfiwGHNmmClwv",
+    "chain": "solana",
+    "label": "Mixer Wallet 1",
+    "notes": "Flagged as mixer in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.613Z",
+    "updated_at": "2025-06-17T12:56:23.613Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 280,
+  "fields": {
+    "user": 2,
+    "address": "GOoRcDdRoQfpYrAOwRaZZfwqqaPimCQAmWTQMAMCVyBb",
+    "chain": "solana",
+    "label": "Suspect Wallet 2",
+    "notes": "Flagged as suspect in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.614Z",
+    "updated_at": "2025-06-17T12:56:23.614Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 281,
+  "fields": {
+    "user": 2,
+    "address": "bAxgyVeUCjlCBNFYVQfJMrZrwpOhXYzmRSfEnkKEqqeD",
+    "chain": "solana",
+    "label": "Victim Wallet 3",
+    "notes": "Flagged as victim in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.615Z",
+    "updated_at": "2025-06-17T12:56:23.615Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 282,
+  "fields": {
+    "user": 2,
+    "address": "aYlKoDlFrSnnzBRrVRoHrJPvkdrLscFtRkwdyGKYTJbp",
+    "chain": "solana",
+    "label": "Mixer Wallet 4",
+    "notes": "Flagged as mixer in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.616Z",
+    "updated_at": "2025-06-17T12:56:23.616Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 283,
+  "fields": {
+    "user": 2,
+    "address": "0x6bb8cc10a4d5bef2f4b1a8adb65695f4927f31eb",
+    "chain": "ethereum",
+    "label": "Mixer Wallet 5",
+    "notes": "Flagged as mixer in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.617Z",
+    "updated_at": "2025-06-17T12:56:23.617Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 284,
+  "fields": {
+    "user": 2,
+    "address": "bc1qySnWvTuySSUTitEywccItKEUzphQtxuNQCYSsz",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 6",
+    "notes": "Flagged as suspect in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.618Z",
+    "updated_at": "2025-06-17T12:56:23.618Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 285,
+  "fields": {
+    "user": 2,
+    "address": "0x472a3bcbf2208438bab4d70400b45ac630148cfb",
+    "chain": "ethereum",
+    "label": "Mixer Wallet 7",
+    "notes": "Flagged as mixer in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.619Z",
+    "updated_at": "2025-06-17T12:56:23.619Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 286,
+  "fields": {
+    "user": 2,
+    "address": "0x84fd0995ed3d03ca92ec5b163ee34845be48b229",
+    "chain": "ethereum",
+    "label": "Victim Wallet 8",
+    "notes": "Flagged as victim in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.621Z",
+    "updated_at": "2025-06-17T12:56:23.621Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 287,
+  "fields": {
+    "user": 2,
+    "address": "lWKsrjmmEnvYzPvaXmSbYXyZXQPhhkZwnefNxlHuyJvs",
+    "chain": "solana",
+    "label": "Suspect Wallet 9",
+    "notes": "Flagged as suspect in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.622Z",
+    "updated_at": "2025-06-17T12:56:23.622Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 288,
+  "fields": {
+    "user": 2,
+    "address": "CSNZOGulmAldlJxerjVIrNgqUmlWzrHeZvIqCdIdhulj",
+    "chain": "solana",
+    "label": "Suspect Wallet 10",
+    "notes": "Flagged as suspect in CASE-5078-JYAT: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.623Z",
+    "updated_at": "2025-06-17T12:56:23.623Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 289,
+  "fields": {
+    "user": 3,
+    "address": "hSawJEeeNXtrzCNqiPhZQOWODaLMCCyTTVaTXfFtTPOs",
+    "chain": "solana",
+    "label": "Unknown Wallet 1",
+    "notes": "Flagged as unknown in CASE-0539-RQCM: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.628Z",
+    "updated_at": "2025-06-17T12:56:23.628Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 290,
+  "fields": {
+    "user": 3,
+    "address": "zFqfbKuuXXSHtihCkQayQPBJErEGMIvdZCtMAETxPGJE",
+    "chain": "solana",
+    "label": "Mixer Wallet 2",
+    "notes": "Flagged as mixer in CASE-0539-RQCM: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.629Z",
+    "updated_at": "2025-06-17T12:56:23.629Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 291,
+  "fields": {
+    "user": 3,
+    "address": "XxQNmluzPioZudRJKwVqJnllOUkebtYPDVTKWKEZNaHq",
+    "chain": "solana",
+    "label": "Unknown Wallet 3",
+    "notes": "Flagged as unknown in CASE-0539-RQCM: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.631Z",
+    "updated_at": "2025-06-17T12:56:23.631Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 292,
+  "fields": {
+    "user": 3,
+    "address": "bc1qFozLTyOvGZobhLvZVZufZwqZkHywBKRjaPthgV",
+    "chain": "bitcoin",
+    "label": "Mixer Wallet 4",
+    "notes": "Flagged as mixer in CASE-0539-RQCM: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.632Z",
+    "updated_at": "2025-06-17T12:56:23.632Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 293,
+  "fields": {
+    "user": 3,
+    "address": "zUtKuKiVdbbfAIfXixrYQafQaDQpmdUkxxyNDnyKLvkF",
+    "chain": "solana",
+    "label": "Mixer Wallet 5",
+    "notes": "Flagged as mixer in CASE-0539-RQCM: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.633Z",
+    "updated_at": "2025-06-17T12:56:23.633Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 294,
+  "fields": {
+    "user": 3,
+    "address": "bc1qkroFVqBSNYiyemKOXUyxnyySoXooEaypjdOCZU",
+    "chain": "bitcoin",
+    "label": "Victim Wallet 1",
+    "notes": "Flagged as victim in CASE-7081-AMDE: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.665Z",
+    "updated_at": "2025-06-17T12:56:23.665Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 295,
+  "fields": {
+    "user": 3,
+    "address": "bc1qEJoDvVaiEsHMhRjxtYmoItvYnKmXpxRbquPNZJ",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 2",
+    "notes": "Flagged as suspect in CASE-7081-AMDE: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.666Z",
+    "updated_at": "2025-06-17T12:56:23.666Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 296,
+  "fields": {
+    "user": 3,
+    "address": "jFqtmcqmiwHJktuqJOIjUOtlSJQLyEFzxoKgeWazCwkT",
+    "chain": "solana",
+    "label": "Mixer Wallet 3",
+    "notes": "Flagged as mixer in CASE-7081-AMDE: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.667Z",
+    "updated_at": "2025-06-17T12:56:23.667Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 297,
+  "fields": {
+    "user": 3,
+    "address": "0x1620629810b45f3b769717f6b13e45fe12f4c4cc",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 4",
+    "notes": "Flagged as suspect in CASE-7081-AMDE: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.668Z",
+    "updated_at": "2025-06-17T12:56:23.668Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 298,
+  "fields": {
+    "user": 3,
+    "address": "bc1qnucsOkkxXLLberaQwrUDAZVhiUOaNCypZMiAON",
+    "chain": "bitcoin",
+    "label": "Victim Wallet 1",
+    "notes": "Flagged as victim in CASE-1272-TREN: ICO Exit Scam Analysis",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.672Z",
+    "updated_at": "2025-06-17T12:56:23.672Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 299,
+  "fields": {
+    "user": 3,
+    "address": "0x7fd438121344d629c7879d8f9fa09b014f81af43",
+    "chain": "ethereum",
+    "label": "Victim Wallet 2",
+    "notes": "Flagged as victim in CASE-1272-TREN: ICO Exit Scam Analysis",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.673Z",
+    "updated_at": "2025-06-17T12:56:23.673Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 300,
+  "fields": {
+    "user": 3,
+    "address": "ffdUoKvArRpIzrSXjhXhIoferjBOpjZsFtjSnxlAOMWe",
+    "chain": "solana",
+    "label": "Victim Wallet 3",
+    "notes": "Flagged as victim in CASE-1272-TREN: ICO Exit Scam Analysis",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.674Z",
+    "updated_at": "2025-06-17T12:56:23.674Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 301,
+  "fields": {
+    "user": 3,
+    "address": "bc1qrdAshrmKdVDkAJbnKDCvMFMJFgeOidVDramYBM",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 4",
+    "notes": "Flagged as suspect in CASE-1272-TREN: ICO Exit Scam Analysis",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.675Z",
+    "updated_at": "2025-06-17T12:56:23.675Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 302,
+  "fields": {
+    "user": 4,
+    "address": "NlMyvnwrCsnpqOrkgFkIfonmBSYxsOnYDUPDDZyZqtLE",
+    "chain": "solana",
+    "label": "Exchange Wallet 1",
+    "notes": "Flagged as exchange in CASE-3023-MHXX: ICO Exit Scam Analysis",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.699Z",
+    "updated_at": "2025-06-17T12:56:23.699Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 303,
+  "fields": {
+    "user": 4,
+    "address": "EmidJTviBIJOBiFcPRAzCendZbGWdAJtppjjqwKUhFvJ",
+    "chain": "solana",
+    "label": "Suspect Wallet 2",
+    "notes": "Flagged as suspect in CASE-3023-MHXX: ICO Exit Scam Analysis",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.700Z",
+    "updated_at": "2025-06-17T12:56:23.700Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 304,
+  "fields": {
+    "user": 4,
+    "address": "0x68a74ac106fe26f07a73e8f6ba5482cd34d7c6f8",
+    "chain": "ethereum",
+    "label": "Exchange Wallet 3",
+    "notes": "Flagged as exchange in CASE-3023-MHXX: ICO Exit Scam Analysis",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.701Z",
+    "updated_at": "2025-06-17T12:56:23.701Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 305,
+  "fields": {
+    "user": 4,
+    "address": "ZpElSwBlbKJPbpWryYRUmLqEwhSIauoYxbaeVjhrOMOw",
+    "chain": "solana",
+    "label": "Suspect Wallet 4",
+    "notes": "Flagged as suspect in CASE-3023-MHXX: ICO Exit Scam Analysis",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.702Z",
+    "updated_at": "2025-06-17T12:56:23.702Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 306,
+  "fields": {
+    "user": 4,
+    "address": "0xda2b2c9c517450007976aa7eb38e04888edca5b6",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 5",
+    "notes": "Flagged as suspect in CASE-3023-MHXX: ICO Exit Scam Analysis",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.704Z",
+    "updated_at": "2025-06-17T12:56:23.704Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 307,
+  "fields": {
+    "user": 4,
+    "address": "0x013b3fd1928f6f60c74f82a00a1db7540958f631",
+    "chain": "ethereum",
+    "label": "Exchange Wallet 1",
+    "notes": "Flagged as exchange in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.738Z",
+    "updated_at": "2025-06-17T12:56:23.738Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 308,
+  "fields": {
+    "user": 4,
+    "address": "DTEEgidZIEkqpfuBpPFQREVCloEQIhmhsxCuJSdwOGVB",
+    "chain": "solana",
+    "label": "Unknown Wallet 2",
+    "notes": "Flagged as unknown in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.739Z",
+    "updated_at": "2025-06-17T12:56:23.739Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 309,
+  "fields": {
+    "user": 4,
+    "address": "bc1qYetAlshYGqplVUjzaWVuWSIWLLHLCzxdCVbnWN",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 3",
+    "notes": "Flagged as unknown in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.741Z",
+    "updated_at": "2025-06-17T12:56:23.741Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 310,
+  "fields": {
+    "user": 4,
+    "address": "bc1qzeoNjRvZZykmXtbmqmvHOdBdKQNKMWUkNWXwMH",
+    "chain": "bitcoin",
+    "label": "Exchange Wallet 4",
+    "notes": "Flagged as exchange in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.743Z",
+    "updated_at": "2025-06-17T12:56:23.743Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 311,
+  "fields": {
+    "user": 4,
+    "address": "FRdFkpAlqzYqOAxCtDXXjTOXbStKPbwJCxKFhwcZUdpo",
+    "chain": "solana",
+    "label": "Unknown Wallet 5",
+    "notes": "Flagged as unknown in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.744Z",
+    "updated_at": "2025-06-17T12:56:23.744Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 312,
+  "fields": {
+    "user": 4,
+    "address": "0x11aa65e9249e2ceeb7a7180b800025a956174fc3",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 6",
+    "notes": "Flagged as unknown in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.746Z",
+    "updated_at": "2025-06-17T12:56:23.746Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 313,
+  "fields": {
+    "user": 4,
+    "address": "GlDkeaIAlnxlMcRnKnkMhEjvTqkjRELdmxxcbmvoSrLZ",
+    "chain": "solana",
+    "label": "Unknown Wallet 7",
+    "notes": "Flagged as unknown in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.747Z",
+    "updated_at": "2025-06-17T12:56:23.747Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 314,
+  "fields": {
+    "user": 4,
+    "address": "bc1qdWrvklSiEoaTsbmdFwTXzPfdUxXpHNVpvjdFtH",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 8",
+    "notes": "Flagged as unknown in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.749Z",
+    "updated_at": "2025-06-17T12:56:23.749Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 315,
+  "fields": {
+    "user": 4,
+    "address": "0x9c0f462eb3470fa1c9b8d4817bd7b6dc47fbf7b5",
+    "chain": "ethereum",
+    "label": "Exchange Wallet 9",
+    "notes": "Flagged as exchange in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.753Z",
+    "updated_at": "2025-06-17T12:56:23.753Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 316,
+  "fields": {
+    "user": 4,
+    "address": "bc1qBxipxmuBxIUGydkuqqSOjKAyFBbHSQOHrErgXE",
+    "chain": "bitcoin",
+    "label": "Exchange Wallet 10",
+    "notes": "Flagged as exchange in CASE-2892-CVFB: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.756Z",
+    "updated_at": "2025-06-17T12:56:23.756Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 317,
+  "fields": {
+    "user": 4,
+    "address": "bc1qtnDRiIqMWBGFgXgaejIdJDTIVMPqJGrVrqrPFO",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 1",
+    "notes": "Flagged as suspect in CASE-3924-BSCI: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.831Z",
+    "updated_at": "2025-06-17T12:56:23.831Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 318,
+  "fields": {
+    "user": 4,
+    "address": "JlTXrlelAqPYZkRBoCDEGyZFDmuaezEvznQjayQmLlAH",
+    "chain": "solana",
+    "label": "Suspect Wallet 2",
+    "notes": "Flagged as suspect in CASE-3924-BSCI: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.832Z",
+    "updated_at": "2025-06-17T12:56:23.832Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 319,
+  "fields": {
+    "user": 4,
+    "address": "0xd8563b53cfdc6811b5374f5f1978d1aa6d28c503",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 3",
+    "notes": "Flagged as suspect in CASE-3924-BSCI: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.834Z",
+    "updated_at": "2025-06-17T12:56:23.834Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 320,
+  "fields": {
+    "user": 4,
+    "address": "bc1qmpmsAdybKhYdqTqZNpxqNQVXITTFOqlsRJsJqe",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 4",
+    "notes": "Flagged as unknown in CASE-3924-BSCI: Terrorist Financing Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.835Z",
+    "updated_at": "2025-06-17T12:56:23.835Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 321,
+  "fields": {
+    "user": 5,
+    "address": "gANPgfLoeRgQuLchhTpBvCLUNPuWAobrCvLEyjuweZfD",
+    "chain": "solana",
+    "label": "Suspect Wallet 1",
+    "notes": "Flagged as suspect in CASE-4121-IAAQ: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.865Z",
+    "updated_at": "2025-06-17T12:56:23.865Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 322,
+  "fields": {
+    "user": 5,
+    "address": "bc1qHxqzRcFjhjuvHQofeYVjlXZXoFDHpKDGEWxCSY",
+    "chain": "bitcoin",
+    "label": "Exchange Wallet 2",
+    "notes": "Flagged as exchange in CASE-4121-IAAQ: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.866Z",
+    "updated_at": "2025-06-17T12:56:23.866Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 323,
+  "fields": {
+    "user": 5,
+    "address": "0x786cde3fad3cc4348c9e5249cc61af5c4794e6a6",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 3",
+    "notes": "Flagged as suspect in CASE-4121-IAAQ: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.868Z",
+    "updated_at": "2025-06-17T12:56:23.868Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 324,
+  "fields": {
+    "user": 5,
+    "address": "FHexXcvykHuCjlqFcQGWWMuifjbWvijZUZDODuRDXVDk",
+    "chain": "solana",
+    "label": "Mixer Wallet 4",
+    "notes": "Flagged as mixer in CASE-4121-IAAQ: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.869Z",
+    "updated_at": "2025-06-17T12:56:23.869Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 325,
+  "fields": {
+    "user": 5,
+    "address": "0x9074fa06117c1494637d8d6c8ea99c269ef5d11e",
+    "chain": "ethereum",
+    "label": "Mixer Wallet 5",
+    "notes": "Flagged as mixer in CASE-4121-IAAQ: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.870Z",
+    "updated_at": "2025-06-17T12:56:23.870Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 326,
+  "fields": {
+    "user": 5,
+    "address": "bc1qXDrfDkuzHErPKOrVdMjAXfuySzmSdaQlIvotdD",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 1",
+    "notes": "Flagged as suspect in CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.885Z",
+    "updated_at": "2025-06-17T12:56:23.885Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 327,
+  "fields": {
+    "user": 5,
+    "address": "0x2cefd61c17e257223be686f02ef4ac10ecba4f78",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 2",
+    "notes": "Flagged as unknown in CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.886Z",
+    "updated_at": "2025-06-17T12:56:23.886Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 328,
+  "fields": {
+    "user": 5,
+    "address": "0x3d051638c3ea0dccecbf326241737b3986727a78",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 3",
+    "notes": "Flagged as suspect in CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.887Z",
+    "updated_at": "2025-06-17T12:56:23.887Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 329,
+  "fields": {
+    "user": 5,
+    "address": "bc1qHzZAaVPFkRAyVBumhtoFVaoNUWIhlblYgGVVov",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 4",
+    "notes": "Flagged as unknown in CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.889Z",
+    "updated_at": "2025-06-17T12:56:23.889Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 330,
+  "fields": {
+    "user": 5,
+    "address": "XPzWhiHWXkeuWmXnOcZgnYLMTbHJYSjvFNpOZdvBEqpx",
+    "chain": "solana",
+    "label": "Suspect Wallet 5",
+    "notes": "Flagged as suspect in CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.890Z",
+    "updated_at": "2025-06-17T12:56:23.890Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 331,
+  "fields": {
+    "user": 5,
+    "address": "bc1qXaVrbFtykvQnkGAeRtgVRGirfThlyrHYszZOPY",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 6",
+    "notes": "Flagged as suspect in CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.891Z",
+    "updated_at": "2025-06-17T12:56:23.891Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 332,
+  "fields": {
+    "user": 5,
+    "address": "MnPofTHWgHYNqHefNOWUkwQFcqFNeugUoyDZMfyAGRYZ",
+    "chain": "solana",
+    "label": "Unknown Wallet 7",
+    "notes": "Flagged as unknown in CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.893Z",
+    "updated_at": "2025-06-17T12:56:23.893Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 333,
+  "fields": {
+    "user": 5,
+    "address": "bc1qnKeUPGrbtqViUkwUyKHUdrGhCnUoquUKuMPtuU",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 8",
+    "notes": "Flagged as unknown in CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:23.894Z",
+    "updated_at": "2025-06-17T12:56:23.894Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 334,
+  "fields": {
+    "user": 5,
+    "address": "0x2168b575bcbc5c55c9c464850c9bc806897b6f29",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 9",
+    "notes": "Flagged as suspect in CASE-2249-RNJT: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:23.895Z",
+    "updated_at": "2025-06-17T12:56:23.895Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 335,
+  "fields": {
+    "user": 5,
+    "address": "bc1qwMGqwuMxVNHcQXttaqPlrckfRdztMMIajFYSdB",
+    "chain": "bitcoin",
+    "label": "Victim Wallet 1",
+    "notes": "Flagged as victim in CASE-5445-CTFB: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.002Z",
+    "updated_at": "2025-06-17T12:56:24.002Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 336,
+  "fields": {
+    "user": 5,
+    "address": "vQdOanKJCFMdusDLkwdhbKbAwuhRTddskHGEKOGKWgKu",
+    "chain": "solana",
+    "label": "Exchange Wallet 2",
+    "notes": "Flagged as exchange in CASE-5445-CTFB: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.003Z",
+    "updated_at": "2025-06-17T12:56:24.003Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 337,
+  "fields": {
+    "user": 5,
+    "address": "grfjMxcAeUPEIXIhUadkkLzUVTYvxiLAmOfVGaJgzoRC",
+    "chain": "solana",
+    "label": "Exchange Wallet 3",
+    "notes": "Flagged as exchange in CASE-5445-CTFB: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.004Z",
+    "updated_at": "2025-06-17T12:56:24.004Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 338,
+  "fields": {
+    "user": 5,
+    "address": "bc1qKhqITcOKCTWQtwUmeaQWrWbtrQhZVSoKICdIux",
+    "chain": "bitcoin",
+    "label": "Exchange Wallet 4",
+    "notes": "Flagged as exchange in CASE-5445-CTFB: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.005Z",
+    "updated_at": "2025-06-17T12:56:24.005Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 339,
+  "fields": {
+    "user": 5,
+    "address": "dTddUdRQFdVJTYaIGXfYmMDiTxhvxYQPKtdTBCdNJdLi",
+    "chain": "solana",
+    "label": "Exchange Wallet 5",
+    "notes": "Flagged as exchange in CASE-5445-CTFB: Pump and Dump Scheme",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.007Z",
+    "updated_at": "2025-06-17T12:56:24.007Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 340,
+  "fields": {
+    "user": 6,
+    "address": "KKHVvIreDURbrozqyQOJnmgOPwUNIeZgDxcRsILPNEsz",
+    "chain": "solana",
+    "label": "Unknown Wallet 1",
+    "notes": "Flagged as unknown in CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.027Z",
+    "updated_at": "2025-06-17T12:56:24.027Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 341,
+  "fields": {
+    "user": 6,
+    "address": "bc1qcQlEstJwheqDkRIxpPpLfmhtYedRASGtQAUCoi",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 2",
+    "notes": "Flagged as suspect in CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.028Z",
+    "updated_at": "2025-06-17T12:56:24.028Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 342,
+  "fields": {
+    "user": 6,
+    "address": "NTTslWtKErrRXUStqajnKRpiexSIaPIAljWWGkhlrxxU",
+    "chain": "solana",
+    "label": "Suspect Wallet 3",
+    "notes": "Flagged as suspect in CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.030Z",
+    "updated_at": "2025-06-17T12:56:24.030Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 343,
+  "fields": {
+    "user": 6,
+    "address": "dvodjGfVkZbzGTdXJsfNykTzisEoJcNAJwoPvQxRuxUl",
+    "chain": "solana",
+    "label": "Unknown Wallet 4",
+    "notes": "Flagged as unknown in CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.031Z",
+    "updated_at": "2025-06-17T12:56:24.031Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 344,
+  "fields": {
+    "user": 6,
+    "address": "bc1qGLMocAZxtuThuKNWNYIDcefMiNobqQKmOVLjHB",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 5",
+    "notes": "Flagged as suspect in CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.032Z",
+    "updated_at": "2025-06-17T12:56:24.032Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 345,
+  "fields": {
+    "user": 6,
+    "address": "0xd59cc184f0e2c16b00e8d6e8a42782ce27f35b90",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 6",
+    "notes": "Flagged as unknown in CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.033Z",
+    "updated_at": "2025-06-17T12:56:24.033Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 346,
+  "fields": {
+    "user": 6,
+    "address": "0xee590d1a452885e325b737cf74ffb97e34515074",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 7",
+    "notes": "Flagged as suspect in CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.035Z",
+    "updated_at": "2025-06-17T12:56:24.035Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 347,
+  "fields": {
+    "user": 6,
+    "address": "bc1qXtrBdqueMEuDaGyLtBLNqivtYlsljOUDOILbOz",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 8",
+    "notes": "Flagged as suspect in CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.036Z",
+    "updated_at": "2025-06-17T12:56:24.036Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 348,
+  "fields": {
+    "user": 6,
+    "address": "bc1qMjQizcmTWOFiGwkIiruVbMxaTQKxIHdOtHBJLx",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 9",
+    "notes": "Flagged as unknown in CASE-8215-MGXV: NFT Wash Trading Investigation",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.037Z",
+    "updated_at": "2025-06-17T12:56:24.037Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 349,
+  "fields": {
+    "user": 6,
+    "address": "0xd3871f355c4ab408c22f5beeb5f316685b84b91d",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 1",
+    "notes": "Flagged as unknown in CASE-3547-ARDM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.112Z",
+    "updated_at": "2025-06-17T12:56:24.112Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 350,
+  "fields": {
+    "user": 6,
+    "address": "bc1qkrySwOPCVHxheNZPqYvJfwkFWMlQOzNgWMLxJF",
+    "chain": "bitcoin",
+    "label": "Exchange Wallet 2",
+    "notes": "Flagged as exchange in CASE-3547-ARDM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.113Z",
+    "updated_at": "2025-06-17T12:56:24.113Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 351,
+  "fields": {
+    "user": 6,
+    "address": "bc1qHoEiZvcelIckMsptHmMZlbHbrQQYlLLqqgWmRf",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 3",
+    "notes": "Flagged as unknown in CASE-3547-ARDM: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.114Z",
+    "updated_at": "2025-06-17T12:56:24.114Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 352,
+  "fields": {
+    "user": 6,
+    "address": "bc1qYxpXlPVgEBYbOsdPEmyEdfvHnLSEwMsAeVTOEw",
+    "chain": "bitcoin",
+    "label": "Suspect Wallet 1",
+    "notes": "Flagged as suspect in CASE-9757-IPDL: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.137Z",
+    "updated_at": "2025-06-17T12:56:24.137Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 353,
+  "fields": {
+    "user": 6,
+    "address": "bc1qBXnzffdVRauKXVqYmPIFpBXXODrNUkJhpCSPKW",
+    "chain": "bitcoin",
+    "label": "Exchange Wallet 2",
+    "notes": "Flagged as exchange in CASE-9757-IPDL: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.138Z",
+    "updated_at": "2025-06-17T12:56:24.138Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 354,
+  "fields": {
+    "user": 6,
+    "address": "HyyHfOXInDkfjnFvDYwcHsWkQecOTLcrtwQThtXFzdxf",
+    "chain": "solana",
+    "label": "Exchange Wallet 3",
+    "notes": "Flagged as exchange in CASE-9757-IPDL: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.139Z",
+    "updated_at": "2025-06-17T12:56:24.139Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 355,
+  "fields": {
+    "user": 7,
+    "address": "pqdhIdadPetIPQttHCKNLMJHQdGhGyYliFprHZvoYxgf",
+    "chain": "solana",
+    "label": "Mixer Wallet 1",
+    "notes": "Flagged as mixer in CASE-5377-WFHV: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.152Z",
+    "updated_at": "2025-06-17T12:56:24.152Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 356,
+  "fields": {
+    "user": 7,
+    "address": "0xabad0ed3dcac6c6bdc015355e0d859a91809f431",
+    "chain": "ethereum",
+    "label": "Mixer Wallet 2",
+    "notes": "Flagged as mixer in CASE-5377-WFHV: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.153Z",
+    "updated_at": "2025-06-17T12:56:24.153Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 357,
+  "fields": {
+    "user": 7,
+    "address": "0x576395515ecde81be4a8044ff1e9c80b435101ff",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 3",
+    "notes": "Flagged as suspect in CASE-5377-WFHV: Money Laundering Network",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.155Z",
+    "updated_at": "2025-06-17T12:56:24.155Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 358,
+  "fields": {
+    "user": 7,
+    "address": "bc1qJKdgFNpyerwWUfFYdaiNMHQKDSimRNhsysIePF",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 1",
+    "notes": "Flagged as unknown in CASE-0575-RTIF: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.168Z",
+    "updated_at": "2025-06-17T12:56:24.168Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 359,
+  "fields": {
+    "user": 7,
+    "address": "0x67c8449a5a0271e7c248df701070b6aaaa9ca8ed",
+    "chain": "ethereum",
+    "label": "Exchange Wallet 2",
+    "notes": "Flagged as exchange in CASE-0575-RTIF: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.169Z",
+    "updated_at": "2025-06-17T12:56:24.169Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 360,
+  "fields": {
+    "user": 7,
+    "address": "dwctLPfhtRSPLdBzfkjbHXxAyIMbtMKuhfGVxTzLkhaj",
+    "chain": "solana",
+    "label": "Unknown Wallet 3",
+    "notes": "Flagged as unknown in CASE-0575-RTIF: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.170Z",
+    "updated_at": "2025-06-17T12:56:24.170Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 361,
+  "fields": {
+    "user": 7,
+    "address": "bc1qCnxiGiMMPlPZTcYBPAgeztPuraFTQJuAGYxRls",
+    "chain": "bitcoin",
+    "label": "Exchange Wallet 4",
+    "notes": "Flagged as exchange in CASE-0575-RTIF: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.171Z",
+    "updated_at": "2025-06-17T12:56:24.171Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 362,
+  "fields": {
+    "user": 7,
+    "address": "0x137474c862a76129c3c2703448a06d1abd2409db",
+    "chain": "ethereum",
+    "label": "Exchange Wallet 5",
+    "notes": "Flagged as exchange in CASE-0575-RTIF: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.172Z",
+    "updated_at": "2025-06-17T12:56:24.172Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 363,
+  "fields": {
+    "user": 7,
+    "address": "EHJfRYIirpPZQfQnICmjeXgXGMAmzvvYpWSxvJtSkZMY",
+    "chain": "solana",
+    "label": "Exchange Wallet 6",
+    "notes": "Flagged as exchange in CASE-0575-RTIF: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.173Z",
+    "updated_at": "2025-06-17T12:56:24.173Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 364,
+  "fields": {
+    "user": 7,
+    "address": "bc1qctJBtilWsHLafZHIAKkpxRfaaMdSByGQPndqdA",
+    "chain": "bitcoin",
+    "label": "Unknown Wallet 7",
+    "notes": "Flagged as unknown in CASE-0575-RTIF: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.175Z",
+    "updated_at": "2025-06-17T12:56:24.175Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 365,
+  "fields": {
+    "user": 7,
+    "address": "0x2d2ecca818b64554f50b2670c8744bf943a34976",
+    "chain": "ethereum",
+    "label": "Exchange Wallet 8",
+    "notes": "Flagged as exchange in CASE-0575-RTIF: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.176Z",
+    "updated_at": "2025-06-17T12:56:24.176Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 366,
+  "fields": {
+    "user": 7,
+    "address": "0x8776a49090bf1eb44c8175ef05b914397ab4609c",
+    "chain": "ethereum",
+    "label": "Unknown Wallet 9",
+    "notes": "Flagged as unknown in CASE-0575-RTIF: Exchange Compliance Check",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.177Z",
+    "updated_at": "2025-06-17T12:56:24.177Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 367,
+  "fields": {
+    "user": 7,
+    "address": "wUZIqCSdKFxWUsmvtFkMZQxgHzoDBgLWweyWqQjKMaoJ",
+    "chain": "solana",
+    "label": "Mixer Wallet 1",
+    "notes": "Flagged as mixer in CASE-9320-OOGL: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.215Z",
+    "updated_at": "2025-06-17T12:56:24.215Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 368,
+  "fields": {
+    "user": 7,
+    "address": "0xc77500a3cf3f79a80de12a935a31fb95cba45432",
+    "chain": "ethereum",
+    "label": "Mixer Wallet 2",
+    "notes": "Flagged as mixer in CASE-9320-OOGL: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.216Z",
+    "updated_at": "2025-06-17T12:56:24.216Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 369,
+  "fields": {
+    "user": 7,
+    "address": "0xcfeb0593a3ae5105d8b61c13a2afa8a8b3849ef9",
+    "chain": "ethereum",
+    "label": "Victim Wallet 3",
+    "notes": "Flagged as victim in CASE-9320-OOGL: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.217Z",
+    "updated_at": "2025-06-17T12:56:24.217Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 370,
+  "fields": {
+    "user": 7,
+    "address": "0x974a45efab5009c498538b3ba68b3ffd72c57e98",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 4",
+    "notes": "Flagged as suspect in CASE-9320-OOGL: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.218Z",
+    "updated_at": "2025-06-17T12:56:24.218Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 371,
+  "fields": {
+    "user": 7,
+    "address": "0x82428fc4d11987969281414b8716780b4b654b9a",
+    "chain": "ethereum",
+    "label": "Mixer Wallet 5",
+    "notes": "Flagged as mixer in CASE-9320-OOGL: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.219Z",
+    "updated_at": "2025-06-17T12:56:24.219Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 372,
+  "fields": {
+    "user": 7,
+    "address": "bc1qQFtzyAqaaRPIMMTtFVOSRhMwLrBHtOgDtSSbzZ",
+    "chain": "bitcoin",
+    "label": "Victim Wallet 6",
+    "notes": "Flagged as victim in CASE-9320-OOGL: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": false,
+    "created_at": "2025-06-17T12:56:24.220Z",
+    "updated_at": "2025-06-17T12:56:24.220Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 373,
+  "fields": {
+    "user": 7,
+    "address": "bc1qxZeWyOAUkProlevtXMGrakQScFZapdQencMrpK",
+    "chain": "bitcoin",
+    "label": "Mixer Wallet 7",
+    "notes": "Flagged as mixer in CASE-9320-OOGL: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.221Z",
+    "updated_at": "2025-06-17T12:56:24.221Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 374,
+  "fields": {
+    "user": 7,
+    "address": "0x971a66c4563ca0cad7e3f779119668989275b7fd",
+    "chain": "ethereum",
+    "label": "Suspect Wallet 8",
+    "notes": "Flagged as suspect in CASE-9320-OOGL: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.222Z",
+    "updated_at": "2025-06-17T12:56:24.222Z"
+  }
+},
+{
+  "model": "wallets.wallet",
+  "pk": 375,
+  "fields": {
+    "user": 7,
+    "address": "ikJIZtAztxoTFzWMcxQcmAOKeEwmsusUDmyQhCFhQOsn",
+    "chain": "solana",
+    "label": "Mixer Wallet 9",
+    "notes": "Flagged as mixer in CASE-9320-OOGL: Ransomware Payment Tracking",
+    "is_active": true,
+    "is_monitored": true,
+    "created_at": "2025-06-17T12:56:24.223Z",
+    "updated_at": "2025-06-17T12:56:24.223Z"
   }
 },
 {
