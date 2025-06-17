@@ -179,6 +179,11 @@ CORS_ALLOW_HEADERS = [
 # Django-HTMX Configuration
 DJANGO_HTMX_USE_CDN = False  # Use bundled HTMX instead of CDN
 
+# Authentication settings
+LOGIN_URL = '/htmx/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 # Content Security Policy for ApexCharts
 # Allow unsafe-eval for chart libraries (development only)
 if DEBUG:

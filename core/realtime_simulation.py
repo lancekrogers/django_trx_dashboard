@@ -5,6 +5,7 @@ Generates realistic-looking fraudulent money movement patterns.
 
 import random
 import time
+import math
 from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Dict, List, Any, Tuple
@@ -55,7 +56,7 @@ class BlockchainSimulator:
         
         # Simulation state
         self.current_time = datetime.now()
-        self.simulation_speed = 3600  # 1 hour per second
+        self.simulation_speed = 1  # Real-time (1 second = 1 second)
         self.running = False
         self.thread = None
         
@@ -117,10 +118,10 @@ class BlockchainSimulator:
             self.balance_history[chain_id].append(data_point)
             self.volume_history[chain_id].append(data_point)
             
-            # Keep only last 100 data points per chain
-            if len(self.balance_history[chain_id]) > 100:
+            # Keep only last 200 data points per chain (for longer timeframes)
+            if len(self.balance_history[chain_id]) > 200:
                 self.balance_history[chain_id].pop(0)
-            if len(self.volume_history[chain_id]) > 100:
+            if len(self.volume_history[chain_id]) > 200:
                 self.volume_history[chain_id].pop(0)
                 
         # Generate fraud events occasionally
@@ -133,17 +134,22 @@ class BlockchainSimulator:
         volatility = config['volatility']
         trend = config['trend']
         
-        # Time-based trend
-        hours_elapsed = (self.current_time.hour + self.current_time.minute / 60)
-        trend_factor = 1 + (trend * hours_elapsed / 24)
+        # Use seconds for more dynamic changes
+        seconds_elapsed = self.current_time.second + (self.current_time.microsecond / 1000000)
         
-        # Random volatility
-        random_factor = 1 + random.gauss(0, volatility * 0.1)
+        # Create a wave pattern for more visible changes
+        wave = math.sin(seconds_elapsed * 0.1) * 0.05  # 5% wave amplitude
+        
+        # Time-based trend (smaller scale for seconds)
+        trend_factor = 1 + (trend * seconds_elapsed / 3600)
+        
+        # Random volatility with higher frequency
+        random_factor = 1 + random.gauss(0, volatility * 0.02)
         
         # Fraud pattern influences
         fraud_factor = self._get_fraud_influence(chain_id)
         
-        balance = base * trend_factor * random_factor * fraud_factor
+        balance = base * trend_factor * random_factor * fraud_factor * (1 + wave)
         return max(balance, 0)  # Never negative
         
     def _calculate_chain_volume(self, chain_id: str, config: Dict) -> float:
@@ -228,24 +234,24 @@ class BlockchainSimulator:
         }
         return descriptions.get(event_type, 'Suspicious activity detected')
         
-    def get_current_data(self, timeframe: str = '7D') -> Dict[str, Any]:
+    def get_current_data(self, timeframe: str = '1M') -> Dict[str, Any]:
         """Get current simulation data for charts."""
         # Determine how many data points to return based on timeframe
         points_map = {
-            '7D': 24,    # Last 24 hours (7 days simulated)
-            '30D': 50,   # Last 50 hours (30 days simulated) 
-            '1Y': 100    # Last 100 hours (1 year simulated)
+            '1M': 30,    # Last 30 seconds (1 minute)
+            '5M': 60,    # Last 60 seconds (5 minutes)
+            '30M': 90    # Last 90 seconds (30 minutes)
         }
         
-        num_points = points_map.get(timeframe, 24)
+        num_points = points_map.get(timeframe, 30)
         
         # Generate labels for the timeframe
-        if timeframe == '7D':
-            labels = [f"{i}h ago" for i in range(num_points, 0, -1)]
-        elif timeframe == '30D':
-            labels = [f"Day {i}" for i in range(num_points, 0, -1)]
-        else:
-            labels = [f"Month {i}" for i in range(num_points, 0, -1)]
+        if timeframe == '1M':
+            labels = [f"{i}s" for i in range(num_points, 0, -1)]
+        elif timeframe == '5M':
+            labels = [f"{i}s" for i in range(num_points*5, 0, -5)][:num_points]
+        else:  # 30M
+            labels = [f"{i}m" for i in range(30, 0, -1)][:num_points]
             
         # Get recent data for each chain
         multi_chain_data = {}

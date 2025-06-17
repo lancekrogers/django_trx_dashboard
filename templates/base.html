@@ -12,6 +12,36 @@
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     
+    <!-- Configure HTMX to include CSRF token -->
+    <script>
+        // Configure HTMX to include CSRF token
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            // Get CSRF token from cookie
+            let csrfToken = null;
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') {
+                    csrfToken = value;
+                    break;
+                }
+            }
+            
+            // If no cookie, try to get from meta tag or form
+            if (!csrfToken) {
+                const tokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+                if (tokenInput) {
+                    csrfToken = tokenInput.value;
+                }
+            }
+            
+            // Add token to request headers
+            if (csrfToken) {
+                event.detail.headers['X-CSRFToken'] = csrfToken;
+            }
+        });
+    </script>
+    
     <!-- Chart.js - Use local version for better performance -->
     <script src="{% static 'js/vendor/chart.umd.min.js' %}"></script>
     <script>
@@ -36,6 +66,9 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-gray-50 text-gray-900">
+    <!-- CSRF Token for HTMX -->
+    {% csrf_token %}
+    
     <div id="main-container">
         {% block content %}{% endblock %}
     </div>
@@ -45,6 +78,18 @@
 
     <!-- Dashboard Application JavaScript -->
     <script src="{% static 'js/dashboard-app.js' %}"></script>
+    
+    <!-- Ensure HTMX is properly initialized -->
+    <script>
+        // Wait for HTMX to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Process any HTMX elements that might have been missed
+            if (typeof htmx !== 'undefined') {
+                htmx.process(document.body);
+                console.log('HTMX initialized and processed');
+            }
+        });
+    </script>
     
     {% block extra_scripts %}{% endblock %}
 </body>

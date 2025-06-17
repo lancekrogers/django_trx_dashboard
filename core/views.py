@@ -5,6 +5,8 @@ HTMX-aware views for rendering HTML partials and handling form submissions.
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from functools import wraps
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db import models
@@ -24,6 +26,17 @@ from portfolio.models import InvestigationCase, CaseWallet, InvestigationStatus,
 from transactions.models import Transaction
 from wallets.models import User, UserSettings, Wallet
 from core.realtime_simulation import get_simulator
+
+
+def demo_or_login_required(view_func):
+    """Allow access for authenticated users or demo mode."""
+    @wraps(view_func)
+    def wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # For demo mode, just proceed - the view should handle demo logic
+            pass
+        return view_func(request, *args, **kwargs)
+    return wrapped_view
 
 
 @require_http_methods(["GET", "POST"])
@@ -292,6 +305,10 @@ def htmx_dashboard(request):
 
 def home_view(request):
     """Root view - show cases dashboard for all users, with auth controls."""
+    # Ensure CSRF cookie is set
+    from django.middleware.csrf import get_token
+    get_token(request)
+    
     # Always show the cases list, but context changes based on auth
     return htmx_cases_list(request)
 
@@ -333,7 +350,7 @@ def htmx_settings(request):
     return HttpResponse('<div class="p-6 text-green-400">Settings updated successfully!</div>')
 
 
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 def htmx_logout(request):
     """Handle logout and return to homepage."""
     from django.contrib.auth import logout
@@ -360,10 +377,10 @@ def htmx_register_form(request):
     if not username or not email or not password1 or not password2:
         errors.append("All fields are required")
     
-    if password1 != password2:
+    if password1 and password2 and password1 != password2:
         errors.append("Passwords do not match")
     
-    if len(password1) < 8:
+    if password1 and len(password1) < 8:
         errors.append("Password must be at least 8 characters")
     
     # Check if user already exists
@@ -461,12 +478,12 @@ def htmx_cases_list(request):
         is_demo_mode = False
     else:
         # Demo mode - show all cases as read-only examples
-        cases = InvestigationCase.objects.all().prefetch_related('case_wallets__wallet')[:10]
-        user_wallets = Wallet.objects.all()[:20] 
-        user_transactions = Transaction.objects.all()[:100]
+        cases = InvestigationCase.objects.all().prefetch_related('case_wallets__wallet')
+        user_wallets = Wallet.objects.all()
+        user_transactions = Transaction.objects.all()
         is_demo_mode = True
     
-    # Calculate dashboard stats
+    # Calculate dashboard stats before any slicing
     active_cases_count = cases.filter(status='active').count()
     total_wallets_count = user_wallets.count()
     flagged_wallets_count = CaseWallet.objects.filter(case__in=cases, flagged=True).count()
@@ -494,6 +511,10 @@ def htmx_cases_list(request):
     
     if priority:
         cases = cases.filter(priority=priority)
+    
+    # Apply slicing for demo mode after all filtering
+    if is_demo_mode:
+        cases = cases[:10]
     
     context = {
         'investigation_cases': cases,
@@ -586,11 +607,14 @@ def htmx_archive_case(request, case_id):
     return render(request, "partials/cases_list.html", {"cases": cases})
 
 
-@login_required
 @require_http_methods(["GET"])
 def htmx_case_detail(request, case_id):
     """Display case investigation dashboard."""
-    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    if request.user.is_authenticated:
+        case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    else:
+        # Demo mode - allow viewing any case
+        case = get_object_or_404(InvestigationCase, id=case_id)
     case_wallets = CaseWallet.objects.filter(case=case).select_related('wallet').prefetch_related('wallet__transactions')
     
     # Get wallet IDs for this case
@@ -619,57 +643,44 @@ def htmx_case_detail(request, case_id):
     for item in wallet_distribution:
         item['category'] = dict(WalletCategory.choices).get(item['category'], 'Unknown')
     
-    # Generate chart data
-    # Transaction flow (last 7 days by default)
-    end_date = timezone.now()
-    start_date = end_date - timedelta(days=7)
+    # Get real-time simulation data for charts
+    simulator = get_simulator()
+    sim_data = simulator.get_current_data('1M')
     
-    # Group transactions by day for flow chart
-    flow_data = []
-    flow_labels = []
+    # Format data for money flow chart
+    flow_labels = sim_data['labels']
+    
+    # Use multi-chain simulation data for inflow/outflow
+    ethereum_data = sim_data['multi_chain_data'].get('ethereum', {'balances': [], 'volume': []})
+    arbitrum_data = sim_data['multi_chain_data'].get('arbitrum', {'balances': [], 'volume': []})
+    
+    # Create realistic inflow/outflow from simulation data
     inflow_data = []
     outflow_data = []
     
-    for i in range(7):
-        date = start_date + timedelta(days=i)
-        day_start = date.replace(hour=0, minute=0, second=0)
-        day_end = date.replace(hour=23, minute=59, second=59)
+    for i in range(len(flow_labels)):
+        # Inflow from simulation volume data
+        eth_volume = ethereum_data['volume'][i] if i < len(ethereum_data['volume']) else 50000
+        arb_volume = arbitrum_data['volume'][i] if i < len(arbitrum_data['volume']) else 20000
         
-        # Calculate inflow (buy/transfer in)
-        inflow = transactions.filter(
-            timestamp__gte=day_start,
-            timestamp__lte=day_end,
-            transaction_type__in=['buy', 'transfer']
-        ).aggregate(total=models.Sum('usd_value'))['total'] or 0
+        # Simulate inflow (money coming in) and outflow (money going out)
+        inflow = eth_volume + random.randint(10000, 50000)
+        outflow = arb_volume + random.randint(5000, 30000)
         
-        # Calculate outflow (sell/transfer out)
-        outflow = transactions.filter(
-            timestamp__gte=day_start,
-            timestamp__lte=day_end,
-            transaction_type='sell'
-        ).aggregate(total=models.Sum('usd_value'))['total'] or 0
-        
-        flow_labels.append(date.strftime('%b %d'))
-        # Add some demo variance if real data is flat
-        demo_inflow = float(inflow) if inflow > 0 else random.randint(50000, 200000)
-        demo_outflow = float(outflow) if outflow > 0 else random.randint(20000, 100000)
-        inflow_data.append(demo_inflow)
-        outflow_data.append(demo_outflow)
+        inflow_data.append(inflow)
+        outflow_data.append(outflow)
     
-    # Timeline data (transactions per day)
+    # Timeline data (transactions per period)
+    timeline_labels = flow_labels
     timeline_data = []
-    timeline_labels = []
     
-    for i in range(30):
-        date = end_date - timedelta(days=29-i)
-        day_count = transactions.filter(
-            timestamp__date=date.date()
-        ).count()
-        
-        # Add some demo variance if real data is flat
-        demo_count = day_count if day_count > 0 else random.randint(1, 15)
-        timeline_data.append(demo_count)
-        timeline_labels.append(date.strftime('%b %d'))
+    for i in range(len(timeline_labels)):
+        # Use simulation data to create realistic transaction counts
+        base_count = random.randint(5, 25)
+        # Add variance based on simulation activity
+        variance = random.randint(-5, 10)
+        count = max(1, base_count + variance)
+        timeline_data.append(count)
     
     import json
     
@@ -865,10 +876,22 @@ def htmx_add_wallet_to_case(request, case_id):
     return HttpResponse(success_message)
 
 
-@login_required
+@demo_or_login_required
 @require_http_methods(["GET"])
 def htmx_add_wallet_to_case_form(request, case_id):
     """Display form to add wallet to case."""
+    if not request.user.is_authenticated:
+        # Show demo mode message
+        return HttpResponse(
+            '<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">'
+            '<div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4">'
+            '<h3 class="text-xl font-semibold text-white mb-4">Demo Mode</h3>'
+            '<p class="text-yellow-400 mb-6">Create an account to add wallets to your investigations!</p>'
+            '<button onclick="document.getElementById(\'modal-container\').innerHTML = \'\'" '
+            'class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">Close</button>'
+            '</div></div>'
+        )
+    
     case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
     
     form_html = f"""
@@ -961,11 +984,15 @@ def htmx_export_case_data(request, case_id):
     return HttpResponse(message)
 
 
-@login_required
+@demo_or_login_required
 @require_http_methods(["POST"])
 def htmx_generate_case_report(request, case_id):
     """Generate comprehensive case report."""
-    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    if request.user.is_authenticated:
+        case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    else:
+        # Demo mode - show message only
+        case = get_object_or_404(InvestigationCase, id=case_id)
     
     # This would normally generate a PDF report
     # For now, return a success message
@@ -1018,14 +1045,14 @@ def htmx_chart_stream(request, case_id):
         simulator = get_simulator()
         
         while True:
-            # Get current simulation data
-            data = simulator.get_current_data('7D')
+            # Get current simulation data with 1 minute timeframe
+            data = simulator.get_current_data('1M')
             
             # Format as SSE
             yield f"data: {json.dumps(data)}\n\n"
             
-            # Update every 2 seconds for smooth real-time effect
-            time.sleep(2)
+            # Update every second for real-time effect
+            time.sleep(1)
     
     response = HttpResponse(event_stream(), content_type='text/event-stream')
     response['Cache-Control'] = 'no-cache'

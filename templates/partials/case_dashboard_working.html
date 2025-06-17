@@ -134,9 +134,9 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-xl font-bold text-white">Multi-Chain Wallet Balance Tracking</h3>
                     <div class="flex space-x-2">
-                        <button class="timeframe-btn px-3 py-1 bg-blue-600 text-white rounded text-sm" data-case-id="{{ case.id }}">7D</button>
-                        <button class="timeframe-btn px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm hover:bg-gray-600" data-case-id="{{ case.id }}">30D</button>
-                        <button class="timeframe-btn px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm hover:bg-gray-600" data-case-id="{{ case.id }}">1Y</button>
+                        <button class="timeframe-btn px-3 py-1 bg-blue-600 text-white rounded text-sm" data-case-id="{{ case.id }}" data-timeframe="1M">1M</button>
+                        <button class="timeframe-btn px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm hover:bg-gray-600" data-case-id="{{ case.id }}" data-timeframe="5M">5M</button>
+                        <button class="timeframe-btn px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm hover:bg-gray-600" data-case-id="{{ case.id }}" data-timeframe="30M">30M</button>
                     </div>
                 </div>
                 <div class="h-64">
@@ -339,11 +339,123 @@ if (!window.caseChartsInitialized) {
         }
     }
 
-    // Initialize charts
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeCharts);
-    } else {
+    // Initialize charts and set up handlers after DOM ready
+    function setupChartHandlers() {
         initializeCharts();
+        
+        // Add timeframe button handlers
+        document.querySelectorAll('.timeframe-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const timeframe = this.dataset.timeframe;
+                const caseId = this.dataset.caseId;
+                
+                console.log('Timeframe button clicked:', timeframe, caseId);
+                
+                // Update active state
+                document.querySelectorAll('.timeframe-btn').forEach(b => {
+                    b.classList.remove('bg-blue-600', 'text-white');
+                    b.classList.add('bg-gray-700', 'text-gray-300');
+                });
+                this.classList.remove('bg-gray-700', 'text-gray-300');
+                this.classList.add('bg-blue-600', 'text-white');
+                
+                // Fetch new data and update charts
+                updateChartsWithTimeframe(caseId, timeframe);
+            });
+        });
+        
+        // Start real-time updates
+        startRealTimeUpdates({{ case.id }});
     }
+    
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupChartHandlers);
+    } else {
+        setupChartHandlers();
+    }
+}
+
+// Function to update charts with new timeframe data
+function updateChartsWithTimeframe(caseId, timeframe) {
+    fetch(`/htmx/cases/${caseId}/chart-data/${timeframe}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateChartData(data);
+                showNotification(`Updated to ${timeframe} view`, 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching chart data:', error);
+            showNotification('Failed to update charts', 'error');
+        });
+}
+
+// Function to update chart data
+function updateChartData(simulationData) {
+    const portfolioChart = document.getElementById('portfolio-chart');
+    const activityChart = document.getElementById('activity-chart');
+    
+    if (portfolioChart && portfolioChart.chartInstance) {
+        // Update portfolio chart with multi-chain data
+        const ethereum = simulationData.multi_chain_data.ethereum || {balances: [], volume: []};
+        const arbitrum = simulationData.multi_chain_data.arbitrum || {balances: [], volume: []};
+        
+        portfolioChart.chartInstance.data.labels = simulationData.labels;
+        portfolioChart.chartInstance.data.datasets[0].data = ethereum.volume.map((v, i) => v + Math.random() * 50000);
+        portfolioChart.chartInstance.data.datasets[1].data = arbitrum.volume.map((v, i) => v + Math.random() * 30000);
+        portfolioChart.chartInstance.update('none'); // No animation for real-time
+    }
+    
+    if (activityChart && activityChart.chartInstance) {
+        // Update activity chart with transaction counts
+        const transactionCounts = simulationData.labels.map(() => Math.floor(Math.random() * 20) + 5);
+        
+        activityChart.chartInstance.data.labels = simulationData.labels;
+        activityChart.chartInstance.data.datasets[0].data = transactionCounts;
+        activityChart.chartInstance.update('none');
+    }
+    
+    // Update summary stats
+    if (simulationData.summary) {
+        const portfolioValue = document.getElementById('portfolio-value');
+        const portfolioChange = document.getElementById('portfolio-change');
+        
+        if (portfolioValue) {
+            portfolioValue.textContent = `$${(simulationData.summary.total_balance / 1000000).toFixed(1)}M`;
+        }
+        if (portfolioChange) {
+            const change = simulationData.summary.change_percent;
+            portfolioChange.textContent = `${change}% (24h)`;
+            portfolioChange.className = change.startsWith('+') ? 'text-green-400 text-sm mt-1 font-medium' : 'text-red-400 text-sm mt-1 font-medium';
+        }
+    }
+}
+
+// Start real-time updates
+function startRealTimeUpdates(caseId) {
+    console.log('Starting real-time updates for case:', caseId);
+    
+    // Update every second for real-time effect
+    const updateInterval = setInterval(() => {
+        const activeTimeframe = document.querySelector('.timeframe-btn.bg-blue-600')?.dataset.timeframe || '1M';
+        console.log('Updating charts with timeframe:', activeTimeframe);
+        
+        fetch(`/htmx/cases/${caseId}/chart-data/${activeTimeframe}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateChartData(data);
+                }
+            })
+            .catch(error => {
+                console.error('Real-time update error:', error);
+            });
+    }, 1000);
+    
+    // Store interval ID for cleanup if needed
+    window.chartUpdateInterval = updateInterval;
 }
 </script>

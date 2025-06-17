@@ -412,6 +412,33 @@ function initializeCharts() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard app initializing...');
     
+    // Configure HTMX to include CSRF token
+    document.body.addEventListener('htmx:configRequest', (event) => {
+        // Get CSRF token from cookie
+        let csrfToken = null;
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'csrftoken') {
+                csrfToken = value;
+                break;
+            }
+        }
+        
+        // If no cookie, try to get from form
+        if (!csrfToken) {
+            const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (tokenInput) {
+                csrfToken = tokenInput.value;
+            }
+        }
+        
+        // Add token to request
+        if (csrfToken) {
+            event.detail.headers['X-CSRFToken'] = csrfToken;
+        }
+    });
+    
     // Initialize charts
     initializeCharts();
     

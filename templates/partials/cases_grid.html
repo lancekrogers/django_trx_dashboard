@@ -23,7 +23,7 @@ Investigation Cases Grid - Multi-portfolio dashboard with case management
             {% if user_authenticated %}
                 <span class="text-gray-400 text-sm">Welcome back!</span>
                 <button 
-                    hx-post="{% url 'htmx:logout' %}"
+                    hx-get="{% url 'htmx:logout' %}"
                     hx-target="#main-container"
                     hx-swap="innerHTML"
                     class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
