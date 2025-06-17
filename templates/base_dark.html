@@ -1,0 +1,234 @@
+{% comment %}
+Dark Base Template - Modern dark-themed layout with sidebar navigation
+Purpose: Provides dark theme layout matching modern analytics dashboard design
+Features: Left sidebar navigation, dark color scheme, modern UI components
+Used by: All authenticated pages when dark theme is enabled
+{% endcomment %}
+{% load static %}
+{% load django_htmx %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}Acme Inc. - Portfolio Dashboard{% endblock %}</title>
+    
+    <!-- Compiled Tailwind CSS with Franken UI -->
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    
+    <!-- Dark theme custom styles (these should be moved to input.css later) -->
+    <style>
+        :root {
+            --dark-bg: #0a0a0a;
+            --dark-sidebar: #111111;
+            --dark-card: #1a1a1a;
+            --dark-border: #2a2a2a;
+            --dark-hover: #2a2a2a;
+            --dark-text: #e5e5e5;
+            --dark-text-secondary: #a0a0a0;
+        }
+    </style>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- HTMX SSE Extension -->
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Alpine.js for UI interactions -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <!-- Custom Dark Theme CSS -->
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+        }
+        
+        .htmx-indicator {
+            display: none;
+        }
+        .htmx-request .htmx-indicator {
+            display: inline-flex;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a4a4a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a5a5a;
+        }
+        
+        /* Chart gradient area */
+        .chart-gradient {
+            background: linear-gradient(to bottom, rgba(99, 102, 241, 0.3), transparent);
+        }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-dark-bg text-dark-text flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-dark-sidebar border-r border-dark-border flex flex-col h-full">
+        <!-- Logo/Company Name -->
+        <div class="p-6 border-b border-dark-border">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                    <i data-feather="layers" class="w-5 h-5 text-white"></i>
+                </div>
+                <h1 class="text-xl font-semibold text-dark-text">Crypto Portfolio</h1>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="flex-1 px-4 py-6 space-y-1">
+            <!-- Main Navigation -->
+            <div class="space-y-1">
+                <a href="#" 
+                   hx-get="{% url 'htmx:dashboard' %}" 
+                   hx-target="#main-content" 
+                   hx-swap="innerHTML"
+                   class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-dark-hover text-dark-text">
+                    <i data-feather="pie-chart" class="w-5 h-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="#" 
+                   hx-get="{% url 'htmx:wallets' %}" 
+                   hx-target="#main-content" 
+                   hx-swap="innerHTML"
+                   class="flex items-center space-x-3 px-3 py-2 rounded-lg text-dark-text-secondary hover:bg-dark-hover hover:text-dark-text transition-colors">
+                    <i data-feather="wallet" class="w-5 h-5"></i>
+                    <span>Wallets</span>
+                </a>
+                
+                <a href="#" 
+                   hx-get="{% url 'htmx:transactions' %}" 
+                   hx-target="#main-content" 
+                   hx-swap="innerHTML"
+                   class="flex items-center space-x-3 px-3 py-2 rounded-lg text-dark-text-secondary hover:bg-dark-hover hover:text-dark-text transition-colors">
+                    <i data-feather="list" class="w-5 h-5"></i>
+                    <span>Transactions</span>
+                </a>
+                
+                <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-dark-text-secondary hover:bg-dark-hover hover:text-dark-text transition-colors">
+                    <i data-feather="bar-chart-2" class="w-5 h-5"></i>
+                    <span>Analytics</span>
+                </a>
+                
+                <a href="#" 
+                   hx-get="{% url 'htmx:settings' %}" 
+                   hx-target="#main-content" 
+                   hx-swap="innerHTML"
+                   class="flex items-center space-x-3 px-3 py-2 rounded-lg text-dark-text-secondary hover:bg-dark-hover hover:text-dark-text transition-colors">
+                    <i data-feather="settings" class="w-5 h-5"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+            
+            <!-- Quick Actions Section -->
+            <div class="mt-8">
+                <h3 class="px-3 text-xs uppercase text-dark-text-secondary font-semibold">Quick Actions</h3>
+                <div class="mt-3 space-y-1">
+                    <button hx-get="{% url 'htmx:add_wallet' %}" 
+                            hx-target="#wallet-form-modal" 
+                            hx-swap="innerHTML"
+                            class="flex items-center space-x-3 px-3 py-2 rounded-lg text-dark-text-secondary hover:bg-dark-hover hover:text-dark-text transition-colors w-full text-left">
+                        <i data-feather="plus-circle" class="w-5 h-5"></i>
+                        <span>Add Wallet</span>
+                    </button>
+                    
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-dark-text-secondary hover:bg-dark-hover hover:text-dark-text transition-colors">
+                        <i data-feather="download" class="w-5 h-5"></i>
+                        <span>Export Data</span>
+                    </a>
+                    
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-dark-text-secondary hover:bg-dark-hover hover:text-dark-text transition-colors">
+                        <i data-feather="refresh-cw" class="w-5 h-5"></i>
+                        <span>Sync All</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- User Menu -->
+        <div class="p-4 border-t border-dark-border">
+            <div class="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-dark-hover transition-colors cursor-pointer">
+                <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                    <span class="text-white text-sm font-medium">{{ user.email|first|upper }}</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-dark-text">{{ user.email|truncatechars:20 }}</p>
+                </div>
+                <i data-feather="chevron-down" class="w-4 h-4 text-dark-text-secondary"></i>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top Header -->
+        <header class="bg-dark-bg border-b border-dark-border px-6 py-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold">Portfolio Dashboard</h2>
+                <button hx-get="{% url 'htmx:add_wallet' %}" 
+                        hx-target="#wallet-form-modal" 
+                        hx-swap="innerHTML"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                    <i data-feather="plus" class="w-4 h-4"></i>
+                    <span>Add Wallet</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main id="main-content" class="flex-1 overflow-y-auto bg-dark-bg">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <!-- Global notification area -->
+    <div id="notifications" 
+         class="fixed bottom-0 right-0 p-6 space-y-4 pointer-events-none"
+         style="z-index: 9999;">
+    </div>
+    
+    <!-- Modal container for wallet form -->
+    <div id="wallet-form-modal"></div>
+
+    <!-- Application JavaScript -->
+    <script src="{% static 'js/htmx-config.js' %}"></script>
+    <script src="{% static 'js/portfolio-chart.js' %}"></script>
+    <script src="{% static 'js/real-time-manager.js' %}"></script>
+    <script src="{% static 'js/transaction-table.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    <!-- Initialize Feather Icons -->
+    <script>
+        feather.replace();
+        
+        // Re-initialize icons after HTMX swaps
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            feather.replace();
+        });
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

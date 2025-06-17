@@ -1,0 +1,20 @@
+{
+  "name": "multichain-trx-dashboard",
+  "version": "1.0.0",
+  "description": "Frontend assets for Multi-Chain Portfolio Dashboard",
+  "private": true,
+  "scripts": {
+    "build-css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
+    "watch-css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "build": "npm run build-css",
+    "dev": "npm run watch-css"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0"
+  },
+  "dependencies": {
+    "franken-ui": "2.0.0"
+  }
+}

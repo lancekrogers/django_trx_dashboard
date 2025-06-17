@@ -1,14 +1,42 @@
-{% comment %}
-Dashboard Template - Full page dashboard layout for authenticated users
-Purpose: Complete dashboard with portfolio overview, recent transactions, and wallets
-Features: Portfolio summary, recent activity, wallet management, auto-refresh
-Usage: Direct access via /dashboard/ URL or loaded via HTMX in SPA
-{% endcomment %}
 {% extends "base.html" %}
+{# Dashboard Template - Full page dashboard layout for authenticated users #}
+{# Purpose: Complete dashboard with portfolio overview, recent transactions, and wallets #}
+{# Features: Portfolio summary, recent activity, wallet management, auto-refresh #}
+{# Usage: Direct access via /dashboard/ URL or loaded via HTMX in SPA #}
 
 {% block title %}Dashboard - Multi-Chain Portfolio{% endblock %}
 
 {% block content %}
+<!-- Navigation -->
+<nav class="bg-white shadow mb-6" x-data="{ mobileMenuOpen: false }">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Left side: Site title/logo -->
+            <div class="flex-shrink-0">
+                <h1 class="text-lg sm:text-xl font-bold text-gray-900">Multi-Chain Portfolio Dashboard</h1>
+            </div>
+            
+            <!-- Center: Navigation buttons -->
+            <div class="hidden md:flex space-x-8">
+                <a href="/dashboard/" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                    Dashboard
+                </a>
+                <a href="/wallets/" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                    Wallets
+                </a>
+                <a href="/transactions/" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                    Transactions
+                </a>
+            </div>
+            
+            <!-- Right side: User menu -->
+            <div class="flex items-center">
+                {% include 'partials/nav_authenticated.html' %}
+            </div>
+        </div>
+    </div>
+</nav>
+
 <div class="px-4 sm:px-0">
     <!-- Page Header -->
     <div class="md:flex md:items-center md:justify-between mb-8">

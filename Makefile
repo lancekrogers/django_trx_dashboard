@@ -1,6 +1,6 @@
 # Portfolio Dashboard Makefile
 
-.PHONY: help setup install migrate collectstatic createsuperuser mock-data mock-data-full reset-users fresh-start run kill-server server-status test test-django test-help test-pytest test-pytest-coverage test-specific format lint lint-strict clean shell dbshell status
+.PHONY: help setup setup-node install install-npm migrate build-css watch-css collectstatic createsuperuser mock-data mock-data-full reset-users fresh-start run run-with-css kill-server server-status test test-django test-help test-pytest test-pytest-coverage test-specific format lint lint-strict clean clean-node shell dbshell status
 
 # Default target
 help: ## Show this help message
@@ -9,8 +9,42 @@ help: ## Show this help message
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
+# Node/npm check and install
+setup-node: ## Install Node.js if not present
+	@if ! command -v node >/dev/null 2>&1; then \
+		echo "Node.js not found. Installing Node.js..."; \
+		if command -v brew >/dev/null 2>&1; then \
+			brew install node; \
+		elif command -v apt-get >/dev/null 2>&1; then \
+			curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -; \
+			sudo apt-get install -y nodejs; \
+		else \
+			echo "Please install Node.js manually from https://nodejs.org/"; \
+			exit 1; \
+		fi; \
+	else \
+		echo "Node.js already installed: $$(node --version)"; \
+	fi
+
+install-npm: setup-node ## Install npm dependencies including Franken UI
+	@echo "Installing npm dependencies..."
+	@npm install
+	@echo "Initializing Franken UI..."
+	@npx franken-ui init -p || echo "Franken UI already initialized"
+	@echo "npm dependencies installed!"
+
+# CSS build commands
+build-css: install-npm ## Build Tailwind CSS with Franken UI
+	@echo "Building CSS with Tailwind and Franken UI..."
+	@npm run build-css
+	@echo "CSS build complete!"
+
+watch-css: install-npm ## Watch and rebuild CSS on changes
+	@echo "Watching CSS files for changes..."
+	@npm run watch-css
+
 # Setup commands
-setup: install migrate collectstatic ## Setup complete Django application
+setup: install install-npm build-css migrate collectstatic ## Setup complete Django application with frontend
 
 collectstatic: ## Collect static files
 	@echo "Collecting static files..."
@@ -62,6 +96,13 @@ run: ## Run Django development server
 	@echo "Admin: http://localhost:8000/admin"
 	@echo ""
 	@uv run --project . python manage.py runserver
+
+run-with-css: ## Run Django server with CSS watch (requires 2 terminals)
+	@echo "Starting CSS watcher and Django server..."
+	@echo "This requires 2 terminals. In this terminal, CSS will be watched."
+	@echo "Please open another terminal and run: make run"
+	@echo ""
+	@npm run watch-css
 
 kill-server: ## Kill Django development server
 	@echo "Stopping Django development server..."
@@ -155,7 +196,15 @@ clean: ## Clean up generated files
 	@find . -name "*.pyc" -delete
 	@find . -name "__pycache__" -type d -exec rm -rf {} + || true
 	@rm -rf staticfiles/
+	@rm -rf node_modules/
+	@rm -f static/css/output.css
 	@echo "Cleanup complete!"
+
+clean-node: ## Clean only Node/npm files
+	@echo "Cleaning Node.js files..."
+	@rm -rf node_modules/
+	@rm -f package-lock.json
+	@echo "Node cleanup complete!"
 
 status: ## Check service status
 	@echo "Checking Django server status..."

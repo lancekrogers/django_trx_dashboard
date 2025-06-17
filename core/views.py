@@ -10,6 +10,9 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 from django_htmx.http import HttpResponseClientRedirect, trigger_client_event
+from django.utils import timezone
+from datetime import timedelta, datetime
+import random
 
 from portfolio.services import PortfolioService
 from transactions.models import Transaction
@@ -19,7 +22,12 @@ from wallets.models import User, UserSettings, Wallet
 @require_http_methods(["GET", "POST"])
 def htmx_login(request):
     """Handle login form display and submission."""
+    # Check for dark theme preference (default to dark for now)
+    use_dark_theme = True  # You can later check user settings
+    
     if request.method == "GET":
+        if use_dark_theme:
+            return render(request, "forms/login_dark.html")
         return render(request, "forms/login.html")
 
     # POST - Handle login
@@ -27,6 +35,13 @@ def htmx_login(request):
     password = request.POST.get("password")
 
     if not username or not password:
+        if use_dark_theme:
+            return render(
+                request,
+                "forms/login_dark.html",
+                {"error": "Username and password are required"},
+                status=400,
+            )
         return render(
             request,
             "forms/login.html",
@@ -37,13 +52,88 @@ def htmx_login(request):
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
-        # Return dashboard content and signal auth status
-        response = render(request, "dashboard.html")
+        # For HTMX requests, return the dashboard partial
+        if request.htmx:
+            # Get dashboard data for the partial
+            wallets = Wallet.objects.filter(user=user)
+            recent_transactions = Transaction.objects.filter(
+                wallet__user=user
+            ).order_by("-timestamp")[:5]
+            service = PortfolioService(user)
+            summary = service.get_portfolio_summary()
+            
+            # Get historical data for chart (7 days)
+            historical_data = service.get_historical_data("7d")
+            
+            # Format chart data for the template
+            if historical_data:
+                chart_labels = []
+                chart_values = []
+                for point in historical_data:
+                    # Format date label
+                    dt = datetime.fromisoformat(point["timestamp"].replace('Z', '+00:00'))
+                    chart_labels.append(dt.strftime("%b %d"))
+                    chart_values.append(point["total_value_usd"])
+                summary["chart_labels"] = chart_labels
+                summary["chart_values"] = chart_values
+                summary["chart_data"] = ",".join(str(v) for v in chart_values)
+            else:
+                # Default data if no historical data
+                summary["chart_labels"] = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
+                summary["chart_values"] = [0, 0, 0, 0, 0, 0, 0]
+                summary["chart_data"] = "0,0,0,0,0,0,0"
+            
+            # Format asset distribution for the template
+            if summary.get("asset_labels") and summary.get("asset_values"):
+                assets = []
+                total_value = sum(summary["asset_values"])
+                for label, value in zip(summary["asset_labels"], summary["asset_values"]):
+                    percentage = (value / total_value * 100) if total_value > 0 else 0
+                    assets.append({
+                        "symbol": label,
+                        "value": value,
+                        "percentage": percentage,
+                        "color": None  # Will use default colors from template
+                    })
+                summary["assets"] = assets
+            else:
+                summary["assets"] = []
+            
+            # Additional summary fields
+            summary["total_value"] = summary.get("total_value_usd", 0)
+            summary["percent_change_24h"] = summary.get("change_24h", 0)
+            summary["value_change_24h"] = summary["total_value"] * summary["percent_change_24h"] / 100 if summary["percent_change_24h"] else 0
+            summary["total_assets"] = summary.get("asset_count", 0)
+            summary["volume_24h"] = random.uniform(1000, 5000) if service.mock_data_enabled else 0  # Mock 24h volume
+            
+            context = {
+                "wallets": wallets,
+                "recent_transactions": recent_transactions,
+                "summary": summary,
+            }
+            
+            if use_dark_theme:
+                response = render(request, "partials/dashboard_crypto_dark.html", context)
+            else:
+                response = render(request, "partials/dashboard_content.html", context)
+        else:
+            # For non-HTMX requests, return full dashboard page
+            if use_dark_theme:
+                response = render(request, "dashboard_dark.html")
+            else:
+                response = render(request, "dashboard.html")
         response["X-Auth-Status"] = "authenticated"
         # Use django-htmx helper to trigger client event
         trigger_client_event(response, "auth-change")
         return response
     else:
+        if use_dark_theme:
+            return render(
+                request,
+                "forms/login_dark.html",
+                {"error": "Invalid username or password", "username": username},
+                status=401,
+            )
         return render(
             request,
             "forms/login.html",
@@ -56,7 +146,12 @@ def htmx_login(request):
 @require_http_methods(["GET", "POST"])
 def htmx_add_wallet(request):
     """Handle add wallet form display and submission."""
+    # Check for dark theme preference (default to dark for now)
+    use_dark_theme = True  # You can later check user settings
+    
     if request.method == "GET":
+        if use_dark_theme:
+            return render(request, "forms/add_wallet_dark.html")
         return render(request, "forms/add_wallet.html")
 
     # POST - Handle wallet creation
@@ -72,6 +167,13 @@ def htmx_add_wallet(request):
         errors["address"] = "Address is required"
 
     if errors:
+        if use_dark_theme:
+            return render(
+                request,
+                "forms/add_wallet_dark.html",
+                {"errors": errors, "name": label, "chain": chain, "address": address},
+                status=400,
+            )
         return render(
             request,
             "forms/add_wallet.html",
@@ -81,6 +183,18 @@ def htmx_add_wallet(request):
 
     # Check if wallet already exists
     if Wallet.objects.filter(user=request.user, address=address, chain=chain).exists():
+        if use_dark_theme:
+            return render(
+                request,
+                "forms/add_wallet_dark.html",
+                {
+                    "error": "This wallet is already added",
+                    "name": label,
+                    "chain": chain,
+                    "address": address,
+                },
+                status=400,
+            )
         return render(
             request,
             "forms/add_wallet.html",
@@ -100,10 +214,26 @@ def htmx_add_wallet(request):
         )
 
         # Return wallet item partial
+        if use_dark_theme:
+            return render(
+                request, "partials/wallet_item_dark.html", {"wallet": wallet, "success": True}
+            )
         return render(
             request, "partials/wallet_item.html", {"wallet": wallet, "success": True}
         )
     except Exception as e:
+        if use_dark_theme:
+            return render(
+                request,
+                "forms/add_wallet_dark.html",
+                {
+                    "error": f"Failed to add wallet: {str(e)}",
+                    "name": label,
+                    "chain": chain,
+                    "address": address,
+                },
+                status=500,
+            )
         return render(
             request,
             "forms/add_wallet.html",
@@ -136,7 +266,17 @@ def htmx_portfolio_summary(request):
     service = PortfolioService(request.user)
     summary = service.get_portfolio_summary()
 
-    return render(request, "partials/portfolio_summary.html", {"summary": summary})
+    # Check if this is an HTMX request
+    if request.htmx:
+        return render(request, "partials/portfolio_summary.html", {"summary": summary})
+    else:
+        # For non-HTMX requests, return a full page with the portfolio summary
+        # Check for dark theme preference (default to dark for now)
+        use_dark_theme = True  # You can later check user settings
+        
+        if use_dark_theme:
+            return render(request, "dashboard_dark.html", {"summary": summary})
+        return render(request, "dashboard.html", {"summary": summary})
 
 
 @login_required
@@ -149,12 +289,12 @@ def htmx_transactions(request):
     search = request.GET.get("search")
     page = request.GET.get("page", 1)
 
-    # Check user's mock data setting
-    try:
-        settings = UserSettings.objects.get(user=request.user)
-        mock_data_enabled = settings.mock_data_enabled
-    except UserSettings.DoesNotExist:
-        mock_data_enabled = False
+    # Check user's mock data setting (create if it doesn't exist)
+    settings, created = UserSettings.objects.get_or_create(
+        user=request.user,
+        defaults={'mock_data_enabled': False}
+    )
+    mock_data_enabled = settings.mock_data_enabled
 
     # Build query - only show transactions if mock data is enabled
     if mock_data_enabled:
@@ -215,7 +355,16 @@ def htmx_transactions(request):
             {"transactions": page_obj, "wallets": wallets},
         )
 
+    # Check for dark theme preference (default to dark for now)
+    use_dark_theme = True  # You can later check user settings
+    
     # Return full page
+    if use_dark_theme:
+        return render(
+            request,
+            "partials/transactions_dark.html",
+            {"transactions": page_obj, "wallets": wallets},
+        )
     return render(
         request,
         "partials/transactions_page.html",
@@ -228,7 +377,12 @@ def htmx_transactions(request):
 def htmx_wallets(request):
     """Render wallets page."""
     wallets = Wallet.objects.filter(user=request.user)
-
+    
+    # Check for dark theme preference (default to dark for now)
+    use_dark_theme = True  # You can later check user settings
+    
+    if use_dark_theme:
+        return render(request, "partials/wallets_dark.html", {"wallets": wallets})
     return render(request, "partials/wallets_page.html", {"wallets": wallets})
 
 
@@ -247,20 +401,77 @@ def htmx_dashboard(request):
     service = PortfolioService(request.user)
     summary = service.get_portfolio_summary()
     
+    # Get historical data for chart (7 days)
+    historical_data = service.get_historical_data("7d")
+    
+    # Format chart data for the template
+    if historical_data:
+        chart_labels = []
+        chart_values = []
+        for point in historical_data:
+            # Format date label
+            dt = datetime.fromisoformat(point["timestamp"].replace('Z', '+00:00'))
+            chart_labels.append(dt.strftime("%b %d"))
+            chart_values.append(point["total_value_usd"])
+        summary["chart_labels"] = chart_labels
+        summary["chart_values"] = chart_values
+        summary["chart_data"] = ",".join(str(v) for v in chart_values)
+    else:
+        # Default data if no historical data
+        summary["chart_labels"] = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
+        summary["chart_values"] = [0, 0, 0, 0, 0, 0, 0]
+        summary["chart_data"] = "0,0,0,0,0,0,0"
+    
+    # Format asset distribution for the template
+    if summary.get("asset_labels") and summary.get("asset_values"):
+        assets = []
+        total_value = sum(summary["asset_values"])
+        for label, value in zip(summary["asset_labels"], summary["asset_values"]):
+            percentage = (value / total_value * 100) if total_value > 0 else 0
+            assets.append({
+                "symbol": label,
+                "value": value,
+                "percentage": percentage,
+                "color": None  # Will use default colors from template
+            })
+        summary["assets"] = assets
+    else:
+        summary["assets"] = []
+    
+    # Additional summary fields
+    summary["total_value"] = summary.get("total_value_usd", 0)
+    summary["percent_change_24h"] = summary.get("change_24h", 0)
+    summary["value_change_24h"] = summary["total_value"] * summary["percent_change_24h"] / 100 if summary["percent_change_24h"] else 0
+    summary["total_assets"] = summary.get("asset_count", 0)
+    summary["volume_24h"] = random.uniform(1000, 5000) if service.mock_data_enabled else 0  # Mock 24h volume
+    
     context = {
         "wallets": wallets,
         "recent_transactions": recent_transactions,
         "summary": summary,
     }
     
+    # Check for dark theme preference (default to dark for now)
+    use_dark_theme = True  # You can later check user settings
+    
     # Return partial for HTMX requests, full page otherwise
     if request.htmx:
+        if use_dark_theme:
+            return render(request, "partials/dashboard_crypto_dark.html", context)
         return render(request, "partials/dashboard_content.html", context)
+    
+    if use_dark_theme:
+        return render(request, "dashboard_dark.html", context)
     return render(request, "dashboard.html", context)
 
 
 def home_view(request):
     """Root view - single page app container."""
+    # Check for dark theme preference (default to dark for now)
+    use_dark_theme = True  # You can later check user settings
+    
+    if use_dark_theme:
+        return render(request, "app_dark.html")
     return render(request, "app.html")
 
 
@@ -288,7 +499,12 @@ def htmx_settings(request):
         user=request.user, defaults={"mock_data_enabled": False}
     )
 
+    # Check for dark theme preference (default to dark for now)
+    use_dark_theme = True  # You can later check user settings
+    
     if request.method == "GET":
+        if use_dark_theme:
+            return render(request, "partials/settings_dark.html", {"settings": settings})
         return render(request, "partials/settings_page.html", {"settings": settings})
 
     # POST - Handle settings update
@@ -297,6 +513,12 @@ def htmx_settings(request):
     settings.save()
 
     # Return updated settings page with success message
+    if use_dark_theme:
+        return render(
+            request,
+            "partials/settings_dark.html",
+            {"settings": settings, "success": "Settings updated successfully!"},
+        )
     return render(
         request,
         "partials/settings_page.html",
@@ -315,3 +537,90 @@ def htmx_logout(request):
     # Use django-htmx helper to trigger client event
     trigger_client_event(response, "auth-change")
     return response
+
+
+@login_required
+@require_http_methods(["POST"])
+def htmx_refresh_mock_data(request):
+    """Refresh mock data by updating all transaction dates to be recent."""
+    # Check if user has mock data enabled
+    try:
+        settings = UserSettings.objects.get(user=request.user)
+        if not settings.mock_data_enabled:
+            use_dark_theme = True
+            if use_dark_theme:
+                return render(
+                    request,
+                    "partials/settings_dark.html",
+                    {"settings": settings, "error": "Mock data is not enabled"},
+                )
+            return render(
+                request,
+                "partials/settings_page.html",
+                {"settings": settings, "error": "Mock data is not enabled"},
+            )
+    except UserSettings.DoesNotExist:
+        use_dark_theme = True
+        if use_dark_theme:
+            return render(
+                request,
+                "partials/settings_dark.html",
+                {"error": "User settings not found"},
+            )
+        return render(
+            request,
+            "partials/settings_page.html",
+            {"error": "User settings not found"},
+        )
+    
+    # Get all user's transactions
+    transactions = Transaction.objects.filter(wallet__user=request.user)
+    
+    if not transactions.exists():
+        # No transactions to update - create new mock data
+        from authentication.signals import create_assets, create_wallets, create_transactions
+        
+        # Create assets if they don't exist
+        assets = create_assets()
+        
+        # Get or create wallets
+        wallets = create_wallets(request.user)
+        
+        # Create new transactions
+        for wallet in wallets:
+            create_transactions(wallet, assets[wallet.chain], 50)
+    else:
+        # Update existing transactions to have recent dates
+        # Calculate date range for the last 30 days
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=30)
+        
+        # Get all transactions ordered by timestamp
+        transactions = transactions.order_by('timestamp')
+        total_transactions = transactions.count()
+        
+        # Calculate time interval between transactions
+        if total_transactions > 1:
+            time_interval = (end_date - start_date) / (total_transactions - 1)
+        else:
+            time_interval = timedelta(hours=1)
+        
+        # Update each transaction with a new timestamp
+        for i, transaction in enumerate(transactions):
+            new_timestamp = start_date + (time_interval * i)
+            transaction.timestamp = new_timestamp
+            transaction.save(update_fields=['timestamp'])
+    
+    # Return updated settings page with success message
+    use_dark_theme = True
+    if use_dark_theme:
+        return render(
+            request,
+            "partials/settings_dark.html",
+            {"settings": settings, "success": "Mock data has been refreshed with recent dates!"},
+        )
+    return render(
+        request,
+        "partials/settings_page.html",
+        {"settings": settings, "success": "Mock data has been refreshed with recent dates!"},
+    )

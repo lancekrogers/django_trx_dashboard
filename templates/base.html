@@ -11,10 +11,11 @@ Used by: All main page templates (app.html, dashboard.html, etc.)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}Multi-Chain Portfolio Dashboard{% endblock %}</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Compiled Tailwind CSS with Franken UI -->
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
@@ -191,67 +192,16 @@ Used by: All main page templates (app.html, dashboard.html, etc.)
          style="z-index: 9999;">
     </div>
 
-    <!-- HTMX configuration -->
-    <script>
-        document.body.addEventListener('htmx:configRequest', (event) => {
-            // Add CSRF token to all requests
-            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-            
-            // Add JWT token if available
-            const token = localStorage.getItem('access_token');
-            if (token) {
-                event.detail.headers['Authorization'] = `Bearer ${token}`;
-            }
-        });
-
-        // Handle 401 errors globally
-        document.body.addEventListener('htmx:responseError', (event) => {
-            if (event.detail.xhr.status === 401) {
-                // Redirect to login if unauthorized
-                window.location.href = '/login';
-            }
-        });
-
-        // Notification helper
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `pointer-events-auto max-w-sm w-full bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-500 transform translate-x-full`;
-            
-            const colors = {
-                'success': 'bg-green-50 text-green-800',
-                'error': 'bg-red-50 text-red-800',
-                'warning': 'bg-yellow-50 text-yellow-800',
-                'info': 'bg-blue-50 text-blue-800'
-            };
-            
-            notification.innerHTML = `
-                <div class="p-4 ${colors[type] || colors.info}">
-                    <p class="text-sm font-medium">${message}</p>
-                </div>
-            `;
-            
-            document.getElementById('notifications').appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => {
-                notification.classList.remove('translate-x-full');
-                notification.classList.add('translate-x-0');
-            }, 100);
-            
-            // Remove after 5 seconds
-            setTimeout(() => {
-                notification.classList.add('translate-x-full');
-                setTimeout(() => notification.remove(), 500);
-            }, 5000);
-        }
-    </script>
-    
     <!-- Application JavaScript - Load order is important -->
-    <!-- 1. Load component classes first -->
+    <!-- 1. HTMX configuration (after HTMX but before other scripts) -->
+    <script src="{% static 'js/htmx-config.js' %}"></script>
+    
+    <!-- 2. Component classes -->
     <script src="{% static 'js/portfolio-chart.js' %}"></script>
     <script src="{% static 'js/real-time-manager.js' %}"></script>
     <script src="{% static 'js/transaction-table.js' %}"></script>
-    <!-- 2. Load main app initialization last -->
+    
+    <!-- 3. Main app initialization (last) -->
     <script src="{% static 'js/main.js' %}"></script>
     
     {% block extra_scripts %}{% endblock %}

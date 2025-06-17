@@ -1,0 +1,80 @@
+{% extends "base_dark.html" %}
+{# App Template - Single Page Application container and entry point (Dark Theme) #}
+{# Purpose: Main SPA wrapper that loads initial content based on auth status #}
+{# Features: Dynamic content loading, toast notifications, modal container #}
+{# Usage: Root template loaded by home_view, contains HTMX SPA logic #}
+{% load static %}
+
+{% block title %}Multi-Chain Portfolio Dashboard{% endblock %}
+
+{% block content %}
+<!-- Single Page App Container -->
+<div id="app" class="min-h-screen bg-dark-bg">
+    <!-- Main Content Area (Navigation is in base_dark.html) -->
+        <!-- Initial content loaded based on auth status -->
+        <div hx-get="{% if user.is_authenticated %}{% url 'htmx:dashboard' %}{% else %}{% url 'htmx:welcome' %}{% endif %}"
+             hx-trigger="load delay:100ms"
+             hx-swap="innerHTML">
+            <!-- Loading state -->
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="text-center">
+                    <div class="inline-flex items-center">
+                        <svg class="animate-spin h-8 w-8 text-indigo-600" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <span class="ml-2 text-dark-text-secondary">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Modal Container (for forms and dialogs) -->
+    <div id="modal-container"></div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Dynamic toasts will appear here -->
+    </div>
+</div>
+
+<script>
+    // Handle authentication changes
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.xhr.getResponseHeader('HX-Trigger') === 'auth-change') {
+            // Trigger navigation reload
+            htmx.trigger('#nav-content', 'auth-change');
+        }
+    });
+
+    // Toast notifications
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `p-4 rounded-lg shadow-lg text-white ${
+            type === 'success' ? 'bg-green-500' : 
+            type === 'error' ? 'bg-red-500' : 
+            'bg-indigo-600'
+        } transform transition-all duration-300 translate-x-full`;
+        toast.innerHTML = message;
+        
+        document.getElementById('toast-container').appendChild(toast);
+        
+        // Animate in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+            toast.classList.add('translate-x-0');
+        }, 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Listen for custom events from HTMX responses
+    document.body.addEventListener('showToast', function(event) {
+        showToast(event.detail.message, event.detail.type);
+    });
+</script>
+{% endblock %}

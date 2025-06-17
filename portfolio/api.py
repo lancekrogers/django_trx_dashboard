@@ -64,9 +64,14 @@ def wallet_balances(request):
     return service.get_wallet_balances()
 
 
-@router.get("/stream", auth=AuthBearer())
+@router.get("/stream")
 def portfolio_stream(request):
     """SSE endpoint for real-time portfolio updates"""
+    
+    # Check if user is authenticated via Django session
+    if not request.user.is_authenticated:
+        from django.http import HttpResponse
+        return HttpResponse("Unauthorized", status=401)
 
     def event_stream():
         """Generate SSE events"""
@@ -75,7 +80,7 @@ def portfolio_stream(request):
 
     response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
     response["Cache-Control"] = "no-cache"
-    response["Connection"] = "keep-alive"
+    # Note: Connection: keep-alive header removed - Django dev server doesn't allow hop-by-hop headers
     response["X-Accel-Buffering"] = "no"  # Disable Nginx buffering
 
     return response

@@ -8,7 +8,7 @@ Dependencies: portfolio-chart.js for chart functionality
 <!-- Portfolio Summary Partial - Real-time updates via SSE -->
 <div id="portfolio-summary" 
      class="bg-white overflow-hidden shadow rounded-lg"
-     hx-trigger="load, refresh"
+     hx-trigger="refresh"
      hx-get="{% url 'htmx:portfolio_summary' %}"
      hx-swap="outerHTML">
     

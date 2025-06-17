@@ -1,0 +1,28 @@
+<!-- Debug template to check chart data -->
+<div class="p-6 bg-dark-card text-dark-text">
+    <h3>Debug Chart Data</h3>
+    
+    <h4>Chart Labels:</h4>
+    <pre>{{ summary.chart_labels|json_script:"chart-labels" }}</pre>
+    
+    <h4>Chart Values:</h4>
+    <pre>{{ summary.chart_values|json_script:"chart-values" }}</pre>
+    
+    <h4>Chart Data String:</h4>
+    <pre>{{ summary.chart_data }}</pre>
+    
+    <h4>Assets:</h4>
+    <pre>{{ summary.assets|json_script:"assets" }}</pre>
+    
+    <h4>Asset Labels:</h4>
+    <pre>{{ summary.asset_labels|json_script:"asset-labels" }}</pre>
+    
+    <h4>Asset Values:</h4>
+    <pre>{{ summary.asset_values|json_script:"asset-values" }}</pre>
+    
+    <h4>Total Value:</h4>
+    <pre>{{ summary.total_value }}</pre>
+    
+    <h4>Mock Data Enabled:</h4>
+    <pre>{{ user.settings.mock_data_enabled }}</pre>
+</div>

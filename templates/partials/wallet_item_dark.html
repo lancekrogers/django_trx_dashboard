@@ -1,0 +1,70 @@
+{% comment %}
+Dark Wallet Item - Single wallet card for dark theme
+Purpose: Display individual wallet after adding via HTMX
+Features: Dark styling, delete functionality, balance display
+Used by: Add wallet form response
+{% endcomment %}
+
+<div class="bg-dark-card border border-dark-border rounded-lg p-6 hover:border-dark-hover transition-colors">
+    <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-dark-hover rounded-lg flex items-center justify-center">
+                {% if wallet.chain == 'ethereum' %}
+                    <i data-feather="link" class="w-6 h-6 text-blue-500"></i>
+                {% elif wallet.chain == 'solana' %}
+                    <i data-feather="sun" class="w-6 h-6 text-purple-500"></i>
+                {% else %}
+                    <i data-feather="dollar-sign" class="w-6 h-6 text-orange-500"></i>
+                {% endif %}
+            </div>
+            <div>
+                <h3 class="text-dark-text font-semibold">{{ wallet.label|default:wallet.chain|title }}</h3>
+                <p class="text-dark-text-secondary text-sm">{{ wallet.chain|title }}</p>
+            </div>
+        </div>
+        <button hx-delete="{% url 'htmx:delete_wallet' wallet.id %}"
+                hx-confirm="Are you sure you want to remove this wallet?"
+                hx-target="closest .bg-dark-card"
+                hx-swap="outerHTML swap:1s"
+                class="text-dark-text-secondary hover:text-red-500 transition-colors">
+            <i data-feather="trash-2" class="w-4 h-4"></i>
+        </button>
+    </div>
+    
+    <div class="space-y-3">
+        <div>
+            <p class="text-dark-text-secondary text-xs uppercase mb-1">Address</p>
+            <p class="text-dark-text text-sm font-mono truncate">{{ wallet.address }}</p>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <p class="text-dark-text-secondary text-xs uppercase mb-1">Balance</p>
+                <p class="text-dark-text font-semibold">${{ wallet.balance_usd|floatformat:2|default:"0.00" }}</p>
+            </div>
+            <div>
+                <p class="text-dark-text-secondary text-xs uppercase mb-1">Last Updated</p>
+                <p class="text-dark-text text-sm">{{ wallet.updated_at|date:"M d, H:i" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4 pt-4 border-t border-dark-border">
+        <button class="text-indigo-400 hover:text-indigo-300 text-sm flex items-center space-x-1">
+            <i data-feather="refresh-cw" class="w-4 h-4"></i>
+            <span>Refresh Balance</span>
+        </button>
+    </div>
+</div>
+
+{% if success %}
+<script>
+    // Initialize feather icons for the new wallet
+    feather.replace();
+    
+    // Show success notification
+    if (window.showNotification) {
+        window.showNotification('Wallet added successfully!', 'success');
+    }
+</script>
+{% endif %}

@@ -27,3 +27,8 @@ server.log
 
 # Docs (auto-generated)
 MAKEFILE_GUIDE.md
+
+# Node/Frontend
+node_modules/
+package-lock.json
+static/css/output.css

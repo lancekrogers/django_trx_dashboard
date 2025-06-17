@@ -23,6 +23,7 @@ urlpatterns = [
     path("welcome/", views.htmx_welcome, name="welcome"),
     path("dashboard/", views.htmx_dashboard, name="dashboard"),
     path("settings/", views.htmx_settings, name="settings"),
+    path("refresh-mock-data/", views.htmx_refresh_mock_data, name="refresh_mock_data"),
     # Wallet management
     path("wallets/add/", views.htmx_add_wallet, name="add_wallet"),
     path(

@@ -80,6 +80,17 @@ class Wallet(models.Model):
         if len(self.address) > 10:
             return f"{self.address[:6]}...{self.address[-4:]}"
         return self.address
+    
+    @property
+    def balance_usd(self):
+        """Get wallet balance in USD from portfolio service."""
+        from portfolio.services import PortfolioService
+        service = PortfolioService(self.user)
+        balances = service.get_wallet_balances()
+        for balance in balances:
+            if balance["wallet_id"] == self.id:
+                return balance["value_usd"]
+        return 0.0
 
 
 class UserSettings(models.Model):

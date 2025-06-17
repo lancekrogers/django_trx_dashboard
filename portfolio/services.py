@@ -124,7 +124,7 @@ class PortfolioService:
             timestamp = start_time + (time_delta / num_points) * i
             # Add some random variation
             variation = random.uniform(0.95, 1.05)
-            value = current_value * Decimal(str(variation))
+            value = Decimal(str(current_value)) * Decimal(str(variation))
 
             data_points.append(
                 {"timestamp": timestamp.isoformat(), "total_value_usd": float(value)}
