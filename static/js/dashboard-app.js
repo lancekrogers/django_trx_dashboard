@@ -7,7 +7,9 @@
 window.DashboardApp = {
     currentCase: null,
     charts: {},
-    notifications: []
+    notifications: [],
+    eventSource: null,
+    simulationEnabled: true
 };
 
 // Notification system
@@ -79,6 +81,63 @@ function handleRefreshData() {
     }, 1500);
 }
 
+// Real-time simulation management
+function startRealTimeUpdates(caseId) {
+    if (!window.DashboardApp.simulationEnabled || window.DashboardApp.eventSource) {
+        return;
+    }
+    
+    try {
+        // Use regular polling instead of SSE for better compatibility
+        window.DashboardApp.updateInterval = setInterval(() => {
+            fetch(`/htmx/cases/${caseId}/chart-data/7D/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateChartData(data);
+                        updateSimulationStatus(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Real-time update error:', error);
+                });
+        }, 3000); // Update every 3 seconds
+        
+        showNotification('Real-time simulation active', 'success');
+        console.log('Real-time updates started for case', caseId);
+    } catch (error) {
+        console.error('Failed to start real-time updates:', error);
+    }
+}
+
+function stopRealTimeUpdates() {
+    if (window.DashboardApp.updateInterval) {
+        clearInterval(window.DashboardApp.updateInterval);
+        window.DashboardApp.updateInterval = null;
+    }
+    
+    if (window.DashboardApp.eventSource) {
+        window.DashboardApp.eventSource.close();
+        window.DashboardApp.eventSource = null;
+    }
+}
+
+function updateSimulationStatus(data) {
+    // Update simulation time display
+    const statusElement = document.getElementById('simulation-status');
+    if (statusElement && data.simulation_time) {
+        statusElement.textContent = `Simulation Time: ${data.simulation_time}`;
+    }
+    
+    // Show fraud alerts if any
+    if (data.recent_events && data.recent_events.length > 0) {
+        const latestEvent = data.recent_events[data.recent_events.length - 1];
+        if (latestEvent && Math.random() < 0.3) { // Occasionally show alerts
+            showNotification(`Fraud Alert: ${latestEvent.description}`, 'warning');
+        }
+    }
+}
+
 // Chart timeframe switching
 function switchTimeframe(timeframe, caseId, clickedButton) {
     showNotification(`Switching to ${timeframe} view...`, 'info');
@@ -95,6 +154,12 @@ function switchTimeframe(timeframe, caseId, clickedButton) {
         clickedButton.classList.add('bg-blue-600', 'text-white');
     }
     
+    // Temporarily stop real-time updates during manual timeframe change
+    const wasRealTime = !!window.DashboardApp.updateInterval;
+    if (wasRealTime) {
+        stopRealTimeUpdates();
+    }
+    
     // If we have a case ID, fetch new chart data
     if (caseId) {
         fetch(`/htmx/cases/${caseId}/chart-data/${timeframe}/`)
@@ -103,6 +168,10 @@ function switchTimeframe(timeframe, caseId, clickedButton) {
                 console.log('Chart data received:', data);
                 if (data.success) {
                     updateChartData(data);
+                    // Restart real-time updates for 7D view
+                    if (timeframe === '7D' && wasRealTime) {
+                        setTimeout(() => startRealTimeUpdates(caseId), 1000);
+                    }
                 } else {
                     showNotification('Failed to update chart data', 'error');
                 }
@@ -385,10 +454,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // Re-initialize charts after HTMX content loads
         setTimeout(initializeCharts, 100);
         
-        // Show success message for successful HTMX requests
-        if (e.detail.xhr.status === 200) {
-            const path = new URL(e.detail.xhr.responseURL).pathname;
-            if (path.includes('/cases/')) {
+        // Start real-time updates if we're on a case detail page
+        const path = new URL(e.detail.xhr.responseURL).pathname;
+        if (path.includes('/cases/') && path.match(/\/cases\/\d+\//)) {
+            const caseId = path.match(/\/cases\/(\d+)\//)[1];
+            setTimeout(() => {
+                initializeCharts();
+                if (window.DashboardApp.simulationEnabled) {
+                    startRealTimeUpdates(caseId);
+                }
+            }, 500);
+            showNotification('Investigation loaded - Real-time tracking active', 'success');
+        } else {
+            // Stop real-time updates when leaving case detail
+            stopRealTimeUpdates();
+            if (e.detail.xhr.status === 200 && path.includes('/cases')) {
                 showNotification('Navigation completed', 'success');
             }
         }
@@ -410,3 +490,10 @@ window.handleAddWallet = handleAddWallet;
 window.handleExportData = handleExportData;
 window.handleGenerateReport = handleGenerateReport;
 window.handleRefreshData = handleRefreshData;
+window.startRealTimeUpdates = startRealTimeUpdates;
+window.stopRealTimeUpdates = stopRealTimeUpdates;
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    stopRealTimeUpdates();
+});

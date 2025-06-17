@@ -12,6 +12,7 @@ urlpatterns = [
     # Authentication
     path("login/", views.htmx_login, name="login"),
     path("logout/", views.htmx_logout, name="logout"),
+    path("register/", views.htmx_register_form, name="register_form"),
     # Navigation
     path("nav/authenticated/", views.htmx_nav_authenticated, name="nav_authenticated"),
     path(
@@ -53,6 +54,7 @@ urlpatterns = [
     path("cases/<int:case_id>/export/", views.htmx_export_case_data, name="export_case_data"),
     path("cases/<int:case_id>/report/", views.htmx_generate_case_report, name="generate_case_report"),
     path("cases/<int:case_id>/chart-data/<str:timeframe>/", views.htmx_chart_data, name="chart_data"),
+    path("cases/<int:case_id>/chart-stream/", views.htmx_chart_stream, name="chart_stream"),
     # Quick case access by pattern
     path("case-by-name/<str:pattern>/", views.htmx_case_by_pattern, name="case_by_pattern"),
 ]

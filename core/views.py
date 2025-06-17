@@ -3,6 +3,7 @@ HTMX-aware views for rendering HTML partials and handling form submissions.
 """
 
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -15,18 +16,23 @@ from django.utils import timezone
 from datetime import timedelta, datetime
 from decimal import Decimal
 import random
+import json
+import time
 
 from portfolio.services import PortfolioService
 from portfolio.models import InvestigationCase, CaseWallet, InvestigationStatus, WalletCategory
 from transactions.models import Transaction
 from wallets.models import User, UserSettings, Wallet
+from core.realtime_simulation import get_simulator
 
 
 @require_http_methods(["GET", "POST"])
 def htmx_login(request):
     """Handle login form display and submission."""
     if request.method == "GET":
-        return render(request, "forms/login.html")
+        # Use modal template for HTMX requests, full page for direct access
+        template = "forms/login_modal.html" if request.htmx else "forms/login.html"
+        return render(request, template)
 
     # POST - Handle login
     username = request.POST.get("username")
@@ -285,18 +291,14 @@ def htmx_dashboard(request):
 
 
 def home_view(request):
-    """Root view - redirect to login or dashboard."""
-    if request.user.is_authenticated:
-        # Always show the cases list for authenticated users
-        return htmx_cases_list(request)
-    else:
-        # Show login for unauthenticated users
-        return render(request, "forms/login.html")
+    """Root view - show cases dashboard for all users, with auth controls."""
+    # Always show the cases list, but context changes based on auth
+    return htmx_cases_list(request)
 
 
 def htmx_welcome(request):
     """Welcome page content for unauthenticated users."""
-    return render(request, "forms/login.html")
+    return htmx_cases_list(request)
 
 
 def htmx_nav_authenticated(request):
@@ -333,15 +335,64 @@ def htmx_settings(request):
 
 @require_http_methods(["POST"])
 def htmx_logout(request):
-    """Handle logout and return welcome content."""
+    """Handle logout and return to homepage."""
     from django.contrib.auth import logout
 
     logout(request)
-    response = render(request, "forms/login.html")
-    response["X-Auth-Status"] = "unauthenticated"
-    # Use django-htmx helper to trigger client event
-    trigger_client_event(response, "auth-change")
-    return response
+    # Return to homepage which will show demo mode
+    return htmx_cases_list(request)
+
+
+@require_http_methods(["GET", "POST"])
+def htmx_register_form(request):
+    """Handle user registration form display and submission."""
+    if request.method == "GET":
+        return render(request, "forms/register.html")
+
+    # POST - Handle registration
+    username = request.POST.get("username")
+    email = request.POST.get("email")
+    password1 = request.POST.get("password1")
+    password2 = request.POST.get("password2")
+
+    errors = []
+    
+    if not username or not email or not password1 or not password2:
+        errors.append("All fields are required")
+    
+    if password1 != password2:
+        errors.append("Passwords do not match")
+    
+    if len(password1) < 8:
+        errors.append("Password must be at least 8 characters")
+    
+    # Check if user already exists
+    if User.objects.filter(username=username).exists():
+        errors.append("Username already exists")
+    
+    if User.objects.filter(email=email).exists():
+        errors.append("Email already registered")
+    
+    if errors:
+        return render(
+            request,
+            "forms/register.html",
+            {"errors": errors, "username": username, "email": email},
+            status=400,
+        )
+    
+    # Create user
+    user = User.objects.create_user(
+        username=username,
+        email=email,
+        password=password1
+    )
+    
+    # Auto-login the new user
+    login(request, user)
+    
+    # Return to dashboard as authenticated user
+    return htmx_cases_list(request)
 
 
 @login_required
@@ -400,23 +451,31 @@ def htmx_refresh_mock_data(request):
 
 # Investigation Case Views
 
-@login_required
 @require_http_methods(["GET"])
 def htmx_cases_list(request):
-    """Return the list of investigation cases with filtering and stats."""
-    cases = InvestigationCase.objects.filter(investigator=request.user).prefetch_related('case_wallets__wallet')
+    """Return the list of investigation cases with filtering and stats - public or authenticated."""
+    if request.user.is_authenticated:
+        cases = InvestigationCase.objects.filter(investigator=request.user).prefetch_related('case_wallets__wallet')
+        user_wallets = Wallet.objects.filter(user=request.user)
+        user_transactions = Transaction.objects.filter(wallet__user=request.user)
+        is_demo_mode = False
+    else:
+        # Demo mode - show all cases as read-only examples
+        cases = InvestigationCase.objects.all().prefetch_related('case_wallets__wallet')[:10]
+        user_wallets = Wallet.objects.all()[:20] 
+        user_transactions = Transaction.objects.all()[:100]
+        is_demo_mode = True
     
     # Calculate dashboard stats
     active_cases_count = cases.filter(status='active').count()
-    total_wallets_count = Wallet.objects.filter(user=request.user).count()
-    flagged_wallets_count = CaseWallet.objects.filter(case__investigator=request.user, flagged=True).count()
+    total_wallets_count = user_wallets.count()
+    flagged_wallets_count = CaseWallet.objects.filter(case__in=cases, flagged=True).count()
     
-    # Calculate total transactions across all user's wallets
-    from transactions.models import Transaction
-    total_transactions_count = Transaction.objects.filter(wallet__user=request.user).count()
+    # Calculate total transactions
+    total_transactions_count = user_transactions.count()
     
     # Count unique chains
-    chains_count = Wallet.objects.filter(user=request.user).values('chain').distinct().count()
+    chains_count = user_wallets.values('chain').distinct().count()
     
     # Apply filters
     search = request.GET.get('search')
@@ -443,6 +502,8 @@ def htmx_cases_list(request):
         'total_transactions_count': total_transactions_count,
         'flagged_wallets_count': flagged_wallets_count,
         'chains_count': chains_count,
+        'is_demo_mode': is_demo_mode,
+        'user_authenticated': request.user.is_authenticated,
     }
     
     # Return grid view - use dashboard.html for full page, cases_grid.html for HTMX partial
@@ -930,135 +991,47 @@ def htmx_generate_case_report(request, case_id):
     return HttpResponse(message)
 
 
-@login_required
 @require_http_methods(["GET"])
 def htmx_chart_data(request, case_id, timeframe):
-    """Return JSON chart data simulating live blockchain data feeds from multiple chains."""
-    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
-    case_wallets = CaseWallet.objects.filter(case=case).select_related('wallet')
+    """Return JSON chart data from real-time blockchain simulation."""
+    # Allow access for demo mode or authenticated users
+    if request.user.is_authenticated:
+        case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    else:
+        # Demo mode - allow access to any case
+        case = get_object_or_404(InvestigationCase, id=case_id)
+    # Get real-time simulation data
+    simulator = get_simulator()
+    simulation_data = simulator.get_current_data(timeframe)
     
-    # Calculate timeframe and data points
-    timeframe_map = {
-        '7D': {'days': 7, 'points': 168, 'interval_hours': 1},  # Hourly for 7 days
-        '30D': {'days': 30, 'points': 120, 'interval_hours': 6}, # Every 6 hours for 30 days
-        '1Y': {'days': 365, 'points': 365, 'interval_hours': 24} # Daily for 1 year
-    }
-    
-    config = timeframe_map.get(timeframe, timeframe_map['7D'])
-    
-    # Get wallet distribution by chain from case
-    chain_wallets = {}
-    for case_wallet in case_wallets:
-        chain = case_wallet.wallet.chain
-        if chain not in chain_wallets:
-            chain_wallets[chain] = []
-        chain_wallets[chain].append(case_wallet.wallet)
-    
-    # Generate blockchain data arrays
-    labels = []
-    ethereum_balances = []
-    arbitrum_balances = []
-    optimism_balances = []
-    polygon_balances = []
-    
-    # Chain volume data
-    ethereum_volume = []
-    arbitrum_volume = []
-    optimism_volume = []
-    polygon_volume = []
-    
-    now = timezone.now()
-    start_time = now - timedelta(days=config['days'])
-    
-    # Starting balances per chain (simulate wallets being tracked)
-    base_balances = {
-        'ethereum': 1200000,  # $1.2M on Ethereum
-        'arbitrum': 450000,   # $450K on Arbitrum
-        'optimism': 380000,   # $380K on Optimism
-        'polygon': 320000     # $320K on Polygon
-    }
-    
-    # Generate realistic blockchain tracking data
-    for i in range(config['points']):
-        timestamp = start_time + timedelta(hours=i * config['interval_hours'])
+    # Return the simulation data directly
+    return HttpResponse(
+        json.dumps(simulation_data),
+        content_type='application/json'
+    )
+
+
+@require_http_methods(["GET"])
+def htmx_chart_stream(request, case_id):
+    """Server-Sent Events endpoint for real-time chart updates."""
+    def event_stream():
+        simulator = get_simulator()
         
-        # Format timestamp based on timeframe
-        if config['days'] <= 7:
-            label = timestamp.strftime('%m/%d %H:%M')
-        elif config['days'] <= 30:
-            label = timestamp.strftime('%m/%d')
-        else:
-            label = timestamp.strftime('%b %Y')
-        
-        labels.append(label)
-        
-        # Simulate balance changes for each chain (as if reading from blockchain APIs)
-        for chain in ['ethereum', 'arbitrum', 'optimism', 'polygon']:
-            # Different volatility patterns for different chains
-            if chain == 'ethereum':
-                volatility = 0.015  # Lower volatility for Ethereum
-                volume_base = 50000
-            elif chain == 'arbitrum':
-                volatility = 0.025  # Medium volatility for L2s
-                volume_base = 25000
-            elif chain == 'optimism':
-                volatility = 0.03   # Higher volatility for smaller L2
-                volume_base = 20000
-            else:  # polygon
-                volatility = 0.035  # Highest volatility
-                volume_base = 15000
+        while True:
+            # Get current simulation data
+            data = simulator.get_current_data('7D')
             
-            # Simulate balance updates (as if querying wallet balances from chain)
-            change = random.normalvariate(0.0001, volatility)
-            base_balances[chain] *= (1 + change)
-            base_balances[chain] = max(base_balances[chain], 50000)  # Don't go below $50K
+            # Format as SSE
+            yield f"data: {json.dumps(data)}\n\n"
             
-            # Simulate transaction volume for this period
-            volume = volume_base + random.randint(-volume_base//2, volume_base)
-            volume = max(volume, 1000)  # Minimum $1K volume
-            
-            # Store data points
-            if chain == 'ethereum':
-                ethereum_balances.append(round(base_balances[chain], 2))
-                ethereum_volume.append(volume)
-            elif chain == 'arbitrum':
-                arbitrum_balances.append(round(base_balances[chain], 2))
-                arbitrum_volume.append(volume)
-            elif chain == 'optimism':
-                optimism_balances.append(round(base_balances[chain], 2))
-                optimism_volume.append(volume)
-            else:  # polygon
-                polygon_balances.append(round(base_balances[chain], 2))
-                polygon_volume.append(volume)
+            # Update every 2 seconds for smooth real-time effect
+            time.sleep(2)
     
-    # Calculate total portfolio value across all chains
-    total_portfolio = []
-    for i in range(len(labels)):
-        total = ethereum_balances[i] + arbitrum_balances[i] + optimism_balances[i] + polygon_balances[i]
-        total_portfolio.append(round(total, 2))
-    
-    # Return blockchain investigation data
-    from django.http import JsonResponse
-    
-    return JsonResponse({
-        'success': True,
-        'timeframe': timeframe,
-        'labels': labels,
-        'multi_chain_data': {
-            'ethereum': {'balances': ethereum_balances, 'volume': ethereum_volume},
-            'arbitrum': {'balances': arbitrum_balances, 'volume': arbitrum_volume},
-            'optimism': {'balances': optimism_balances, 'volume': optimism_volume},
-            'polygon': {'balances': polygon_balances, 'volume': polygon_volume}
-        },
-        'total_portfolio': total_portfolio,
-        'summary': {
-            'start_value': total_portfolio[0],
-            'end_value': total_portfolio[-1],
-            'total_points': len(total_portfolio),
-            'change_percent': round(((total_portfolio[-1] - total_portfolio[0]) / total_portfolio[0]) * 100, 2),
-            'chains_tracked': len(chain_wallets)
-        }
-    })
+    response = HttpResponse(event_stream(), content_type='text/event-stream')
+    response['Cache-Control'] = 'no-cache'
+    response['Connection'] = 'keep-alive'
+    response['X-Accel-Buffering'] = 'no'  # Disable nginx buffering
+    return response
 
 
 @login_required

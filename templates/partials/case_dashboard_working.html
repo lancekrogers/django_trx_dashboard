@@ -27,6 +27,10 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                     <div class="flex items-center space-x-4 mt-2">
                         <span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm font-medium">{{ case.priority|title }} Priority</span>
                         <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-medium">{{ case.status|title }}</span>
+                        <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm font-medium flex items-center">
+                            <div class="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
+                            <span id="simulation-status">Live Simulation</span>
+                        </span>
                     </div>
                 </div>
             </div>
