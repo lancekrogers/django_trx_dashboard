@@ -53,7 +53,7 @@ MAKEFILE_GUIDE.md
 node_modules/
 package-lock.json
 yarn.lock
-static/css/output.css
+#static/css/output.css
 
 # OS files
 .DS_Store
