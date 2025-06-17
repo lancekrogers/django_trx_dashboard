@@ -80,7 +80,7 @@ function handleRefreshData() {
 }
 
 // Chart timeframe switching
-function switchTimeframe(timeframe, caseId) {
+function switchTimeframe(timeframe, caseId, clickedButton) {
     showNotification(`Switching to ${timeframe} view...`, 'info');
     
     // Update button states
@@ -90,17 +90,21 @@ function switchTimeframe(timeframe, caseId) {
     });
     
     // Highlight selected button
-    event.target.classList.remove('bg-gray-700', 'text-gray-300');
-    event.target.classList.add('bg-blue-600', 'text-white');
+    if (clickedButton) {
+        clickedButton.classList.remove('bg-gray-700', 'text-gray-300');
+        clickedButton.classList.add('bg-blue-600', 'text-white');
+    }
     
     // If we have a case ID, fetch new chart data
     if (caseId) {
         fetch(`/htmx/cases/${caseId}/chart-data/${timeframe}/`)
             .then(response => response.json())
             .then(data => {
+                console.log('Chart data received:', data);
                 if (data.success) {
                     updateChartData(data);
-                    showNotification(`Updated to ${timeframe} timeframe`, 'success');
+                } else {
+                    showNotification('Failed to update chart data', 'error');
                 }
             })
             .catch(error => {
@@ -113,11 +117,83 @@ function switchTimeframe(timeframe, caseId) {
 // Update chart with new data
 function updateChartData(data) {
     const portfolioChart = window.DashboardApp.charts.portfolio;
-    if (portfolioChart && data.data) {
-        // Update chart data points
-        portfolioChart.data.datasets[0].data = data.data.map(point => point.value);
-        portfolioChart.data.labels = data.data.map(point => point.time);
-        portfolioChart.update('none'); // No animation for real-time feel
+    const activityChart = window.DashboardApp.charts.activity;
+    
+    if (portfolioChart && data.multi_chain_data) {
+        // Update multi-chain wallet balance tracking chart
+        portfolioChart.data.labels = data.labels;
+        portfolioChart.data.datasets = [
+            {
+                label: 'Ethereum',
+                data: data.multi_chain_data.ethereum.balances,
+                borderColor: '#627EEA',
+                backgroundColor: 'rgba(98, 126, 234, 0.1)',
+                fill: false,
+                tension: 0.4
+            },
+            {
+                label: 'Arbitrum', 
+                data: data.multi_chain_data.arbitrum.balances,
+                borderColor: '#28A0F0',
+                backgroundColor: 'rgba(40, 160, 240, 0.1)', 
+                fill: false,
+                tension: 0.4
+            },
+            {
+                label: 'Optimism',
+                data: data.multi_chain_data.optimism.balances,
+                borderColor: '#FF0420',
+                backgroundColor: 'rgba(255, 4, 32, 0.1)',
+                fill: false,
+                tension: 0.4
+            },
+            {
+                label: 'Polygon',
+                data: data.multi_chain_data.polygon.balances,
+                borderColor: '#8247E5',
+                backgroundColor: 'rgba(130, 71, 229, 0.1)',
+                fill: false,
+                tension: 0.4
+            }
+        ];
+        portfolioChart.update('none');
+        
+        showNotification(`Updated ${data.timeframe} - tracking ${data.summary.chains_tracked} chains (${data.summary.change_percent}% change)`, 'success');
+    }
+    
+    if (activityChart && data.multi_chain_data) {
+        // Update on-chain transaction volume chart
+        activityChart.data.labels = data.labels;
+        activityChart.data.datasets = [
+            {
+                label: 'Ethereum Volume',
+                data: data.multi_chain_data.ethereum.volume,
+                backgroundColor: '#627EEA',
+                borderRadius: 4
+            },
+            {
+                label: 'Arbitrum Volume',
+                data: data.multi_chain_data.arbitrum.volume,
+                backgroundColor: '#28A0F0',
+                borderRadius: 4
+            },
+            {
+                label: 'Optimism Volume',
+                data: data.multi_chain_data.optimism.volume,
+                backgroundColor: '#FF0420',
+                borderRadius: 4
+            },
+            {
+                label: 'Polygon Volume',
+                data: data.multi_chain_data.polygon.volume,
+                backgroundColor: '#8247E5',
+                borderRadius: 4
+            }
+        ];
+        activityChart.options.scales.y.ticks.callback = function(value) {
+            return '$' + (value / 1000).toFixed(0) + 'K';
+        };
+        activityChart.update('none');
     }
 }
 
@@ -277,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const timeframe = e.target.textContent.trim();
             const caseId = e.target.dataset.caseId;
-            switchTimeframe(timeframe, caseId);
+            switchTimeframe(timeframe, caseId, e.target);
         }
         
         // Handle action buttons
