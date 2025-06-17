@@ -23,9 +23,9 @@ build/
 staticfiles/
 media/
 *.sqlite3
-*.db
-portfolio.db
 db.sqlite3
+# Keep portfolio.db for deployment
+# portfolio.db
 
 # Logs
 logs/

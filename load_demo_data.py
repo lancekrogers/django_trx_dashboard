@@ -22,28 +22,31 @@ def load_demo_data():
     user_count = User.objects.count()
     print(f"Current users: {user_count}")
     
-    # Always generate fresh demo data for consistent experience
-    print("Generating fresh demo data...")
-    
-    try:
-        # Generate all demo data
-        print("1. Generating users and wallets...")
-        call_command('generate_mock_data', '--superusers', '1', '--users', '5', '--transactions', '100')
-        print("✓ Users and wallets created")
+    # Only generate data if database is empty (fresh deployment)
+    if user_count == 0:
+        print("Empty database detected. Generating fresh demo data...")
         
-        print("2. Generating investigation cases...")
-        call_command('generate_investigation_data')
-        print("✓ Investigation cases created")
-        
-        print("3. Generating portfolio cases...")
-        call_command('generate_portfolio_cases')
-        print("✓ Portfolio cases created")
-        
-        print("Demo data generated successfully!")
-    except Exception as e:
-        print(f"Error generating demo data: {e}")
-        import traceback
-        traceback.print_exc()
+        try:
+            # Generate all demo data
+            print("1. Generating users and wallets...")
+            call_command('generate_mock_data', '--superusers', '1', '--users', '5', '--transactions', '100')
+            print("✓ Users and wallets created")
+            
+            print("2. Generating investigation cases...")
+            call_command('generate_investigation_data')
+            print("✓ Investigation cases created")
+            
+            print("3. Generating portfolio cases...")
+            call_command('generate_portfolio_cases')
+            print("✓ Portfolio cases created")
+            
+            print("Demo data generated successfully!")
+        except Exception as e:
+            print(f"Error generating demo data: {e}")
+            import traceback
+            traceback.print_exc()
+    else:
+        print(f"Database already has {user_count} users. Skipping data generation.")
     
     # Ensure admin user exists
     if not User.objects.filter(email='admin@example.com').exists():

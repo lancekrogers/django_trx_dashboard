@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Render build script with demo data
+# Render build script
 
 set -o errexit
 
@@ -16,14 +16,7 @@ source .venv/bin/activate
 # Collect static files
 python manage.py collectstatic --no-input --clear
 
-# Run migrations
-python manage.py migrate
+# Run migrations (in case of model changes)
+python manage.py migrate --run-syncdb
 
-# Load demo data
-echo "Loading demo data..."
-python load_demo_data.py
-
-# Quick database check
-echo "Checking database..."
-python check_db.py
-
+echo "Build complete! Using pre-populated SQLite database."
