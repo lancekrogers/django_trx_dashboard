@@ -682,11 +682,15 @@ def htmx_case_detail(request, case_id):
         count = max(1, base_count + variance)
         timeline_data.append(count)
     
+    # Get recent transactions for case wallets
+    recent_transactions = transactions.select_related('wallet').order_by('-timestamp')[:10]
+    
     import json
     
     context = {
         "case": case,
         "case_wallets": case_wallets,
+        "recent_transactions": recent_transactions,
         "transaction_count": transaction_count,
         "total_value": total_value,
         "suspicious_count": suspicious_count,

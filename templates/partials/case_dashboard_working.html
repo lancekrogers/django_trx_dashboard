@@ -36,6 +36,7 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
             </div>
             
             <div class="flex space-x-3">
+                {% if user.is_authenticated %}
                 <button 
                     hx-get="{% url 'htmx:add_wallet_to_case_form' case.id %}"
                     hx-target="#modal-container"
@@ -44,6 +45,13 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
                     class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                     + Add Wallet
                 </button>
+                {% else %}
+                <button 
+                    onclick="showNotification('This is a demo - account functions are disabled', 'info'); return false;"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    + Add Wallet
+                </button>
+                {% endif %}
                 <button 
                     hx-post="{% url 'htmx:export_case_data' case.id %}"
                     hx-target="#modal-container"
@@ -132,7 +140,7 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
                 <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-white">Multi-Chain Wallet Balance Tracking</h3>
+                    <h3 class="text-xl font-bold text-white">Multi-Chain Money Flow (Inflow vs Outflow)</h3>
                     <div class="flex space-x-2">
                         <button class="timeframe-btn px-3 py-1 bg-blue-600 text-white rounded text-sm" data-case-id="{{ case.id }}" data-timeframe="1M">1M</button>
                         <button class="timeframe-btn px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm hover:bg-gray-600" data-case-id="{{ case.id }}" data-timeframe="5M">5M</button>
@@ -145,10 +153,89 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
             </div>
 
             <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700">
-                <h3 class="text-xl font-bold text-white mb-6">On-Chain Transaction Volume by Chain</h3>
+                <h3 class="text-xl font-bold text-white mb-6">Multi-Wallet On-Chain Transaction Volume</h3>
                 <div class="h-64">
                     <canvas id="activity-chart" width="100%" height="100%"></canvas>
                 </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white">Recent Transactions</h3>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-400 text-sm">Live updates</span>
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="text-left py-3 text-gray-400 font-medium">Time</th>
+                            <th class="text-left py-3 text-gray-400 font-medium">Chain</th>
+                            <th class="text-left py-3 text-gray-400 font-medium">Type</th>
+                            <th class="text-left py-3 text-gray-400 font-medium">From/To</th>
+                            <th class="text-left py-3 text-gray-400 font-medium">Amount</th>
+                            <th class="text-left py-3 text-gray-400 font-medium">Value</th>
+                            <th class="text-left py-3 text-gray-400 font-medium">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-tbody">
+                        {% for tx in recent_transactions %}
+                        <tr class="border-b border-gray-700 hover:bg-gray-700/50 transition-colors">
+                            <td class="py-4">
+                                <span class="text-white text-sm">{{ tx.timestamp|date:"H:i:s" }}</span>
+                            </td>
+                            <td class="py-4">
+                                <span class="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">{{ tx.wallet.chain|upper }}</span>
+                            </td>
+                            <td class="py-4">
+                                <span class="px-2 py-1 {% if tx.transaction_type == 'buy' %}bg-green-500/20 text-green-400{% elif tx.transaction_type == 'sell' %}bg-red-500/20 text-red-400{% else %}bg-blue-500/20 text-blue-400{% endif %} rounded text-xs">
+                                    {{ tx.transaction_type|title }}
+                                </span>
+                            </td>
+                            <td class="py-4">
+                                <p class="text-gray-300 font-mono text-xs">{{ tx.from_address|truncatechars:20 }}</p>
+                            </td>
+                            <td class="py-4">
+                                <p class="text-white">{{ tx.amount|floatformat:4 }} {{ tx.token_symbol }}</p>
+                            </td>
+                            <td class="py-4">
+                                <p class="text-white font-semibold">${{ tx.usd_value|floatformat:2 }}</p>
+                            </td>
+                            <td class="py-4">
+                                <span class="text-green-400 text-sm">✓ Confirmed</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr id="no-transactions-row">
+                            <td colspan="7" class="py-8 text-center text-gray-400">
+                                <div class="flex flex-col items-center">
+                                    <svg class="w-12 h-12 text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                    </svg>
+                                    <p>Waiting for transactions...</p>
+                                    <p class="text-sm text-gray-500 mt-1">Transactions will appear here as they occur</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-4 flex justify-between items-center">
+                <p class="text-gray-400 text-sm">Showing last 10 transactions</p>
+                <a href="{% url 'htmx:case_transactions' case.id %}" 
+                   hx-get="{% url 'htmx:case_transactions' case.id %}"
+                   hx-target="#main-container"
+                   hx-swap="innerHTML"
+                   class="text-blue-400 hover:text-blue-300 text-sm">
+                    View all transactions →
+                </a>
             </div>
         </div>
 
@@ -223,6 +310,28 @@ Investigation Case Dashboard - Clean implementation without infinite chart bug
     </div>
 </div>
 
+<style>
+@keyframes slideInHighlight {
+    0% {
+        transform: translateX(-20px);
+        opacity: 0;
+        background-color: rgba(59, 130, 246, 0.2);
+    }
+    50% {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+        background-color: transparent;
+    }
+}
+
+.new-transaction {
+    animation: slideInHighlight 0.8s ease-out;
+}
+</style>
+
 <script>
 // Chart initialization - SINGLE LOAD PROTECTION
 if (!window.caseChartsInitialized) {
@@ -267,6 +376,14 @@ if (!window.caseChartsInitialized) {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutCubic'
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
                     plugins: {
                         legend: { 
                             display: true,
@@ -285,7 +402,12 @@ if (!window.caseChartsInitialized) {
                             grid: { color: '#374151' }
                         },
                         x: {
-                            ticks: { color: '#9CA3AF' },
+                            ticks: { 
+                                color: '#9CA3AF',
+                                autoSkip: true,
+                                maxTicksLimit: 8,
+                                maxRotation: 0
+                            },
                             grid: { color: '#374151' }
                         }
                     }
@@ -305,7 +427,7 @@ if (!window.caseChartsInitialized) {
                 data: {
                     labels: timelineLabels,
                     datasets: [{
-                        label: 'Transactions',
+                        label: 'Transaction Count',
                         data: timelineData,
                         backgroundColor: '#8B5CF6',
                         borderRadius: 4
@@ -314,12 +436,31 @@ if (!window.caseChartsInitialized) {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutCubic'
+                    },
                     plugins: {
-                        legend: { display: false }
+                        legend: { 
+                            display: true,
+                            labels: { color: '#9CA3AF' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + ' transactions';
+                                }
+                            }
+                        }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Transactions',
+                                color: '#9CA3AF'
+                            },
                             ticks: { 
                                 color: '#9CA3AF',
                                 stepSize: 1
@@ -350,7 +491,7 @@ if (!window.caseChartsInitialized) {
                 const timeframe = this.dataset.timeframe;
                 const caseId = this.dataset.caseId;
                 
-                console.log('Timeframe button clicked:', timeframe, caseId);
+                // Timeframe button clicked
                 
                 // Update active state
                 document.querySelectorAll('.timeframe-btn').forEach(b => {
@@ -360,12 +501,12 @@ if (!window.caseChartsInitialized) {
                 this.classList.remove('bg-gray-700', 'text-gray-300');
                 this.classList.add('bg-blue-600', 'text-white');
                 
-                // Fetch new data and update charts
+                // Fetch new data and update charts immediately on timeframe change
                 updateChartsWithTimeframe(caseId, timeframe);
             });
         });
         
-        // Start real-time updates
+        // Start transaction-based updates
         startRealTimeUpdates({{ case.id }});
     }
     
@@ -398,24 +539,96 @@ function updateChartData(simulationData) {
     const portfolioChart = document.getElementById('portfolio-chart');
     const activityChart = document.getElementById('activity-chart');
     
+    // Don't update transactions with every chart update - too fast
+    
     if (portfolioChart && portfolioChart.chartInstance) {
-        // Update portfolio chart with multi-chain data
+        // Update portfolio chart with scrolling effect
+        const chart = portfolioChart.chartInstance;
         const ethereum = simulationData.multi_chain_data.ethereum || {balances: [], volume: []};
         const arbitrum = simulationData.multi_chain_data.arbitrum || {balances: [], volume: []};
         
-        portfolioChart.chartInstance.data.labels = simulationData.labels;
-        portfolioChart.chartInstance.data.datasets[0].data = ethereum.volume.map((v, i) => v + Math.random() * 50000);
-        portfolioChart.chartInstance.data.datasets[1].data = arbitrum.volume.map((v, i) => v + Math.random() * 30000);
-        portfolioChart.chartInstance.update('none'); // No animation for real-time
+        // Get current data
+        const currentLabels = [...chart.data.labels];
+        const currentData0 = [...chart.data.datasets[0].data];
+        const currentData1 = [...chart.data.datasets[1].data];
+        
+        // Generate new data point with timestamp
+        const timestamp = new Date().toLocaleTimeString('en-US', { 
+            hour12: false, 
+            second: '2-digit' 
+        });
+        const newLabel = timestamp;
+        const newValue0 = ethereum.volume[ethereum.volume.length - 1] + Math.random() * 50000;
+        const newValue1 = arbitrum.volume[arbitrum.volume.length - 1] + Math.random() * 30000;
+        
+        // Smooth the new values with previous
+        const smoothedValue0 = currentData0.length > 0 ? 
+            currentData0[currentData0.length - 1] * 0.3 + newValue0 * 0.7 : newValue0;
+        const smoothedValue1 = currentData1.length > 0 ? 
+            currentData1[currentData1.length - 1] * 0.3 + newValue1 * 0.7 : newValue1;
+        
+        // For proper left-to-right scrolling:
+        // Remove oldest data from the left first
+        if (currentLabels.length >= 30) {  // Keep last 30 points
+            currentLabels.shift();
+            currentData0.shift();
+            currentData1.shift();
+        }
+        
+        // Then add new data to the right
+        currentLabels.push(newLabel);
+        currentData0.push(smoothedValue0);
+        currentData1.push(smoothedValue1);
+        
+        // Update chart
+        chart.data.labels = currentLabels;
+        chart.data.datasets[0].data = currentData0;
+        chart.data.datasets[1].data = currentData1;
+        
+        chart.update({
+            duration: 0  // No animation for smooth scrolling
+        });
+        
+        // Don't generate transactions on every chart update
     }
     
     if (activityChart && activityChart.chartInstance) {
-        // Update activity chart with transaction counts
-        const transactionCounts = simulationData.labels.map(() => Math.floor(Math.random() * 20) + 5);
+        // Update activity chart with scrolling effect
+        const chart = activityChart.chartInstance;
         
-        activityChart.chartInstance.data.labels = simulationData.labels;
-        activityChart.chartInstance.data.datasets[0].data = transactionCounts;
-        activityChart.chartInstance.update('none');
+        // Get current data
+        const currentLabels = [...chart.data.labels];
+        const currentData = [...chart.data.datasets[0].data];
+        
+        // Generate new transaction count
+        const newCount = Math.floor(Math.random() * 20) + 5;
+        
+        // Smooth the new value
+        const smoothedCount = currentData.length > 0 ?
+            Math.round(currentData[currentData.length - 1] * 0.4 + newCount * 0.6) : newCount;
+        
+        // For proper left-to-right scrolling:
+        // Remove oldest data from the left first
+        if (currentLabels.length >= 30) {
+            currentLabels.shift();
+            currentData.shift();
+        }
+        
+        // Then add new data to the right with timestamp
+        const timestamp = new Date().toLocaleTimeString('en-US', { 
+            hour12: false, 
+            second: '2-digit' 
+        });
+        currentLabels.push(timestamp);
+        currentData.push(smoothedCount);
+        
+        // Update chart
+        chart.data.labels = currentLabels;
+        chart.data.datasets[0].data = currentData;
+        
+        chart.update({
+            duration: 0  // No animation for smooth scrolling
+        });
     }
     
     // Update summary stats
@@ -436,14 +649,127 @@ function updateChartData(simulationData) {
 
 // Start real-time updates
 function startRealTimeUpdates(caseId) {
-    console.log('Starting real-time updates for case:', caseId);
+    // Starting real-time updates
     
-    // Update every second for real-time effect
-    const updateInterval = setInterval(() => {
-        const activeTimeframe = document.querySelector('.timeframe-btn.bg-blue-600')?.dataset.timeframe || '1M';
-        console.log('Updating charts with timeframe:', activeTimeframe);
-        
-        fetch(`/htmx/cases/${caseId}/chart-data/${activeTimeframe}/`)
+    // Store case ID globally for transaction-triggered updates
+    window.currentCaseId = caseId;
+    
+    // Simulate new transactions every few seconds
+    setInterval(() => {
+        simulateNewTransaction();
+    }, 3000 + Math.random() * 5000); // Random interval between 3-8 seconds
+}
+
+// Update transactions from simulation data
+function updateTransactionsFromSimulation(events) {
+    // Process only new events (check if we've seen them before)
+    if (!window.processedEventTimestamps) {
+        window.processedEventTimestamps = new Set();
+    }
+    
+    events.forEach(event => {
+        if (!window.processedEventTimestamps.has(event.timestamp)) {
+            window.processedEventTimestamps.add(event.timestamp);
+            
+            // Map event type to transaction type
+            const typeMap = {
+                'large_transfer': 'transfer',
+                'mixing_service': 'transfer',
+                'bridge_transaction': 'transfer',
+                'tumbler_activity': 'sell',
+                'multiple_small_transfers': 'buy'
+            };
+            
+            const txType = typeMap[event.type] || 'transfer';
+            const chainMap = {
+                'ethereum': 'ETH',
+                'arbitrum': 'ARB',
+                'optimism': 'OP',
+                'polygon': 'MATIC'
+            };
+            
+            addTransactionToTable({
+                timestamp: new Date(event.timestamp),
+                chain: chainMap[event.chain] || 'ETH',
+                type: txType,
+                amount: event.amount,
+                suspicious: event.suspicious_score > 0.7,
+                description: event.description
+            });
+        }
+    });
+}
+
+// Add a transaction to the table
+function addTransactionToTable(txData) {
+    const tbody = document.getElementById('transactions-tbody');
+    if (!tbody) return;
+    
+    // Remove "no transactions" row if it exists
+    const noTxRow = document.getElementById('no-transactions-row');
+    if (noTxRow) {
+        noTxRow.remove();
+    }
+    
+    const typeClass = txData.type === 'buy' ? 'bg-green-500/20 text-green-400' : 
+                     txData.type === 'sell' ? 'bg-red-500/20 text-red-400' : 
+                     'bg-blue-500/20 text-blue-400';
+    
+    const suspiciousClass = txData.suspicious ? 'border-yellow-500/50' : '';
+    
+    const newRow = document.createElement('tr');
+    newRow.className = `border-b border-gray-700 hover:bg-gray-700/50 transition-colors new-transaction ${suspiciousClass}`;
+    newRow.innerHTML = `
+        <td class="py-4">
+            <span class="text-white text-sm">${txData.timestamp.toLocaleTimeString('en-US', { hour12: false })}</span>
+        </td>
+        <td class="py-4">
+            <span class="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">${txData.chain}</span>
+        </td>
+        <td class="py-4">
+            <span class="px-2 py-1 ${typeClass} rounded text-xs">
+                ${txData.type.charAt(0).toUpperCase() + txData.type.slice(1)}
+                ${txData.suspicious ? '<span class="ml-1 text-yellow-400">⚠</span>' : ''}
+            </span>
+        </td>
+        <td class="py-4">
+            <p class="text-gray-300 font-mono text-xs" title="${txData.description}">
+                0x${Math.random().toString(16).substr(2, 8)}...
+            </p>
+        </td>
+        <td class="py-4">
+            <p class="text-white">${(txData.amount / 1000).toFixed(2)} ETH</p>
+        </td>
+        <td class="py-4">
+            <p class="text-white font-semibold">$${txData.amount.toLocaleString()}</p>
+        </td>
+        <td class="py-4">
+            <span class="text-green-400 text-sm">✓ Confirmed</span>
+        </td>
+    `;
+    
+    // Add animation
+    newRow.style.opacity = '0';
+    tbody.insertBefore(newRow, tbody.firstChild);
+    
+    // Animate in
+    setTimeout(() => {
+        newRow.style.transition = 'opacity 0.5s';
+        newRow.style.opacity = '1';
+    }, 10);
+    
+    // Keep only last 10 transactions
+    while (tbody.children.length > 10) {
+        tbody.removeChild(tbody.lastChild);
+    }
+}
+
+// Update charts based on transaction
+function updateChartsOnTransaction(transaction) {
+    const activeTimeframe = document.querySelector('.timeframe-btn.bg-blue-600')?.dataset.timeframe || '1M';
+    
+    if (window.currentCaseId) {
+        fetch(`/htmx/cases/${window.currentCaseId}/chart-data/${activeTimeframe}/`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -451,11 +777,88 @@ function startRealTimeUpdates(caseId) {
                 }
             })
             .catch(error => {
-                console.error('Real-time update error:', error);
+                console.error('Chart update error:', error);
             });
-    }, 1000);
+    }
+}
+
+// Simulate a new transaction appearing
+function simulateNewTransaction() {
+    const tbody = document.getElementById('transactions-tbody');
+    if (!tbody) return;
     
-    // Store interval ID for cleanup if needed
-    window.chartUpdateInterval = updateInterval;
+    // Remove "no transactions" row if it exists
+    const noTxRow = document.getElementById('no-transactions-row');
+    if (noTxRow) {
+        noTxRow.remove();
+    }
+    
+    // Realistic transaction patterns for investigation
+    const scenarios = [
+        { chain: 'ETH', type: 'transfer', token: 'ETH', amountRange: [5, 50], suspicious: true, desc: 'Large transfer to mixer' },
+        { chain: 'ARB', type: 'transfer', token: 'USDC', amountRange: [1000, 10000], suspicious: false, desc: 'Bridge transfer' },
+        { chain: 'OP', type: 'sell', token: 'ETH', amountRange: [0.5, 5], suspicious: false, desc: 'DEX swap' },
+        { chain: 'MATIC', type: 'buy', token: 'USDT', amountRange: [100, 5000], suspicious: false, desc: 'CEX deposit' },
+        { chain: 'ETH', type: 'transfer', token: 'USDC', amountRange: [10000, 50000], suspicious: true, desc: 'Suspicious large transfer' },
+        { chain: 'ARB', type: 'buy', token: 'ETH', amountRange: [1, 10], suspicious: false, desc: 'DCA purchase' },
+    ];
+    
+    const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+    const amount = (scenario.amountRange[0] + Math.random() * (scenario.amountRange[1] - scenario.amountRange[0])).toFixed(4);
+    const tokenPrice = scenario.token === 'ETH' ? 2500 : scenario.token === 'USDC' || scenario.token === 'USDT' ? 1 : 1;
+    const value = (amount * tokenPrice * (0.98 + Math.random() * 0.04)).toFixed(2);
+    
+    const typeClass = scenario.type === 'buy' ? 'bg-green-500/20 text-green-400' : 
+                     scenario.type === 'sell' ? 'bg-red-500/20 text-red-400' : 
+                     'bg-blue-500/20 text-blue-400';
+    
+    const suspiciousClass = scenario.suspicious ? 'border-l-4 border-yellow-500' : '';
+    
+    const newRow = document.createElement('tr');
+    newRow.className = `border-b border-gray-700 hover:bg-gray-700/50 transition-colors new-transaction ${suspiciousClass}`;
+    newRow.innerHTML = `
+        <td class="py-4 pl-4">
+            <span class="text-white text-sm">${new Date().toLocaleTimeString('en-US', { hour12: false })}</span>
+        </td>
+        <td class="py-4">
+            <span class="px-2 py-1 bg-gray-700 text-gray-300 rounded text-xs">${scenario.chain}</span>
+        </td>
+        <td class="py-4">
+            <span class="px-2 py-1 ${typeClass} rounded text-xs">
+                ${scenario.type.charAt(0).toUpperCase() + scenario.type.slice(1)}
+                ${scenario.suspicious ? '<span class="ml-1 text-yellow-400">⚠</span>' : ''}
+            </span>
+        </td>
+        <td class="py-4">
+            <p class="text-gray-300 font-mono text-xs" title="${scenario.desc}">0x${Math.random().toString(16).substr(2, 8)}...</p>
+        </td>
+        <td class="py-4">
+            <p class="text-white">${amount} ${scenario.token}</p>
+        </td>
+        <td class="py-4">
+            <p class="text-white font-semibold">$${value}</p>
+        </td>
+        <td class="py-4">
+            <span class="text-green-400 text-sm">✓ Confirmed</span>
+        </td>
+    `;
+    
+    // Add animation class
+    newRow.style.opacity = '0';
+    tbody.insertBefore(newRow, tbody.firstChild);
+    
+    // Animate in
+    setTimeout(() => {
+        newRow.style.transition = 'opacity 0.5s';
+        newRow.style.opacity = '1';
+    }, 10);
+    
+    // Keep only last 10 transactions
+    while (tbody.children.length > 10) {
+        tbody.removeChild(tbody.lastChild);
+    }
+    
+    // Update charts when transaction is added
+    updateChartsOnTransaction(scenario);
 }
 </script>

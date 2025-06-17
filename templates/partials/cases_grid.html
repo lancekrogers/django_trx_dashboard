@@ -41,16 +41,12 @@ Investigation Cases Grid - Multi-portfolio dashboard with case management
                 </button>
             {% else %}
                 <button 
-                    hx-get="{% url 'htmx:login' %}"
-                    hx-target="#modal-container"
-                    hx-swap="innerHTML"
+                    onclick="showNotification('This is a demo - sign in is disabled', 'info'); return false;"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                     Sign In
                 </button>
                 <button 
-                    hx-get="{% url 'htmx:register_form' %}"
-                    hx-target="#modal-container"
-                    hx-swap="innerHTML"
+                    onclick="showNotification('This is a demo - account creation is disabled', 'info'); return false;"
                     class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                     Create Account
                 </button>

@@ -143,8 +143,18 @@ class BlockchainSimulator:
         # Time-based trend (smaller scale for seconds)
         trend_factor = 1 + (trend * seconds_elapsed / 3600)
         
-        # Random volatility with higher frequency
-        random_factor = 1 + random.gauss(0, volatility * 0.02)
+        # Random volatility with smoothing
+        if not hasattr(self, '_last_random_factor'):
+            self._last_random_factor = {}
+        
+        if chain_id not in self._last_random_factor:
+            self._last_random_factor[chain_id] = 1.0
+            
+        # Smooth random factor by blending with previous value
+        new_random = 1 + random.gauss(0, volatility * 0.01)
+        smoothing = 0.7  # Higher = smoother
+        random_factor = (self._last_random_factor[chain_id] * smoothing) + (new_random * (1 - smoothing))
+        self._last_random_factor[chain_id] = random_factor
         
         # Fraud pattern influences
         fraud_factor = self._get_fraud_influence(chain_id)
