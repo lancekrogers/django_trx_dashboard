@@ -1,106 +1,102 @@
 {% comment %}
-Investigation Case Form - FrankenUI Modal Form
-Purpose: Create/edit investigation cases using FrankenUI form components
+Investigation Case Form - Simple Modal Form
+Purpose: Create/edit investigation cases without UIkit dependencies
 {% endcomment %}
 
-<div id="case-modal" uk-modal>
-    <div class="uk-modal-dialog uk-modal-body">
-        <button class="uk-modal-close-default" type="button" uk-close></button>
-        
-        <h2 class="uk-modal-title">
-            {% if case %}Edit Case{% else %}Create New Investigation Case{% endif %}
-        </h2>
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold text-white">
+                {% if case %}Edit Case{% else %}Create New Investigation Case{% endif %}
+            </h2>
+            <button onclick="document.getElementById('case-form-modal').innerHTML = ''" 
+                    class="text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
         
         <form 
             hx-post="{% if case %}{% url 'htmx:update_case' case.id %}{% else %}{% url 'htmx:create_case' %}{% endif %}"
             hx-target="#cases-list"
             hx-swap="innerHTML"
-            hx-on::after-request="if(event.detail.successful) UIkit.modal('#case-modal').hide()"
-            class="uk-form-stacked">
+            hx-on::after-request="if(event.detail.successful) document.getElementById('case-form-modal').innerHTML = ''"
+            class="space-y-4">
             
             {% csrf_token %}
             
             <!-- Case Name -->
-            <div class="uk-margin">
-                <label class="uk-form-label" for="case-name">Case Name *</label>
-                <div class="uk-form-controls">
-                    <input 
-                        class="uk-input" 
-                        id="case-name" 
-                        name="name" 
-                        type="text" 
-                        placeholder="Enter case name"
-                        value="{{ case.name|default:'' }}"
-                        required>
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2" for="case-name">Case Name *</label>
+                <input 
+                    class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    id="case-name" 
+                    name="name" 
+                    type="text" 
+                    placeholder="Enter case name"
+                    value="{{ case.name|default:'' }}"
+                    required>
             </div>
             
             <!-- Description -->
-            <div class="uk-margin">
-                <label class="uk-form-label" for="case-description">Description</label>
-                <div class="uk-form-controls">
-                    <textarea 
-                        class="uk-textarea" 
-                        id="case-description" 
-                        name="description" 
-                        rows="3"
-                        placeholder="Brief description of the investigation">{{ case.description|default:'' }}</textarea>
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2" for="case-description">Description</label>
+                <textarea 
+                    class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    id="case-description" 
+                    name="description" 
+                    rows="3"
+                    placeholder="Brief description of the investigation">{{ case.description|default:'' }}</textarea>
             </div>
             
             <!-- Priority -->
-            <div class="uk-margin">
-                <label class="uk-form-label" for="case-priority">Priority</label>
-                <div class="uk-form-controls">
-                    <select class="uk-select" id="case-priority" name="priority">
-                        <option value="low" {% if case.priority == 'low' %}selected{% endif %}>Low</option>
-                        <option value="medium" {% if case.priority == 'medium' or not case %}selected{% endif %}>Medium</option>
-                        <option value="high" {% if case.priority == 'high' %}selected{% endif %}>High</option>
-                        <option value="critical" {% if case.priority == 'critical' %}selected{% endif %}>Critical</option>
-                    </select>
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2" for="case-priority">Priority</label>
+                <select class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="case-priority" name="priority">
+                    <option value="low" {% if case.priority == 'low' %}selected{% endif %}>Low</option>
+                    <option value="medium" {% if case.priority == 'medium' or not case %}selected{% endif %}>Medium</option>
+                    <option value="high" {% if case.priority == 'high' %}selected{% endif %}>High</option>
+                    <option value="critical" {% if case.priority == 'critical' %}selected{% endif %}>Critical</option>
+                </select>
             </div>
             
             {% if case %}
             <!-- Status (only for editing) -->
-            <div class="uk-margin">
-                <label class="uk-form-label" for="case-status">Status</label>
-                <div class="uk-form-controls">
-                    <select class="uk-select" id="case-status" name="status">
-                        <option value="active" {% if case.status == 'active' %}selected{% endif %}>Active</option>
-                        <option value="pending" {% if case.status == 'pending' %}selected{% endif %}>Pending</option>
-                        <option value="completed" {% if case.status == 'completed' %}selected{% endif %}>Completed</option>
-                        <option value="archived" {% if case.status == 'archived' %}selected{% endif %}>Archived</option>
-                    </select>
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2" for="case-status">Status</label>
+                <select class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent" id="case-status" name="status">
+                    <option value="active" {% if case.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="pending" {% if case.status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="completed" {% if case.status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="archived" {% if case.status == 'archived' %}selected{% endif %}>Archived</option>
+                </select>
             </div>
             {% endif %}
             
             <!-- Notes -->
-            <div class="uk-margin">
-                <label class="uk-form-label" for="case-notes">Investigation Notes</label>
-                <div class="uk-form-controls">
-                    <textarea 
-                        class="uk-textarea" 
-                        id="case-notes" 
-                        name="notes" 
-                        rows="4"
-                        placeholder="Investigation notes, findings, leads, etc.">{{ case.notes|default:'' }}</textarea>
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2" for="case-notes">Investigation Notes</label>
+                <textarea 
+                    class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                    id="case-notes" 
+                    name="notes" 
+                    rows="4"
+                    placeholder="Investigation notes, findings, leads, etc.">{{ case.notes|default:'' }}</textarea>
             </div>
             
             <!-- Form Actions -->
-            <div class="uk-margin uk-flex uk-flex-right">
+            <div class="flex justify-end space-x-3 mt-6">
                 <button 
                     type="button" 
-                    class="uk-button uk-button-default uk-margin-small-right"
-                    uk-close>
+                    onclick="document.getElementById('case-form-modal').innerHTML = ''"
+                    class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors">
                     Cancel
                 </button>
                 <button 
                     type="submit" 
-                    class="uk-button uk-button-primary">
-                    <span class="htmx-indicator uk-margin-small-right" uk-spinner="ratio: 0.5"></span>
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                    <span class="htmx-indicator opacity-0">⏳</span>
                     {% if case %}Update Case{% else %}Create Case{% endif %}
                 </button>
             </div>
@@ -109,9 +105,9 @@ Purpose: Create/edit investigation cases using FrankenUI form components
 </div>
 
 <script>
-// Show the modal
-UIkit.modal('#case-modal').show();
-
 // Auto-focus on the name field
-document.getElementById('case-name').focus();
+setTimeout(() => {
+    const nameField = document.getElementById('case-name');
+    if (nameField) nameField.focus();
+}, 100);
 </script>

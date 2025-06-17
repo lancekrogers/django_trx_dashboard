@@ -67,6 +67,11 @@ class Command(BaseCommand):
                 )
 
         self.stdout.write(self.style.SUCCESS("Mock data generated successfully!"))
+        
+        # Also generate investigation cases
+        self.stdout.write("\nGenerating investigation cases...")
+        from django.core.management import call_command
+        call_command('generate_investigation_data', cases=5)
 
     def _create_assets(self):
         """Create mock assets for each chain"""

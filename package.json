@@ -15,6 +15,27 @@
     "tailwindcss": "^3.4.0"
   },
   "dependencies": {
-    "franken-ui": "2.0.0"
-  }
+    "alpinejs": "^3.14.9",
+    "chart.js": "^4.5.0",
+    "franken-ui": "2.0.0",
+    "htmx.org": "^1.9.12",
+    "lightweight-charts": "^5.0.7"
+  },
+  "main": "tailwind.config.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lancekrogers/django_trx_dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lancekrogers/django_trx_dashboard/issues"
+  },
+  "homepage": "https://github.com/lancekrogers/django_trx_dashboard#readme"
 }

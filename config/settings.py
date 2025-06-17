@@ -179,6 +179,14 @@ CORS_ALLOW_HEADERS = [
 # Django-HTMX Configuration
 DJANGO_HTMX_USE_CDN = False  # Use bundled HTMX instead of CDN
 
+# Content Security Policy for ApexCharts
+# Allow unsafe-eval for chart libraries (development only)
+if DEBUG:
+    SECURE_CONTENT_TYPE_NOSNIFF = False
+    SECURE_BROWSER_XSS_FILTER = False
+    # Disable CSP in development to allow chart libraries
+    CSP_DEFAULT_SRC = None
+
 # Logging Configuration
 LOG_DIR = BASE_DIR / "logs"
 LOG_DIR.mkdir(exist_ok=True)

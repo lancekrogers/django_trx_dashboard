@@ -10,6 +10,5 @@ from . import views
 urlpatterns = [
     path("", views.home_view, name="home"),
     path("dashboard/", views.htmx_dashboard, name="dashboard"),
-    path("login/", lambda request: render(request, "login.html"), name="login"),
-    path("welcome/", lambda request: render(request, "welcome.html"), name="welcome"),
+    path("login/", lambda request: render(request, "forms/login.html"), name="login"),
 ]

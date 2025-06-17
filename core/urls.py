@@ -36,4 +36,23 @@ urlpatterns = [
     path("portfolio/summary/", views.htmx_portfolio_summary, name="portfolio_summary"),
     # Transactions
     path("transactions/", views.htmx_transactions, name="transactions"),
+    # Investigation Cases
+    path("cases/", views.htmx_cases_list, name="cases_list"),
+    path("cases/create/form/", views.htmx_create_case_form, name="create_case_form"),
+    path("cases/create/", views.htmx_create_case, name="create_case"),
+    path("cases/<int:case_id>/edit/form/", views.htmx_edit_case_form, name="edit_case_form"),
+    path("cases/<int:case_id>/update/", views.htmx_update_case, name="update_case"),
+    path("cases/<int:case_id>/archive/", views.htmx_archive_case, name="archive_case"),
+    path("cases/<int:case_id>/", views.htmx_case_detail, name="case_detail"),
+    path("cases/<int:case_id>/transactions/", views.htmx_case_transactions, name="case_transactions"),
+    path("cases/<int:case_id>/wallet-analysis/", views.htmx_case_wallet_analysis, name="case_wallet_analysis"),
+    path("cases/<int:case_id>/suspicious-patterns/", views.htmx_case_suspicious_patterns, name="case_suspicious_patterns"),
+    path("cases/<int:case_id>/update-notes/", views.htmx_update_case_notes, name="update_case_notes"),
+    path("cases/<int:case_id>/add-wallet/", views.htmx_add_wallet_to_case, name="add_wallet_to_case"),
+    path("cases/<int:case_id>/add-wallet/form/", views.htmx_add_wallet_to_case_form, name="add_wallet_to_case_form"),
+    path("cases/<int:case_id>/export/", views.htmx_export_case_data, name="export_case_data"),
+    path("cases/<int:case_id>/report/", views.htmx_generate_case_report, name="generate_case_report"),
+    path("cases/<int:case_id>/chart-data/<str:timeframe>/", views.htmx_chart_data, name="chart_data"),
+    # Quick case access by pattern
+    path("case-by-name/<str:pattern>/", views.htmx_case_by_pattern, name="case_by_pattern"),
 ]

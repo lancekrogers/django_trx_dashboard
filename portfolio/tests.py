@@ -318,7 +318,7 @@ class PortfolioViewsTestCase(TestCase):
             'assets': []
         }
         
-        response = self.client.get("/htmx/portfolio/summary/")
+        response = self.client.get("/htmx/portfolio/summary/", HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "partials/portfolio_summary.html")
 

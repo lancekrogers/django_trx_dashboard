@@ -116,7 +116,7 @@ class HTMXViewsTestCase(TestCase):
         self.client.login(email="test@example.com", password="testpass123")
         response = self.client.get("/htmx/dashboard/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "dashboard.html")
+        self.assertTemplateUsed(response, "partials/dashboard_content.html")
 
 
 class HTMXHeaderTestCase(TestCase):

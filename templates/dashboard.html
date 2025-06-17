@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Include the investigation cases dashboard -->
-{% include "partials/investigation_cases.html" %}
+{% if case %}
+    <!-- Include the working dashboard with Chart.js -->
+    {% include "partials/case_dashboard_working.html" %}
+{% elif show_cases_list %}
+    <!-- Show cases list if no specific case -->
+    {% include "partials/cases_grid.html" %}
+{% elif show_dashboard_content %}
+    <!-- Show dashboard content with portfolio summary -->
+    {% include "partials/dashboard_content.html" %}
+{% else %}
+    <!-- Fallback content -->
+    <div class="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold mb-4">Welcome to Portfolio Dashboard</h1>
+            <p class="text-gray-400 mb-8">Your investigation cases will appear here.</p>
+            <a href="{% url 'htmx:cases_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                View Cases
+            </a>
+        </div>
+    </div>
+{% endif %}
 {% endblock %}

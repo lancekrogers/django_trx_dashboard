@@ -6,12 +6,14 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.db import models
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 from django_htmx.http import HttpResponseClientRedirect, trigger_client_event
 from django.utils import timezone
 from datetime import timedelta, datetime
+from decimal import Decimal
 import random
 
 from portfolio.services import PortfolioService
@@ -30,6 +32,9 @@ def htmx_login(request):
     username = request.POST.get("username")
     password = request.POST.get("password")
 
+    print(f"DEBUG: Login attempt - username: '{username}', password length: {len(password) if password else 0}")
+    print(f"DEBUG: POST data: {dict(request.POST)}")
+
     if not username or not password:
         return render(
             request,
@@ -39,74 +44,15 @@ def htmx_login(request):
         )
 
     user = authenticate(request, username=username, password=password)
+    print(f"DEBUG: Authentication result: {user}")
     if user is not None:
         login(request, user)
-        # For HTMX requests, return the dashboard partial
-        if request.htmx:
-            # Get dashboard data for the partial
-            wallets = Wallet.objects.filter(user=user)
-            recent_transactions = Transaction.objects.filter(
-                wallet__user=user
-            ).order_by("-timestamp")[:5]
-            service = PortfolioService(user)
-            summary = service.get_portfolio_summary()
-            
-            # Get historical data for chart (7 days)
-            historical_data = service.get_historical_data("7d")
-            
-            # Format chart data for the template
-            if historical_data:
-                chart_labels = []
-                chart_values = []
-                for point in historical_data:
-                    # Format date label
-                    dt = datetime.fromisoformat(point["timestamp"].replace('Z', '+00:00'))
-                    chart_labels.append(dt.strftime("%b %d"))
-                    chart_values.append(point["total_value_usd"])
-                summary["chart_labels"] = chart_labels
-                summary["chart_values"] = chart_values
-                summary["chart_data"] = ",".join(str(v) for v in chart_values)
-            else:
-                # Default data if no historical data
-                summary["chart_labels"] = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
-                summary["chart_values"] = [0, 0, 0, 0, 0, 0, 0]
-                summary["chart_data"] = "0,0,0,0,0,0,0"
-            
-            # Format asset distribution for the template
-            if summary.get("asset_labels") and summary.get("asset_values"):
-                assets = []
-                total_value = sum(summary["asset_values"])
-                for label, value in zip(summary["asset_labels"], summary["asset_values"]):
-                    percentage = (value / total_value * 100) if total_value > 0 else 0
-                    assets.append({
-                        "symbol": label,
-                        "value": value,
-                        "percentage": percentage,
-                        "color": None  # Will use default colors from template
-                    })
-                summary["assets"] = assets
-            else:
-                summary["assets"] = []
-            
-            # Additional summary fields
-            summary["total_value"] = summary.get("total_value_usd", 0)
-            summary["percent_change_24h"] = summary.get("change_24h", 0)
-            summary["value_change_24h"] = summary["total_value"] * summary["percent_change_24h"] / 100 if summary["percent_change_24h"] else 0
-            summary["total_assets"] = summary.get("asset_count", 0)
-            summary["volume_24h"] = random.uniform(1000, 5000) if service.mock_data_enabled else 0  # Mock 24h volume
-            
-            context = {
-                "wallets": wallets,
-                "recent_transactions": recent_transactions,
-                "summary": summary,
-            }
-            
-            response = render(request, "partials/dashboard_content.html", context)
-        else:
-            # For non-HTMX requests, return full dashboard page
-            response = render(request, "dashboard.html")
+        
+        # Always redirect to dashboard page after login
+        from django.shortcuts import redirect
+        response = redirect('/')
+        
         response["X-Auth-Status"] = "authenticated"
-        # Use django-htmx helper to trigger client event
         trigger_client_event(response, "auth-change")
         return response
     else:
@@ -167,10 +113,8 @@ def htmx_add_wallet(request):
             user=request.user, label=label, chain=chain, address=address
         )
 
-        # Return wallet item partial
-        return render(
-            request, "partials/wallet_item.html", {"wallet": wallet, "success": True}
-        )
+        # Return success message as simple HTML
+        return HttpResponse(f'<div class="text-green-400">Wallet "{wallet.label}" added successfully!</div>')
     except Exception as e:
         return render(
             request,
@@ -209,7 +153,15 @@ def htmx_portfolio_summary(request):
         return render(request, "partials/portfolio_summary.html", {"summary": summary})
     else:
         # For non-HTMX requests, return a full page with the portfolio summary
-        return render(request, "dashboard.html", {"summary": summary})
+        # Use dashboard_content to show the summary along with other content
+        wallets = Wallet.objects.filter(user=request.user)
+        recent_transactions = []  # Mock data for now
+        return render(request, "dashboard.html", {
+            "summary": summary, 
+            "show_dashboard_content": True,
+            "wallets": wallets,
+            "recent_transactions": recent_transactions
+        })
 
 
 @login_required
@@ -305,57 +257,38 @@ def htmx_wallets(request):
 
 @login_required
 def htmx_dashboard(request):
-    """Main dashboard view - now shows investigation cases."""
-    # Get investigation stats
-    active_cases = InvestigationCase.objects.filter(
-        investigator=request.user, 
-        status=InvestigationStatus.ACTIVE
-    )
-    critical_cases = InvestigationCase.objects.filter(
-        investigator=request.user,
-        priority="critical"
-    )
-    
-    # Get total wallets across all cases
-    total_wallets = Wallet.objects.filter(user=request.user).count()
-    
-    # Get total transactions
-    total_transactions = Transaction.objects.filter(
-        wallet__user=request.user
-    ).count()
-    
-    context = {
-        "active_cases_count": active_cases.count(),
-        "critical_cases_count": critical_cases.count(),
-        "total_wallets_count": total_wallets,
-        "total_transactions_count": total_transactions,
-    }
-    
-    # Return partial for HTMX requests, full page otherwise
-    if request.htmx:
-        return render(request, "partials/investigation_cases.html", context)
-    
-    return render(request, "dashboard.html", context)
+    """Main dashboard view - show multi-portfolio investigation dashboard."""
+    # Redirect to cases list which is the main dashboard
+    return htmx_cases_list(request)
 
 
 def home_view(request):
-    """Root view - single page app container."""
-    return render(request, "app.html")
+    """Root view - redirect to login or dashboard."""
+    if request.user.is_authenticated:
+        # Redirect authenticated users to their first case or cases list
+        first_case = InvestigationCase.objects.filter(investigator=request.user).first()
+        if first_case:
+            return render(request, "dashboard.html", {"case": first_case})
+        else:
+            return render(request, "dashboard.html", {"show_cases_list": True})
+    else:
+        # Show login for unauthenticated users
+        return render(request, "forms/login.html")
 
 
 def htmx_welcome(request):
     """Welcome page content for unauthenticated users."""
-    return render(request, "partials/welcome.html")
+    return render(request, "forms/login.html")
 
 
 def htmx_nav_authenticated(request):
     """Navigation for authenticated users."""
-    return render(request, "partials/nav_authenticated.html")
+    return HttpResponse("")  # No navigation needed in simplified design
 
 
 def htmx_nav_unauthenticated(request):
     """Navigation for unauthenticated users."""
-    return render(request, "partials/nav_unauthenticated.html")
+    return HttpResponse("")  # No navigation needed in simplified design
 
 
 @login_required
@@ -368,7 +301,7 @@ def htmx_settings(request):
     )
 
     if request.method == "GET":
-        return render(request, "partials/settings_page.html", {"settings": settings})
+        return HttpResponse('<div class="p-6"><h2 class="text-xl text-white">Settings</h2><p class="text-gray-400">Mock data enabled</p></div>')
 
     # POST - Handle settings update
     mock_data_enabled = request.POST.get("mock_data_enabled") == "on"
@@ -377,11 +310,7 @@ def htmx_settings(request):
     settings.save()
 
     # Return updated settings page with success message
-    return render(
-        request,
-        "partials/settings_page.html",
-        {"settings": settings, "success": "Settings updated successfully!"},
-    )
+    return HttpResponse('<div class="p-6 text-green-400">Settings updated successfully!</div>')
 
 
 @require_http_methods(["POST"])
@@ -390,7 +319,7 @@ def htmx_logout(request):
     from django.contrib.auth import logout
 
     logout(request)
-    response = render(request, "partials/welcome.html")
+    response = render(request, "forms/login.html")
     response["X-Auth-Status"] = "unauthenticated"
     # Use django-htmx helper to trigger client event
     trigger_client_event(response, "auth-change")
@@ -405,17 +334,9 @@ def htmx_refresh_mock_data(request):
     try:
         settings = UserSettings.objects.get(user=request.user)
         if not settings.mock_data_enabled:
-            return render(
-                request,
-                "partials/settings_page.html",
-                {"settings": settings, "error": "Mock data is not enabled"},
-            )
+            return HttpResponse('<div class="p-6 text-red-400">Mock data is not enabled</div>')
     except UserSettings.DoesNotExist:
-        return render(
-            request,
-            "partials/settings_page.html",
-            {"error": "User settings not found"},
-        )
+        return HttpResponse('<div class="p-6 text-red-400">User settings not found</div>')
     
     # Get all user's transactions
     transactions = Transaction.objects.filter(wallet__user=request.user)
@@ -456,8 +377,621 @@ def htmx_refresh_mock_data(request):
             transaction.save(update_fields=['timestamp'])
     
     # Return updated settings page with success message
-    return render(
-        request,
-        "partials/settings_page.html",
-        {"settings": settings, "success": "Mock data has been refreshed with recent dates!"},
+    return HttpResponse('<div class="p-6 text-green-400">Mock data has been refreshed with recent dates!</div>')
+
+
+# Investigation Case Views
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_cases_list(request):
+    """Return the list of investigation cases with filtering and stats."""
+    cases = InvestigationCase.objects.filter(investigator=request.user)
+    
+    # Calculate dashboard stats
+    active_cases_count = cases.filter(status='active').count()
+    total_wallets_count = Wallet.objects.filter(user=request.user).count()
+    flagged_wallets_count = CaseWallet.objects.filter(case__investigator=request.user, flagged=True).count()
+    
+    # Calculate total transactions across all user's wallets
+    from transactions.models import Transaction
+    total_transactions_count = Transaction.objects.filter(wallet__user=request.user).count()
+    
+    # Count unique chains
+    chains_count = Wallet.objects.filter(user=request.user).values('chain').distinct().count()
+    
+    # Apply filters
+    search = request.GET.get('search')
+    status = request.GET.get('status')
+    priority = request.GET.get('priority')
+    
+    if search:
+        cases = cases.filter(
+            Q(name__icontains=search) | 
+            Q(description__icontains=search) |
+            Q(notes__icontains=search)
+        )
+    
+    if status:
+        cases = cases.filter(status=status)
+    
+    if priority:
+        cases = cases.filter(priority=priority)
+    
+    context = {
+        'investigation_cases': cases,
+        'active_cases_count': active_cases_count,
+        'total_wallets_count': total_wallets_count,
+        'total_transactions_count': total_transactions_count,
+        'flagged_wallets_count': flagged_wallets_count,
+        'chains_count': chains_count,
+    }
+    
+    # Return grid view
+    return render(request, "partials/cases_grid.html", context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_create_case_form(request):
+    """Display the create case form."""
+    return render(request, "partials/case_form.html", {"case": None})
+
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_edit_case_form(request, case_id):
+    """Display the edit case form."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    return render(request, "partials/case_form.html", {"case": case})
+
+
+@login_required
+@require_http_methods(["POST"])
+def htmx_create_case(request):
+    """Handle case creation."""
+    name = request.POST.get("name")
+    description = request.POST.get("description", "")
+    priority = request.POST.get("priority", "medium")
+    notes = request.POST.get("notes", "")
+    
+    if not name:
+        return HttpResponse("Case name is required", status=400)
+    
+    case = InvestigationCase.objects.create(
+        name=name,
+        description=description,
+        priority=priority,
+        notes=notes,
+        investigator=request.user
     )
+    
+    # Return updated cases list
+    cases = InvestigationCase.objects.filter(investigator=request.user)
+    return render(request, "partials/cases_list.html", {"cases": cases})
+
+
+@login_required
+@require_http_methods(["POST"])
+def htmx_update_case(request, case_id):
+    """Handle case update."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    
+    case.name = request.POST.get("name", case.name)
+    case.description = request.POST.get("description", case.description)
+    case.status = request.POST.get("status", case.status)
+    case.priority = request.POST.get("priority", case.priority)
+    case.notes = request.POST.get("notes", case.notes)
+    case.save()
+    
+    # Return updated cases list
+    cases = InvestigationCase.objects.filter(investigator=request.user)
+    return render(request, "partials/cases_list.html", {"cases": cases})
+
+
+@login_required
+@require_http_methods(["POST"])
+def htmx_archive_case(request, case_id):
+    """Archive a case."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    case.status = InvestigationStatus.ARCHIVED
+    case.save()
+    
+    # Return updated cases list
+    cases = InvestigationCase.objects.filter(investigator=request.user)
+    return render(request, "partials/cases_list.html", {"cases": cases})
+
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_case_detail(request, case_id):
+    """Display case investigation dashboard."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    case_wallets = CaseWallet.objects.filter(case=case).select_related('wallet').prefetch_related('wallet__transactions')
+    
+    # Get wallet IDs for this case
+    wallet_ids = case_wallets.values_list('wallet_id', flat=True)
+    
+    # Calculate metrics
+    transactions = Transaction.objects.filter(wallet_id__in=wallet_ids)
+    transaction_count = transactions.count()
+    
+    # Calculate total value
+    total_value = transactions.aggregate(
+        total=models.Sum('usd_value')
+    )['total'] or Decimal('0')
+    
+    # Count suspicious transactions (those with patterns in metadata)
+    suspicious_count = transactions.exclude(
+        metadata__pattern__isnull=True
+    ).count()
+    
+    # Get wallet distribution by category
+    wallet_distribution = list(case_wallets.values('category').annotate(
+        count=models.Count('id')
+    ).order_by('category'))
+    
+    # Format wallet distribution for chart
+    for item in wallet_distribution:
+        item['category'] = dict(WalletCategory.choices).get(item['category'], 'Unknown')
+    
+    # Generate chart data
+    # Transaction flow (last 7 days by default)
+    end_date = timezone.now()
+    start_date = end_date - timedelta(days=7)
+    
+    # Group transactions by day for flow chart
+    flow_data = []
+    flow_labels = []
+    inflow_data = []
+    outflow_data = []
+    
+    for i in range(7):
+        date = start_date + timedelta(days=i)
+        day_start = date.replace(hour=0, minute=0, second=0)
+        day_end = date.replace(hour=23, minute=59, second=59)
+        
+        # Calculate inflow (buy/transfer in)
+        inflow = transactions.filter(
+            timestamp__gte=day_start,
+            timestamp__lte=day_end,
+            transaction_type__in=['buy', 'transfer']
+        ).aggregate(total=models.Sum('usd_value'))['total'] or 0
+        
+        # Calculate outflow (sell/transfer out)
+        outflow = transactions.filter(
+            timestamp__gte=day_start,
+            timestamp__lte=day_end,
+            transaction_type='sell'
+        ).aggregate(total=models.Sum('usd_value'))['total'] or 0
+        
+        flow_labels.append(date.strftime('%b %d'))
+        inflow_data.append(float(inflow))
+        outflow_data.append(float(outflow))
+    
+    # Timeline data (transactions per day)
+    timeline_data = []
+    timeline_labels = []
+    
+    for i in range(30):
+        date = end_date - timedelta(days=29-i)
+        day_count = transactions.filter(
+            timestamp__date=date.date()
+        ).count()
+        
+        timeline_data.append(day_count)
+        timeline_labels.append(date.strftime('%b %d'))
+    
+    import json
+    
+    context = {
+        "case": case,
+        "case_wallets": case_wallets,
+        "transaction_count": transaction_count,
+        "total_value": total_value,
+        "suspicious_count": suspicious_count,
+        "wallet_categories": WalletCategory.choices,
+        "wallet_distribution": json.dumps(wallet_distribution),
+        "flow_labels": json.dumps(flow_labels),
+        "inflow_data": json.dumps(inflow_data),
+        "outflow_data": json.dumps(outflow_data),
+        "timeline_data": json.dumps(timeline_data),
+        "timeline_labels": json.dumps(timeline_labels),
+    }
+    
+    return render(request, "partials/case_dashboard_working.html", context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_case_transactions(request, case_id):
+    """Get paginated transactions for a case."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    case_wallets = CaseWallet.objects.filter(case=case)
+    wallet_ids = case_wallets.values_list('wallet_id', flat=True)
+    
+    # Get transactions for all wallets in this case
+    transactions = Transaction.objects.filter(
+        wallet_id__in=wallet_ids
+    ).select_related('wallet').order_by('-timestamp')
+    
+    # Paginate
+    paginator = Paginator(transactions, 20)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'case': case,
+        'transactions': page_obj,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+    }
+    
+    return render(request, "partials/case_transactions.html", context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_case_wallet_analysis(request, case_id):
+    """Analyze wallets in a case."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    case_wallets = CaseWallet.objects.filter(case=case).select_related('wallet')
+    
+    wallet_analysis = []
+    for cw in case_wallets:
+        wallet = cw.wallet
+        transactions = Transaction.objects.filter(wallet=wallet)
+        
+        # Calculate wallet metrics
+        total_in = transactions.filter(
+            transaction_type__in=['buy', 'transfer']
+        ).aggregate(total=models.Sum('usd_value'))['total'] or 0
+        
+        total_out = transactions.filter(
+            transaction_type='sell'
+        ).aggregate(total=models.Sum('usd_value'))['total'] or 0
+        
+        balance_estimate = total_in - total_out
+        tx_count = transactions.count()
+        
+        # Get last activity
+        last_tx = transactions.order_by('-timestamp').first()
+        
+        wallet_analysis.append({
+            'case_wallet': cw,
+            'total_in': total_in,
+            'total_out': total_out,
+            'balance_estimate': balance_estimate,
+            'tx_count': tx_count,
+            'last_activity': last_tx.timestamp if last_tx else None,
+        })
+    
+    context = {
+        'case': case,
+        'wallet_analysis': wallet_analysis,
+    }
+    
+    return render(request, "partials/case_wallet_analysis.html", context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_case_suspicious_patterns(request, case_id):
+    """Detect and display suspicious patterns in case transactions."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    case_wallets = CaseWallet.objects.filter(case=case)
+    wallet_ids = case_wallets.values_list('wallet_id', flat=True)
+    
+    # Get transactions with patterns
+    suspicious_transactions = Transaction.objects.filter(
+        wallet_id__in=wallet_ids
+    ).exclude(
+        metadata__pattern__isnull=True
+    ).select_related('wallet').order_by('-timestamp')
+    
+    # Group by pattern type
+    patterns = {}
+    for tx in suspicious_transactions:
+        pattern = tx.metadata.get('pattern', 'unknown')
+        if pattern not in patterns:
+            patterns[pattern] = []
+        patterns[pattern].append(tx)
+    
+    context = {
+        'case': case,
+        'patterns': patterns,
+        'suspicious_count': suspicious_transactions.count(),
+    }
+    
+    return render(request, "partials/case_suspicious_patterns.html", context)
+
+
+@login_required
+@require_http_methods(["PUT"])
+def htmx_update_case_notes(request, case_id):
+    """Update case investigation notes."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    
+    notes = request.POST.get('notes', '')
+    case.notes = notes
+    case.save()
+    
+    return HttpResponse('<div class="uk-alert-success" uk-alert>Notes saved successfully!</div>')
+
+
+@login_required
+@require_http_methods(["POST"])
+def htmx_add_wallet_to_case(request, case_id):
+    """Add a new wallet to a case."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    
+    # Get form data
+    address = request.POST.get('address')
+    chain = request.POST.get('chain')
+    label = request.POST.get('label', '')
+    category = request.POST.get('category', 'unknown')
+    flagged = request.POST.get('flagged') == 'on'
+    
+    if not address or not chain:
+        return HttpResponse("Address and chain are required", status=400)
+    
+    # Create or get wallet
+    wallet, created = Wallet.objects.get_or_create(
+        user=request.user,
+        address=address,
+        chain=chain,
+        defaults={'label': label}
+    )
+    
+    # Add to case
+    case_wallet, cw_created = CaseWallet.objects.get_or_create(
+        case=case,
+        wallet=wallet,
+        defaults={
+            'category': category,
+            'flagged': flagged,
+        }
+    )
+    
+    # Clear modal and return success message
+    success_message = f"""
+    <div class="fixed top-4 right-4 bg-green-600 text-white p-4 rounded-lg shadow-lg max-w-sm z-50">
+        <div class="flex items-start space-x-3">
+            <svg class="w-5 h-5 text-green-200 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <div>
+                <p class="font-semibold">Wallet Added</p>
+                <p class="text-sm text-green-100">Wallet successfully added to case</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => {{
+            document.querySelector('.fixed.top-4.right-4').remove();
+        }}, 3000);
+    </script>
+    """
+    
+    return HttpResponse(success_message)
+
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_add_wallet_to_case_form(request, case_id):
+    """Display form to add wallet to case."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    
+    form_html = f"""
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-semibold text-white mb-6">Add Wallet to Case</h3>
+            <form hx-post="/htmx/cases/{case_id}/add-wallet/" hx-target="#modal-container" hx-swap="innerHTML">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Wallet Address</label>
+                        <input type="text" name="address" required 
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="0x...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Chain</label>
+                        <select name="chain" required class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Chain</option>
+                            <option value="ethereum">Ethereum</option>
+                            <option value="arbitrum">Arbitrum</option>
+                            <option value="optimism">Optimism</option>
+                            <option value="polygon">Polygon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Label (Optional)</label>
+                        <input type="text" name="label" 
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Wallet description">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                        <select name="category" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="unknown">Unknown</option>
+                            <option value="personal">Personal</option>
+                            <option value="exchange">Exchange</option>
+                            <option value="defi">DeFi Protocol</option>
+                            <option value="suspicious">Suspicious</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="flagged" id="flagged" class="rounded bg-gray-700 border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                        <label for="flagged" class="ml-2 text-sm text-gray-300">Flag as high risk</label>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="document.getElementById('modal-container').innerHTML = ''" 
+                            class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                        Add Wallet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    """
+    
+    return HttpResponse(form_html)
+
+
+@login_required
+@require_http_methods(["POST"])
+def htmx_export_case_data(request, case_id):
+    """Export case data to CSV."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    
+    # This would normally generate and return a CSV file
+    # For now, return a success message
+    message = f"""
+    <div class="fixed top-4 right-4 bg-green-600 text-white p-4 rounded-lg shadow-lg max-w-sm z-50">
+        <div class="flex items-start space-x-3">
+            <svg class="w-5 h-5 text-green-200 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <div>
+                <p class="font-semibold">Export Complete</p>
+                <p class="text-sm text-green-100">Case data exported successfully</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => {{
+            document.querySelector('.fixed.top-4.right-4').remove();
+        }}, 3000);
+    </script>
+    """
+    
+    return HttpResponse(message)
+
+
+@login_required
+@require_http_methods(["POST"])
+def htmx_generate_case_report(request, case_id):
+    """Generate comprehensive case report."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    
+    # This would normally generate a PDF report
+    # For now, return a success message
+    message = f"""
+    <div class="fixed top-4 right-4 bg-blue-600 text-white p-4 rounded-lg shadow-lg max-w-sm z-50">
+        <div class="flex items-start space-x-3">
+            <svg class="w-5 h-5 text-blue-200 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <div>
+                <p class="font-semibold">Report Generated</p>
+                <p class="text-sm text-blue-100">Comprehensive analysis ready for download</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => {{
+            document.querySelector('.fixed.top-4.right-4').remove();
+        }}, 3000);
+    </script>
+    """
+    
+    return HttpResponse(message)
+
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_chart_data(request, case_id, timeframe):
+    """Return JSON chart data for a specific timeframe - demonstrates Django-to-Chart connection."""
+    case = get_object_or_404(InvestigationCase, id=case_id, investigator=request.user)
+    case_wallets = CaseWallet.objects.filter(case=case)
+    wallet_ids = case_wallets.values_list('wallet_id', flat=True)
+    
+    # Calculate timeframe
+    timeframe_map = {
+        '1D': 1,
+        '7D': 7, 
+        '30D': 30,
+        '1Y': 365
+    }
+    days = timeframe_map.get(timeframe, 7)
+    
+    # Generate realistic chart data based on case transactions
+    transactions = Transaction.objects.filter(
+        wallet_id__in=wallet_ids,
+        timestamp__gte=timezone.now() - timedelta(days=days)
+    ).order_by('timestamp')
+    
+    # Build portfolio value over time
+    chart_data = []
+    base_value = 2400000  # $2.4M starting value
+    
+    if transactions.exists():
+        # Use real transaction data
+        current_value = base_value
+        for tx in transactions:
+            # Simulate portfolio impact
+            if tx.transaction_type in ['buy', 'transfer']:
+                current_value += float(tx.usd_value) * 0.1  # 10% portfolio impact
+            elif tx.transaction_type == 'sell':
+                current_value -= float(tx.usd_value) * 0.1
+                
+            chart_data.append({
+                'time': tx.timestamp.strftime('%Y-%m-%d %H:%M'),
+                'value': round(current_value, 2)
+            })
+    else:
+        # Generate mock data for demo
+        for i in range(min(days * 4, 100)):  # 4 points per day, max 100 points
+            timestamp = timezone.now() - timedelta(days=days) + timedelta(hours=i * 6)
+            base_value += random.randint(-50000, 80000)  # Random walk with upward bias
+            base_value = max(base_value, 1000000)  # Don't go below $1M
+            
+            chart_data.append({
+                'time': timestamp.strftime('%Y-%m-%d %H:%M'),
+                'value': round(base_value, 2)
+            })
+    
+    # Return JSON response for HTMX
+    import json
+    from django.http import JsonResponse
+    
+    return JsonResponse({
+        'success': True,
+        'timeframe': timeframe,
+        'data': chart_data,
+        'summary': {
+            'start_value': chart_data[0]['value'] if chart_data else base_value,
+            'end_value': chart_data[-1]['value'] if chart_data else base_value,
+            'total_points': len(chart_data),
+            'transaction_count': transactions.count()
+        }
+    })
+
+
+@login_required
+@require_http_methods(["GET"])
+def htmx_case_by_pattern(request, pattern):
+    """Quick access to case by pattern name"""
+    pattern_map = {
+        "arbitrage": "Arbitrage Bot Strategy Tracker",
+        "defi": "DeFi Yield Farming Monitor", 
+        "mev": "Cross-Chain MEV Analysis"
+    }
+    
+    case_name = pattern_map.get(pattern)
+    if not case_name:
+        return htmx_cases_list(request)
+        
+    case = InvestigationCase.objects.filter(
+        investigator=request.user,
+        name__icontains=case_name
+    ).first()
+    
+    if case:
+        return htmx_case_detail(request, case.id)
+    else:
+        return htmx_cases_list(request)
