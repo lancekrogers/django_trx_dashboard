@@ -1,0 +1,28 @@
+databases:
+  - name: multichain-db
+    databaseName: multichain_db
+    user: multichain_user
+    plan: free
+
+services:
+  - type: web
+    name: multichain-investigation-dashboard
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: DATABASE_URL
+        fromDatabase:
+          name: multichain-db
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: .onrender.com,localhost,127.0.0.1
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://multichain-investigation-dashboard.onrender.com
+    autoDeploy: false
